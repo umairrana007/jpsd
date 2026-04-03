@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Us - Ethereal Guardian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary": "#0060ac",
+              "error-container": "#ffdad6",
+              "tertiary": "#984721",
+              "surface-container-low": "#f3f3f5",
+              "surface-tint": "#006a65",
+              "on-primary-container": "#003e3b",
+              "on-error-container": "#93000a",
+              "error": "#ba1a1a",
+              "surface": "#f9f9fb",
+              "primary": "#006a65",
+              "on-tertiary-container": "#632200",
+              "inverse-primary": "#59dad1",
+              "surface-container": "#eeeef0",
+              "surface-container-highest": "#e2e2e4",
+              "outline-variant": "#bbc9c7",
+              "on-surface": "#1a1c1d",
+              "primary-container": "#20b2aa",
+              "on-surface-variant": "#3c4948",
+              "surface-variant": "#e2e2e4",
+              "surface-bright": "#f9f9fb",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#00504c",
+              "inverse-on-surface": "#f0f0f2",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary-fixed": "#360f00",
+              "surface-dim": "#d9dadc",
+              "on-secondary-container": "#003e73",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb597",
+              "secondary-container": "#68abff",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-primary-fixed": "#00201e",
+              "background": "#f9f9fb",
+              "tertiary-container": "#e9865b",
+              "on-secondary-fixed-variant": "#004883",
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-high": "#e8e8ea",
+              "primary-fixed-dim": "#59dad1",
+              "on-tertiary": "#ffffff",
+              "outline": "#6c7a78",
+              "on-secondary": "#ffffff",
+              "inverse-surface": "#2f3132",
+              "on-secondary-fixed": "#001c39",
+              "on-background": "#1a1c1d",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#a4c9ff",
+              "primary-fixed": "#79f6ed"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #006a65, #20b2aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-sm">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-black text-teal-700 dark:text-teal-300 tracking-tighter">
+                Ethereal Charity
+            </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-sans font-medium tracking-tight" href="#">Our Mission</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-sans font-medium tracking-tight" href="#">Global Impact</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-sans font-medium tracking-tight" href="#">Programs</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-sans font-medium tracking-tight" href="#">Stories</a>
+<a class="text-teal-700 dark:text-teal-300 border-b-2 border-teal-600 pb-1 font-sans font-medium tracking-tight" href="#">Get Involved</a>
+</div>
+<button class="bg-primary hover:bg-primary-container text-white px-6 py-2 rounded-full font-bold transition-all active:scale-95 duration-200">
+                Donate Now
+            </button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative min-h-[400px] flex items-center justify-center overflow-hidden py-20 px-6">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-20 scale-105" data-alt="Soft morning sunlight filtering through trees in a serene urban park with people walking in the blurred distance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIcElYCfPSmSM2qjXac4pDB8XwwtBPBCaYekR7Ncl2VumNr_ssbic1FAIm9iDZsOfEdRDYbNgN08oE3CN0RZ--fIwlw5_3MnfAUZxGi8Ace_5_XIcvf4yaqBreI--1h9kJj_GVMXqfsSQK8qBJnXbYdX9mTbZNMSsvcwHao6yohlLDyL2FrMgnaE_j2w6Y1yosRdw6xRnsnbxDYR4uxppOzsavhfAkPiDrB7juqmr35z0pUfyZuuyi2eGtHGIMbH8Ci-tQc0EZ9Z0"/>
+<div class="absolute inset-0 bg-gradient-to-b from-surface/0 via-surface/50 to-surface"></div>
+</div>
+<div class="relative z-10 text-center max-w-3xl mx-auto">
+<h1 class="text-5xl md:text-7xl font-black tracking-tighter text-on-surface mb-6">
+                    Get in <span class="text-gradient">Touch</span>
+</h1>
+<p class="text-lg md:text-xl text-on-surface-variant leading-relaxed font-medium">
+                    Your questions, ideas, and support fuel our global mission. Reach out to the Ethereal Guardian team—we're here to listen and collaborate for a better world.
+                </p>
+</div>
+</section>
+<section class="max-w-7xl mx-auto px-6 pb-24">
+<div class="grid lg:grid-cols-12 gap-12 items-start">
+<!-- Contact Form Section -->
+<div class="lg:col-span-7">
+<div class="glass-panel p-8 md:p-12 rounded-[2rem] shadow-2xl shadow-primary/5 border border-white/40">
+<h2 class="text-3xl font-bold mb-8 tracking-tight">Send a Message</h2>
+<form class="space-y-6">
+<div class="grid md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">Full Name</label>
+<input class="w-full px-5 py-4 rounded-2xl bg-white/50 border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="John Doe" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">Email Address</label>
+<input class="w-full px-5 py-4 rounded-2xl bg-white/50 border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="john@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">Subject</label>
+<input class="w-full px-5 py-4 rounded-2xl bg-white/50 border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="How can we help?" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">Message</label>
+<textarea class="w-full px-5 py-4 rounded-2xl bg-white/50 border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-none" placeholder="Tell us more about your inquiry..." rows="5"></textarea>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-white font-bold py-5 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all duration-200">
+                                Send Inquiry
+                            </button>
+</form>
+</div>
+</div>
+<!-- Info Sidebar -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Quick Connect -->
+<div class="bg-surface-container-low p-8 rounded-[2rem]">
+<h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
+                            Quick Connect
+                        </h3>
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
+<a class="flex flex-col items-center justify-center p-6 bg-white rounded-2xl hover:bg-primary-container hover:text-white transition-all group border border-outline-variant/30" href="mailto:hello@etherealguardian.org">
+<span class="material-symbols-outlined text-3xl mb-2 group-hover:scale-110 transition-transform" data-icon="mail">mail</span>
+<span class="text-xs font-bold uppercase tracking-widest">Email</span>
+</a>
+<a class="flex flex-col items-center justify-center p-6 bg-white rounded-2xl hover:bg-[#25D366] hover:text-white transition-all group border border-outline-variant/30" href="https://wa.me/123456789">
+<span class="material-symbols-outlined text-3xl mb-2 group-hover:scale-110 transition-transform" data-icon="chat">chat</span>
+<span class="text-xs font-bold uppercase tracking-widest">WhatsApp</span>
+</a>
+<a class="flex flex-col items-center justify-center p-6 bg-white rounded-2xl hover:bg-secondary hover:text-white transition-all group border border-outline-variant/30" href="#">
+<span class="material-symbols-outlined text-3xl mb-2 group-hover:scale-110 transition-transform" data-icon="share">share</span>
+<span class="text-xs font-bold uppercase tracking-widest">Social</span>
+</a>
+<a class="flex flex-col items-center justify-center p-6 bg-white rounded-2xl hover:bg-tertiary hover:text-white transition-all group border border-outline-variant/30" href="#">
+<span class="material-symbols-outlined text-3xl mb-2 group-hover:scale-110 transition-transform" data-icon="videocam">videocam</span>
+<span class="text-xs font-bold uppercase tracking-widest">Meeting</span>
+</a>
+</div>
+</div>
+<!-- Working Hours -->
+<div class="bg-white border border-outline-variant/20 p-8 rounded-[2rem] shadow-sm">
+<h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+                            Operating Hours
+                        </h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="text-on-surface-variant font-medium">Monday — Friday</span>
+<span class="font-bold">09:00 - 18:00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="text-on-surface-variant font-medium">Saturday</span>
+<span class="font-bold">10:00 - 14:00</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-on-surface-variant font-medium">Sunday</span>
+<span class="text-error font-bold">Closed</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Office Locations Section -->
+<section class="bg-surface-container-low py-24 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="mb-16 text-center">
+<h2 class="text-4xl font-black tracking-tight mb-4">Our Global Presence</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">We operate across three continents to ensure our humanitarian impact reaches those who need it most.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Location 1 -->
+<div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Modern architectural office building in San Francisco with glass facade and clear blue sky reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEW3Z_BWqJZlcEy_qDD-J_unvpaNFAbaf1_qAW8PvGAIBnifmiY5iiqUyunJpjI68KxK_K_mLHkCkWPCdSAx9L17kJGBPPfnDcHUGKHp3JKtVVcDcRqU_TiOw3aJmbF772roNCqj615a-n4MwXBb9dJY3BkcvPQIqXy4Dm9bAX45AuH-GgQboVwBe-jkLo375P6ymcdcsjkQpw0HazMTuPdFCjNa5AAp5KHF_l3xm2JAIbobmJ9DvIfSR5wQZluIHv_D3AqJ6xiLc"/>
+<div class="absolute inset-0 bg-primary/10"></div>
+<div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-1 rounded-full text-xs font-bold uppercase tracking-tighter">HQ - North America</div>
+</div>
+<div class="p-8">
+<h4 class="text-xl font-bold mb-4">San Francisco</h4>
+<p class="text-on-surface-variant mb-6 leading-relaxed">
+                                450 Ethereal Way, Suite 100<br/>
+                                San Francisco, CA 94103
+                            </p>
+<div class="space-y-3 mb-8">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="tel:+14155550123">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+                                    +1 (415) 555-0123
+                                </a>
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+                                    View on Map
+                                </a>
+</div>
+</div>
+</div>
+<!-- Location 2 -->
+<div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Historical and modern fusion building in London, soft evening lighting and cobblestone street" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1XV4rNkZRLYzXEdKRYNq_CTGVXrhUeg8fhhaQzwRXIe1r_H_WHazNMQVYuAw9BZ_b3F-eGZbqlM3lUt4eQ5GtWDE0TCIcQHSLIfkL4rbwPnFrdKb9Z6-VlvTmeviwzfd5-Z8vmpRhKr0NvwH7qR3aJTLKfvLEmNjcfP6mtI1_IGVhRAY6x4kJ1aA8gCgP_twnx41oVMYweffqg3g9AN7DDiLWNjzJhGpgHBi7YUy_vMhcM3CAILXe5VuW-nXyOypa5IdWxaOanQA"/>
+<div class="absolute inset-0 bg-primary/10"></div>
+<div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-1 rounded-full text-xs font-bold uppercase tracking-tighter">Europe Office</div>
+</div>
+<div class="p-8">
+<h4 class="text-xl font-bold mb-4">London</h4>
+<p class="text-on-surface-variant mb-6 leading-relaxed">
+                                12 Guardian Square, Chelsea<br/>
+                                London SW3 4LZ, UK
+                            </p>
+<div class="space-y-3 mb-8">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="tel:+442079460123">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+                                    +44 20 7946 0123
+                                </a>
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+                                    View on Map
+                                </a>
+</div>
+</div>
+</div>
+<!-- Location 3 -->
+<div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Stunning modern skyline of Singapore with lush green rooftop gardens and tropical atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrbJapeZGzGcP_l6SnxN3TlJeD7wCLHqSomuYaZKzWtuJqIxIiRLnCCeTl5IUS7dr8BIkUb8J-DpdbOw0zVhwMoWaUkcpZQQ0C40URm6ewdYr9M6IT0Z8G0xVlyZSpJSA-LLmjTRVnzrPWKGs6oOAGKuazKwcQVNE5dWfyQTndD2J5WMdD489jc5pve7NEepUc-IoLpVI6_LeHHfN6kdcK7mXrOZZ3X8nfrq19So7q4CRdtJbCNVVJNEWDLGup_NlrUAeVM1pPJdM"/>
+<div class="absolute inset-0 bg-primary/10"></div>
+<div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-1 rounded-full text-xs font-bold uppercase tracking-tighter">APAC Regional</div>
+</div>
+<div class="p-8">
+<h4 class="text-xl font-bold mb-4">Singapore</h4>
+<p class="text-on-surface-variant mb-6 leading-relaxed">
+                                88 Marina View, Level 24<br/>
+                                Singapore 018960
+                            </p>
+<div class="space-y-3 mb-8">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="tel:+6567890123">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+                                    +65 6789 0123
+                                </a>
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+                                    View on Map
+                                </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+<div class="max-w-7xl mx-auto px-8 py-12 flex flex-col md:flex-row justify-between items-center">
+<div class="mb-6 md:mb-0">
+<div class="text-lg font-bold text-teal-800 dark:text-teal-200 mb-2">Ethereal Guardian</div>
+<div class="font-sans text-sm text-slate-500 dark:text-slate-400">© 2024 Ethereal Guardian. All rights reserved.</div>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-slate-500 hover:text-teal-600 transition-colors font-sans text-sm hover:underline decoration-teal-500 underline-offset-4" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-teal-600 transition-colors font-sans text-sm hover:underline decoration-teal-500 underline-offset-4" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-teal-600 transition-colors font-sans text-sm hover:underline decoration-teal-500 underline-offset-4" href="#">Annual Report</a>
+<a class="text-slate-500 hover:text-teal-600 transition-colors font-sans text-sm hover:underline decoration-teal-500 underline-offset-4" href="#">Careers</a>
+<a class="text-teal-600 font-semibold font-sans text-sm hover:underline decoration-teal-500 underline-offset-4" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Noto+Nastaliq+Urdu&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f9f9fb",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-tertiary-container": "#632200",
+              "on-primary-fixed": "#00201e",
+              "surface": "#f9f9fb",
+              "primary-fixed": "#79f6ed",
+              "tertiary-fixed-dim": "#ffb597",
+              "on-secondary-fixed-variant": "#004883",
+              "on-primary-fixed-variant": "#00504c",
+              "secondary-container": "#68abff",
+              "primary": "#006a65",
+              "outline-variant": "#bbc9c7",
+              "on-surface-variant": "#3c4948",
+              "primary-fixed-dim": "#59dad1",
+              "tertiary-container": "#e9865b",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#59dad1",
+              "on-surface": "#1a1c1d",
+              "surface-container": "#eeeef0",
+              "on-primary": "#ffffff",
+              "primary-container": "#20b2aa",
+              "error-container": "#ffdad6",
+              "secondary": "#0060ac",
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "on-secondary-fixed": "#001c39",
+              "inverse-surface": "#2f3132",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "error": "#ba1a1a",
+              "surface-dim": "#d9dadc",
+              "surface-container-low": "#f3f3f5",
+              "on-tertiary-fixed": "#360f00",
+              "on-background": "#1a1c1d",
+              "surface-container-high": "#e8e8ea",
+              "on-secondary-container": "#003e73",
+              "tertiary": "#984721",
+              "outline": "#6c7a78",
+              "background": "#f9f9fb",
+              "surface-variant": "#e2e2e4",
+              "surface-tint": "#006a65",
+              "inverse-on-surface": "#f0f0f2",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary-container": "#003e3b"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #006a65 0%, #20b2aa 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-teal-800 dark:text-teal-200">
+                Ethereal Guardian
+            </div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="font-sans tracking-tight font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors" href="#">Our Mission</a>
+<a class="font-sans tracking-tight font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors" href="#">Impact</a>
+<a class="font-sans tracking-tight font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors" href="#">Reports</a>
+<a class="font-sans tracking-tight font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors" href="#">Transparency</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-white/10 p-2 rounded-full transition-all">language</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-white/10 p-2 rounded-full transition-all">search</span>
+<button class="signature-gradient text-white px-6 py-2 rounded-full font-medium text-sm shadow-lg shadow-primary/20 hover:scale-95 transition-transform duration-200 active:scale-90">Donate</button>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20">
+<!-- Section 1: The Lumina Story -->
+<section class="max-w-7xl mx-auto px-8 py-20 lg:py-32">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-7">
+<span class="text-primary font-bold tracking-widest text-xs uppercase mb-4 block">Our Origin</span>
+<h1 class="font-headline text-5xl lg:text-7xl font-extrabold tracking-tighter text-on-surface mb-8 leading-none">The Lumina Story</h1>
+<div class="space-y-6 text-on-surface-variant text-lg leading-relaxed">
+<p>Founded in 2008 by Dr. Elias Thorne, Ethereal Guardian emerged from a simple realization: that the world's most vulnerable ecosystems were being lost not through lack of care, but through a lack of focused, transparent stewardship. Our history is a journey of turning quiet intentions into global resonance.</p>
+<p>Lumina was our first project—a restored coastal wetland that became the blueprint for our founding principles: Radical Transparency, Adaptive Resilience, and Ecosystem Sovereignty. We don't just protect land; we empower the silent rhythms of nature to heal themselves under our watchful guidance.</p>
+</div>
+<div class="mt-12 grid grid-cols-2 gap-8">
+<div class="border-l-4 border-primary-container pl-6">
+<div class="text-4xl font-black text-primary mb-1">16+</div>
+<div class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Years of Impact</div>
+</div>
+<div class="border-l-4 border-secondary-container pl-6">
+<div class="text-4xl font-black text-secondary mb-1">4.2M</div>
+<div class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Hectares Guarded</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl rotate-2 transition-transform hover:rotate-0 duration-500">
+<img class="w-full h-full object-cover" data-alt="Stunning aerial view of a vibrant green river delta meeting the turquoise ocean with ethereal soft morning mist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw1KbPUtcQXJig4Inh-pq7B72vx-fk4Luh6Va25dRAmlkgRO027_kBU-8hBtCipHDSxQIkBA1vl-yaPQG6oVP4WSmL9QA_R15Xhj2nTYoLR28rgXXsYF9qTdotiFygDwJDpdXwElNYgDQ_b0770speCAgja1E7PMpiywjZUZESqJFqTF8jFaFOytFwX9AeeJuTwVryV_wmpNrQSKKoBruNhiZ7oCNkpV_V9_vQRjIn6NHrDjFz5Eff4QvmQY5RsRvTgD18TTBK67w"/>
+</div>
+<div class="absolute -bottom-10 -left-10 glass-panel p-8 rounded-xl shadow-xl max-w-xs -rotate-3">
+<p class="italic text-on-surface font-medium">"Our mission is to be the silent bridge between human ambition and planetary survival."</p>
+<p class="text-primary text-xs font-bold mt-4 uppercase">— Dr. Elias Thorne</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: The Guardians -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div>
+<h2 class="font-headline text-4xl font-bold tracking-tight text-on-surface mb-4">The Guardians</h2>
+<p class="text-on-surface-variant max-w-xl text-lg">Led by visionaries in ecology, finance, and ethics, our leadership team ensures every donation is transformed into lasting planetary change.</p>
+</div>
+<button class="border-2 border-outline-variant text-on-surface-variant px-8 py-3 rounded-full font-bold hover:bg-surface-container-high transition-all text-sm uppercase tracking-widest">Join the Mission</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+<!-- Leader 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+<div class="h-80 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Professional portrait of a middle-aged woman with silver hair and warm eyes wearing a teal linen blazer in a bright office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_LeiE4Ymj8Y8_n5xdEQ1CLO7Bpsx6xAbO41wJVZT4pf6ljt5f8YGO8cu4DvcPbcJf4ma_tfXeRDFUG79GAQA6bKNTFEC0t5mOZd851lMFpzYkciFJ-ECKHItPokdAoqZsTF9XigC1Gh2enY8bjlMRo5RzCtyP7RlkLn4XGYxd_WE8M1vz0w_-u5jDrYVYGnpx3TlcVRADx8r36UTXsGksTeCJnnqmsgPNjSkEPXEmYhe1QLsA7ggPo8LdzpTH5ygP0B9_t3p04z4"/>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-xl font-bold text-on-surface">Dr. Sarah Vane</h3>
+<p class="text-primary font-medium text-sm mb-4">Chief Conservation Officer</p>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Former UN advisor with 20 years of experience in biodiversity restoration across Southeast Asia and the Amazon Basin.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">alternate_email</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">public</span>
+</div>
+</div>
+</div>
+<!-- Leader 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+<div class="h-80 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Portrait of a young man with glasses and a friendly smile wearing a navy blue turtleneck in a modern library setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJbq1FddfoO5qsD4Zm3KBshG-AB8syT0rNbgWCmXh0aD2ZcbtREWCniTtJ2RIssNeyPLkE6xSbrIODF1l5MMTHTdT6SIJcRmOQereVPrA4hiabnV80KwBH5NCKaQ4dTJWJSgXIrBN52gbqQvnzN7BPSQo61o86R8j97wEF60CJ1NtNwC6-Os0vAskPpVsh5Awj7bvGG1CzkSBHpayKJCEAn8GHb4EGJrpHiO-ETuy-UamPORXcQOdbKxJFFM0oMae1QiNaRm_W5oQ"/>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-xl font-bold text-on-surface">Marcus Thorne</h3>
+<p class="text-primary font-medium text-sm mb-4">Head of Strategic Partnerships</p>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Architect of our 'Ecosystem Bonds' program, bridging the gap between ethical investment and radical reforestation.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">alternate_email</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">public</span>
+</div>
+</div>
+</div>
+<!-- Leader 3 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+<div class="h-80 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Portrait of a woman of color with a confident expression wearing a white silk blouse against a soft bokeh background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeJUNeB7o8cD--d83NaV4zKN48-pScvaA3MEMDLtM8uLrcpy_AIyEjcttpn2mKC2b8jqAfdKZM-hS_Qm0QXl-RmHOTlzz012TFO1m-JJ35rQ75SScCOjrfareT-V-nqC5xgEol-HEn-qvLlyYkw00lNv-O657s4sOHjFQxHdSPtfofwhIQgK4V20pJGmoZJTcQGP28MeN2wKHVLghdDYm4Q002c9ZGf8HwBLqONeFs6ql593McIcaZkpFK2CdOA_skV5rM1nirCnA"/>
+</div>
+<div class="p-8">
+<h3 class="font-headline text-xl font-bold text-on-surface">Elena Rodriguez</h3>
+<p class="text-primary font-medium text-sm mb-4">Director of Global Transparency</p>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Ensuring every cent is accounted for through real-time blockchain tracking and rigorous third-party auditing.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">alternate_email</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">public</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Transparency First -->
+<section class="max-w-7xl mx-auto px-8 py-24">
+<div class="text-center mb-16">
+<h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Transparency First</h2>
+<p class="text-on-surface-variant text-lg">We believe trust is earned through clarity. Access our full financial history and impact metrics below.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<!-- Report Card 1 -->
+<div class="lg:col-span-2 bg-surface-container p-8 rounded-2xl flex flex-col md:flex-row items-center gap-8 border border-white/20">
+<div class="w-32 h-44 bg-slate-900 rounded-lg shadow-xl flex-shrink-0 flex items-center justify-center p-4 text-center">
+<div class="text-white">
+<div class="text-xs font-bold uppercase tracking-widest mb-1">Impact</div>
+<div class="text-3xl font-black">2024</div>
+<div class="w-8 h-1 bg-primary mx-auto mt-4"></div>
+</div>
+</div>
+<div>
+<h4 class="text-xl font-bold mb-2">2024 Annual Impact Report</h4>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Detailed analysis of our project growth, carbon sequestration metrics, and financial disbursement over the last 12 months.</p>
+<button class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">download</span> Download PDF (12.4 MB)
+                        </button>
+</div>
+</div>
+<!-- Report Card 2 -->
+<div class="lg:col-span-2 bg-surface-container p-8 rounded-2xl flex flex-col md:flex-row items-center gap-8 border border-white/20">
+<div class="w-32 h-44 bg-teal-800 rounded-lg shadow-xl flex-shrink-0 flex items-center justify-center p-4 text-center">
+<div class="text-white">
+<div class="text-xs font-bold uppercase tracking-widest mb-1">Audit</div>
+<div class="text-3xl font-black">2023</div>
+<div class="w-8 h-1 bg-secondary mx-auto mt-4"></div>
+</div>
+</div>
+<div>
+<h4 class="text-xl font-bold mb-2">2023 Certified Financial Audit</h4>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Full breakdown of our operational costs and charity-to-impact ratio, verified by independent third-party auditors.</p>
+<button class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">description</span> View Audit Details
+                        </button>
+</div>
+</div>
+</div>
+<div class="mt-20 pt-16 border-t border-outline-variant/30 text-center">
+<p class="text-xs font-bold uppercase tracking-[0.3em] text-on-surface-variant mb-10">Global Trust Certifications</p>
+<div class="flex flex-wrap justify-center items-center gap-12 opacity-60 hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-4xl text-secondary">verified_user</span>
+<div class="text-left">
+<div class="font-bold text-sm leading-none">Charity Navigator</div>
+<div class="text-[10px] uppercase font-medium">100/100 Score</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-4xl text-primary">security</span>
+<div class="text-left">
+<div class="font-bold text-sm leading-none">Guidestar</div>
+<div class="text-[10px] uppercase font-medium">Platinum Transparency</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-4xl text-tertiary">eco</span>
+<div class="text-left">
+<div class="font-bold text-sm leading-none">Global Eco Watch</div>
+<div class="text-[10px] uppercase font-medium">Gold Standard</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Contact Summary -->
+<section class="max-w-7xl mx-auto px-8 mb-24">
+<div class="signature-gradient rounded-[2rem] p-12 lg:p-20 text-white relative overflow-hidden shadow-2xl">
+<div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div>
+<h2 class="font-headline text-4xl font-bold mb-6">Global Headquarters</h2>
+<p class="text-white/80 text-lg mb-10">Connect with our team directly for media inquiries, large-scale partnership proposals, or to visit our Lumina restoration site.</p>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined">location_on</span>
+<div>
+<p class="font-bold">The Guardian House</p>
+<p class="text-white/70">1221 Emerald Corridor, Suite 400<br/>Reykjavík, Iceland 101</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined">mail</span>
+<p class="font-bold">stewardship@etherealguardian.org</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined">call</span>
+<p class="font-bold">+354 555 0192</p>
+</div>
+</div>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 h-80 relative overflow-hidden">
+<img class="w-full h-full object-cover rounded-xl opacity-60" data-alt="Minimalist abstract map of Reykjavik with teal and blue geometric patterns" data-location="Reykjavik" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyyGzSrEftaYyMJjzB9cmcm2rampGOq9YXCDIcpx0rstCZPhYfJWkBxZblOotds9SWCNnJZ4HEpUmORrQNrGuuKbFEM92Bv6yMTpWvJNJLdkZkAjmeXS-10qQsxPqvY0P2VFrGLAdEMFaxnGmAQc-CXd3xuVpn3yXpDKyFpLgizkzMuiTylg8XSlhNeVc6ZI_5nWW3xlMPUM8zjY2H9qu3ttO2DzsZRKptOQ7IGK9EZ9gNCWAG_F0qKqCMfrKGnI0vKBmsVBazjU4"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-white p-3 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Abstract visual elements -->
+<div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-20 -left-20 w-80 h-80 bg-black/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-16 gap-8 max-w-7xl mx-auto">
+<div class="text-xl font-black text-slate-900 dark:text-white">
+                ETHEREAL GUARDIAN
+            </div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-sans text-xs uppercase tracking-widest text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Impact Report 2023</a>
+<a class="font-sans text-xs uppercase tracking-widest text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Financial Transparency</a>
+<a class="font-sans text-xs uppercase tracking-widest text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Privacy Policy</a>
+<a class="font-sans text-xs uppercase tracking-widest text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Terms of Service</a>
+<a class="font-sans text-xs uppercase tracking-widest text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Contact Us</a>
+</div>
+<div class="font-sans text-xs uppercase tracking-widest text-slate-500">
+                © 2024 Ethereal Guardian Foundation. Registered Charity.
+            </div>
+</div>
+</footer>
+</body></html>

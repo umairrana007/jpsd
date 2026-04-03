@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Noto+Nastaliq+Urdu:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#00201e",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#59dad1",
+              "secondary-fixed": "#d4e3ff",
+              "surface-container-low": "#f3f3f5",
+              "on-secondary-fixed": "#001c39",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#003e3b",
+              "on-primary-fixed-variant": "#00504c",
+              "on-tertiary-fixed": "#360f00",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#79300b",
+              "surface-container-lowest": "#ffffff",
+              "background": "#f9f9fb",
+              "surface-container": "#eeeef0",
+              "tertiary-fixed-dim": "#ffb597",
+              "tertiary": "#984721",
+              "surface": "#f9f9fb",
+              "primary-fixed": "#79f6ed",
+              "inverse-on-surface": "#f0f0f2",
+              "inverse-surface": "#2f3132",
+              "surface-variant": "#e2e2e4",
+              "surface-tint": "#006a65",
+              "on-tertiary": "#ffffff",
+              "surface-bright": "#f9f9fb",
+              "outline": "#6c7a78",
+              "on-error-container": "#93000a",
+              "primary": "#006a65",
+              "on-background": "#1a1c1d",
+              "surface-dim": "#d9dadc",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-secondary-container": "#003e73",
+              "primary-container": "#20b2aa",
+              "on-tertiary-container": "#632200",
+              "on-surface-variant": "#3c4948",
+              "inverse-primary": "#59dad1",
+              "secondary-container": "#68abff",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed-variant": "#004883",
+              "tertiary-container": "#e9865b",
+              "outline-variant": "#bbc9c7",
+              "secondary": "#0060ac",
+              "on-surface": "#1a1c1d",
+              "surface-container-high": "#e8e8ea"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "urdu": ["Noto Nastaliq Urdu"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopAppBar from Shared Components -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-6 h-16 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold text-teal-800 dark:text-teal-300">CharityOS</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-6 font-sans text-sm font-medium tracking-tight">
+<a class="text-slate-500 hover:bg-slate-100 transition-colors px-2 py-1 rounded" href="#">Dashboard</a>
+<a class="text-slate-500 hover:bg-slate-100 transition-colors px-2 py-1 rounded" href="#">Volunteers</a>
+<a class="text-teal-700 font-semibold" href="#">Settings</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-500 cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer" data-icon="help_outline">help_outline</span>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a professional male administrator in a modern office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHiPyQRKbZdZ94uNb4Mtxke9Zup30Iwk8iP6sFSTEXaal4CIAVXZCFg0_mJTpmCGI0Vj9n6fNkPZFVSO7ZUYQyb3qMAsmeRgeRTYRtYpwo1OG7h4Weduzv_m3eHSUnweM_5dPm3SjNRaSHmQ7hZ4ySLMZ4IBecfPikWwYGBqg_0dvR1YF2yyycTLrUG9-ViQ5jCgfVRDUxr3Ic1BwVWP0fZBfiauzeElphiKZcJG0r0iMguy3folgiGWQV4TYCQA7MiyRgrZLGprI"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar from Shared Components -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex flex-col py-6 bg-slate-50 border-r z-30 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="text-lg font-black text-teal-700">The Ethereal Guardian</h2>
+<p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Charity Admin</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                    Volunteers
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+                    Events
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+                    Donations
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="equalizer">equalizer</span>
+                    Impact
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-teal-50 text-teal-800 border-r-4 border-teal-600 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</nav>
+<div class="px-4 mt-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-error-container/20 transition-all font-sans text-sm font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined text-error" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-6 lg:p-10 max-w-7xl mx-auto w-full">
+<header class="mb-10">
+<h1 class="text-4xl font-black text-on-surface tracking-tight mb-2">Site Settings</h1>
+<p class="text-on-surface-variant max-w-2xl">Configure your organization's digital presence, payment flows, and security protocols through the central Ethereal Guardian dashboard.</p>
+</header>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+<!-- Sidebar Tabs (Local Nav) -->
+<nav class="xl:col-span-3 space-y-2">
+<button class="w-full flex items-center gap-3 px-5 py-4 rounded-xl glass-panel border border-white/40 shadow-sm text-primary font-bold transition-all">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+                        General Settings
+                    </button>
+<button class="w-full flex items-center gap-3 px-5 py-4 rounded-xl hover:bg-white/40 transition-all text-on-surface-variant font-medium">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+                        Payment Gateways
+                    </button>
+<button class="w-full flex items-center gap-3 px-5 py-4 rounded-xl hover:bg-white/40 transition-all text-on-surface-variant font-medium">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+                        Email &amp; SMS
+                    </button>
+<button class="w-full flex items-center gap-3 px-5 py-4 rounded-xl hover:bg-white/40 transition-all text-on-surface-variant font-medium">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+                        Security &amp; Access
+                    </button>
+<button class="w-full flex items-center gap-3 px-5 py-4 rounded-xl hover:bg-white/40 transition-all text-on-surface-variant font-medium">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+                        SEO &amp; Localization
+                    </button>
+</nav>
+<!-- Content Panels -->
+<div class="xl:col-span-9 space-y-8">
+<!-- General Settings Section -->
+<section class="bg-surface-container-low rounded-3xl p-8 border border-white/20">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-primary-container/20 text-primary rounded-2xl">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight">General Identity</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-1">Site Name</label>
+<input class="w-full bg-white border-0 ring-1 ring-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary transition-all" type="text" value="The Ethereal Guardian"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-1">Contact Email</label>
+<input class="w-full bg-white border-0 ring-1 ring-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary transition-all" type="email" value="admin@etherealguardian.org"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-1">Phone Number</label>
+<input class="w-full bg-white border-0 ring-1 ring-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary transition-all" type="tel" value="+92 21 34567890"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-1">Organization Logo</label>
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-white flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-teal-600" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<button class="px-4 py-2 text-sm font-bold bg-white ring-1 ring-outline-variant rounded-lg hover:bg-surface transition-colors">Upload New</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Payment Gateway Section -->
+<section class="bg-surface-container-low rounded-3xl p-8 border border-white/20">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-secondary-container/20 text-secondary rounded-2xl">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight">Payment Gateways</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- JazzCash -->
+<div class="glass-panel p-6 rounded-2xl border border-white/60 shadow-sm flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-lg bg-[#FF0000]/10 flex items-center justify-center font-black text-[#FF0000] text-xs">JCash</div>
+<span class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary-container/20 text-primary text-[10px] font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Active
+                                    </span>
+</div>
+<h3 class="font-bold mb-4">JazzCash Integration</h3>
+<div class="mt-auto space-y-3">
+<div class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Merchant ID</div>
+<div class="text-sm font-mono bg-white/50 px-3 py-2 rounded-lg border border-outline-variant/30">MC_********442</div>
+</div>
+</div>
+<!-- EasyPaisa -->
+<div class="glass-panel p-6 rounded-2xl border border-white/60 shadow-sm flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-lg bg-[#39B54A]/10 flex items-center justify-center font-black text-[#39B54A] text-xs">EPaisa</div>
+<span class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary-container/20 text-primary text-[10px] font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Active
+                                    </span>
+</div>
+<h3 class="font-bold mb-4">EasyPaisa Gateway</h3>
+<div class="mt-auto space-y-3">
+<div class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Hash Key</div>
+<div class="text-sm font-mono bg-white/50 px-3 py-2 rounded-lg border border-outline-variant/30">********9928</div>
+</div>
+</div>
+<!-- Stripe -->
+<div class="glass-panel p-6 rounded-2xl border border-white/60 shadow-sm flex flex-col h-full opacity-60">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-lg bg-[#635BFF]/10 flex items-center justify-center font-black text-[#635BFF] text-xs">Stripe</div>
+<span class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">
+                                        Inactive
+                                    </span>
+</div>
+<h3 class="font-bold mb-4">Bank / Credit Card</h3>
+<div class="mt-auto">
+<button class="w-full py-2 text-xs font-bold text-secondary bg-secondary-container/20 rounded-lg hover:bg-secondary-container/40 transition-colors">Configure Gateway</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Email & SMS Templates (Bento Layout) -->
+<section class="bg-surface-container-low rounded-3xl p-8 border border-white/20">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-tertiary-container/20 text-tertiary rounded-2xl">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight">Communication Templates</h2>
+</div>
+<button class="text-primary text-sm font-bold flex items-center gap-2">View All <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span></button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white/60 p-5 rounded-2xl flex flex-col group hover:bg-white transition-all">
+<span class="material-symbols-outlined text-teal-600 mb-3" data-icon="receipt_long">receipt_long</span>
+<h4 class="font-bold text-sm mb-1">Donation Receipt</h4>
+<p class="text-[11px] text-on-surface-variant mb-4">Sent automatically after checkout.</p>
+<button class="mt-auto py-2 text-xs font-bold text-primary border border-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">Edit HTML</button>
+</div>
+<div class="bg-white/60 p-5 rounded-2xl flex flex-col group hover:bg-white transition-all">
+<span class="material-symbols-outlined text-teal-600 mb-3" data-icon="verified_user">verified_user</span>
+<h4 class="font-bold text-sm mb-1">2FA Verification</h4>
+<p class="text-[11px] text-on-surface-variant mb-4">Security code SMS template.</p>
+<button class="mt-auto py-2 text-xs font-bold text-primary border border-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">Edit SMS</button>
+</div>
+<div class="bg-white/60 p-5 rounded-2xl flex flex-col group hover:bg-white transition-all">
+<span class="material-symbols-outlined text-teal-600 mb-3" data-icon="calendar_month">calendar_month</span>
+<h4 class="font-bold text-sm mb-1">Event Confirmed</h4>
+<p class="text-[11px] text-on-surface-variant mb-4">Volunteer shifts notifications.</p>
+<button class="mt-auto py-2 text-xs font-bold text-primary border border-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">Edit Email</button>
+</div>
+<div class="bg-white/60 p-5 rounded-2xl flex flex-col group hover:bg-white transition-all">
+<span class="material-symbols-outlined text-teal-600 mb-3" data-icon="celebration">celebration</span>
+<h4 class="font-bold text-sm mb-1">Milestone Hit</h4>
+<p class="text-[11px] text-on-surface-variant mb-4">Annual impact report teaser.</p>
+<button class="mt-auto py-2 text-xs font-bold text-primary border border-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">Edit Campaign</button>
+</div>
+</div>
+</section>
+<!-- Security & SEO (Two Column) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Security Section -->
+<section class="bg-surface-container-low rounded-3xl p-8 border border-white/20 flex flex-col">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-error-container/20 text-error rounded-2xl">
+<span class="material-symbols-outlined" data-icon="shield_lock">shield_lock</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Security &amp; Access</h2>
+</div>
+<div class="space-y-6 flex-1">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm">Two-Factor Authentication</p>
+<p class="text-xs text-on-surface-variant">Require SMS/App codes for all admins.</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm">Session Timeout</p>
+<p class="text-xs text-on-surface-variant">Auto-logout after inactivity.</p>
+</div>
+<select class="bg-white border-0 ring-1 ring-outline-variant rounded-lg text-xs font-bold py-1.5 pl-3 pr-8">
+<option>30 Minutes</option>
+<option>1 Hour</option>
+</select>
+</div>
+<div class="pt-4 border-t border-outline-variant/30 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-on-surface text-surface rounded-xl font-bold hover:bg-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="cloud_download">cloud_download</span>
+                                        Backup Database Now
+                                    </button>
+</div>
+</div>
+</section>
+<!-- SEO & Localization Section -->
+<section class="bg-surface-container-low rounded-3xl p-8 border border-white/20">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-primary-container/20 text-primary rounded-2xl">
+<span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">SEO &amp; Global</h2>
+</div>
+<div class="space-y-5">
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant">Default Dashboard Language</label>
+<div class="flex p-1 bg-white/50 rounded-xl border border-outline-variant/30">
+<button class="flex-1 py-2 text-xs font-bold bg-white shadow-sm rounded-lg text-primary">English</button>
+<button class="flex-1 py-2 text-xs font-bold text-on-surface-variant font-urdu">اردو</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant">Meta Description</label>
+<textarea class="w-full bg-white border-0 ring-1 ring-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary transition-all text-sm" rows="3">Providing aid and hope to the most vulnerable communities through sustainable charity and digital empowerment.</textarea>
+</div>
+</div>
+</section>
+</div>
+<!-- Action Footer -->
+<footer class="flex items-center justify-end gap-4 pt-6 border-t border-outline-variant/20">
+<button class="px-8 py-3 rounded-xl text-on-surface-variant font-bold hover:bg-surface-container-high transition-colors">Discard Changes</button>
+<button class="px-10 py-3 rounded-xl bg-gradient-to-br from-primary to-primary-container text-white font-black shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">Save Global Settings</button>
+</footer>
+</div>
+</div>
+</main>
+</div>
+<!-- FAB Suppression Rule Active: FAB not rendered on Settings screen -->
+</body></html>

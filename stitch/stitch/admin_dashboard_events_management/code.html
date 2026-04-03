@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Events Management | Ethereal Guardian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary-container": "#20b2aa",
+                "on-secondary-fixed": "#001c39",
+                "on-secondary-container": "#003e73",
+                "surface": "#f9f9fb",
+                "on-surface": "#1a1c1d",
+                "surface-tint": "#006a65",
+                "surface-container-high": "#e8e8ea",
+                "tertiary-container": "#e9865b",
+                "primary": "#006a65",
+                "surface-container": "#eeeef0",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "surface-container-highest": "#e2e2e4",
+                "on-tertiary-container": "#632200",
+                "on-secondary-fixed-variant": "#004883",
+                "surface-container-low": "#f3f3f5",
+                "primary-fixed-dim": "#59dad1",
+                "tertiary-fixed": "#ffdbcd",
+                "secondary-fixed": "#d4e3ff",
+                "primary-fixed": "#79f6ed",
+                "on-error": "#ffffff",
+                "on-tertiary-fixed": "#360f00",
+                "surface-variant": "#e2e2e4",
+                "outline-variant": "#bbc9c7",
+                "on-error-container": "#93000a",
+                "tertiary-fixed-dim": "#ffb597",
+                "secondary": "#0060ac",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#59dad1",
+                "error-container": "#ffdad6",
+                "on-surface-variant": "#3c4948",
+                "surface-dim": "#d9dadc",
+                "on-tertiary-fixed-variant": "#79300b",
+                "secondary-container": "#68abff",
+                "background": "#f9f9fb",
+                "tertiary": "#984721",
+                "inverse-surface": "#2f3132",
+                "inverse-on-surface": "#f0f0f2",
+                "surface-bright": "#f9f9fb",
+                "secondary-fixed-dim": "#a4c9ff",
+                "on-background": "#1a1c1d",
+                "on-primary-container": "#003e3b",
+                "outline": "#6c7a78",
+                "on-primary": "#ffffff",
+                "on-primary-fixed-variant": "#00504c",
+                "on-primary-fixed": "#00201e"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .editorial-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 106, 101, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container/30">
+<!-- Side Navigation Bar -->
+<aside class="h-screen w-64 border-r fixed left-0 top-0 bg-slate-50 flex flex-col py-6 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold text-teal-700 tracking-tight">Ethereal Guardian</h1>
+<p class="text-xs text-slate-500 font-medium mt-1">Charity Admin</p>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<!-- Dashboard -->
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<!-- Volunteers -->
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">group</span>
+<span class="text-sm font-medium">Volunteers</span>
+</a>
+<!-- Events (Active) -->
+<a class="flex items-center px-4 py-3 rounded-xl text-teal-700 font-bold border-r-4 border-teal-600 bg-teal-50/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-sm">Events</span>
+</a>
+<!-- Donations -->
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">volunteer_activism</span>
+<span class="text-sm font-medium">Donations</span>
+</a>
+<!-- Impact -->
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">auto_graph</span>
+<span class="text-sm font-medium">Impact</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="text-sm">New Campaign</span>
+</button>
+<div class="mt-6 flex items-center p-3 glass-panel rounded-2xl">
+<img alt="Admin Profile" class="h-10 w-10 rounded-full object-cover" data-alt="portrait of a professional male administrator in a light blue shirt with a friendly and focused expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2_vhlt6qjrfvZGwJy5N-4uPRaFa3UdJsUeIDt38TJSKkaGmY4ghhRPFjdebekmbf-fD0Jcwdl51BLY6f-_xyp1k6A-9vjvUOGdY1lulkBmfcjQzqwYmIdxqwUcXyGDhenp2c3xihhYSZVsxMln9Kt8dTFT4nYFC7J3mhskcZaJNfzLCkJ0sdKjPYI0TQKV533j6-tB2y4RLoYyuSfcaObhjjv_twcJvokGljAx_Hlce9lx-0Rk99qec10-ujR0114HkAE1qZ4W1w"/>
+<div class="ml-3">
+<p class="text-xs font-bold truncate">Admin User</p>
+<p class="text-[10px] text-slate-500">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen relative overflow-hidden">
+<!-- Background Accents -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-container/10 blur-[100px] rounded-full"></div>
+<div class="absolute top-1/2 -left-24 w-64 h-64 bg-secondary/10 blur-[80px] rounded-full"></div>
+<!-- Top Bar -->
+<header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md flex justify-between items-center w-full px-8 py-4 border-b border-slate-200/60">
+<div class="flex flex-col">
+<h2 class="text-2xl font-extrabold text-on-surface tracking-tight leading-none">Events Management</h2>
+<div class="flex items-center gap-4 mt-2">
+<span class="text-teal-600 border-b-2 border-teal-600 pb-0.5 text-xs font-semibold cursor-pointer">Overview</span>
+<span class="text-slate-500 text-xs font-medium hover:text-teal-700 transition-colors cursor-pointer">Upcoming</span>
+<span class="text-slate-500 text-xs font-medium hover:text-teal-700 transition-colors cursor-pointer">Past Events</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search Bar -->
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-slate-100 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all" placeholder="Search events..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 shadow-md shadow-primary/10">
+<span class="material-symbols-outlined text-lg">event</span>
+                    Create Event
+                </button>
+</div>
+</header>
+<div class="p-8">
+<!-- Quick Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="glass-panel p-6 rounded-3xl editorial-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-primary">calendar_month</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Total Events This Month</p>
+<h3 class="text-4xl font-extrabold text-primary mt-2">12</h3>
+<div class="flex items-center mt-4 text-[11px] font-bold text-teal-600 bg-teal-50 w-fit px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs mr-1">trending_up</span>
+                        +2 from last month
+                    </div>
+</div>
+<div class="glass-panel p-6 rounded-3xl editorial-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-secondary">person_add</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Active Registrations</p>
+<h3 class="text-4xl font-extrabold text-secondary mt-2">450</h3>
+<div class="flex items-center mt-4 text-[11px] font-bold text-blue-600 bg-blue-50 w-fit px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs mr-1">check_circle</span>
+                        84% Capacity reached
+                    </div>
+</div>
+<div class="glass-panel p-6 rounded-3xl editorial-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-tertiary">medical_services</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Upcoming Medical Camps</p>
+<h3 class="text-4xl font-extrabold text-tertiary mt-2">3</h3>
+<div class="flex items-center mt-4 text-[11px] font-bold text-tertiary bg-tertiary-fixed w-fit px-2 py-1 rounded-full">
+                        Next: Tomorrow, 9 AM
+                    </div>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Filters & Table Section -->
+<div class="col-span-12 lg:col-span-9 space-y-6">
+<!-- Dynamic Filters -->
+<div class="flex items-center justify-between glass-panel px-6 py-4 rounded-2xl border-none">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2">Filters:</span>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-white shadow-sm transition-all">All</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface hover:bg-slate-100 text-slate-600 transition-all">Medical</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface hover:bg-slate-100 text-slate-600 transition-all">Education</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface hover:bg-slate-100 text-slate-600 transition-all">Food</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface hover:bg-slate-100 text-slate-600 transition-all">Emergency</button>
+</div>
+<button class="flex items-center gap-2 text-xs font-bold text-primary hover:underline">
+<span class="material-symbols-outlined text-sm">tune</span>
+                            Advanced Filters
+                        </button>
+</div>
+<!-- Events Table Container -->
+<div class="glass-panel rounded-3xl editorial-shadow overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50/50">
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Event Name</th>
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Registrations</th>
+<th class="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center">
+<div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center mr-3">
+<span class="material-symbols-outlined">fastfood</span>
+</div>
+<span class="text-sm font-bold text-on-surface">Winter Food Drive</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-600">Oct 15, 2026</td>
+<td class="px-6 py-5 text-sm text-slate-600">Downtown Community Center</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-teal-50 text-teal-700 border border-teal-100">ACTIVE</span>
+</td>
+<td class="px-6 py-5">
+<div class="w-full bg-slate-100 h-1.5 rounded-full max-w-[100px] mb-2 overflow-hidden">
+<div class="bg-teal-500 h-full w-[80%] rounded-full"></div>
+</div>
+<span class="text-[11px] font-bold text-slate-500 tracking-tight">120/150</span>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-primary transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-secondary transition-all"><span class="material-symbols-outlined text-lg">bar_chart</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-error transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center">
+<div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mr-3">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<span class="text-sm font-bold text-on-surface">Mobile Medical Camp</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-600">Oct 22, 2026</td>
+<td class="px-6 py-5 text-sm text-slate-600">North Valley Settlement</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100">ACTIVE</span>
+</td>
+<td class="px-6 py-5">
+<div class="w-full bg-slate-100 h-1.5 rounded-full max-w-[100px] mb-2 overflow-hidden">
+<div class="bg-blue-500 h-full w-[95%] rounded-full"></div>
+</div>
+<span class="text-[11px] font-bold text-slate-500 tracking-tight">190/200</span>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-primary transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-secondary transition-all"><span class="material-symbols-outlined text-lg">bar_chart</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-error transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center">
+<div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center mr-3">
+<span class="material-symbols-outlined">school</span>
+</div>
+<span class="text-sm font-bold text-on-surface">Skills Workshop</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-600">Nov 05, 2026</td>
+<td class="px-6 py-5 text-sm text-slate-600">City Library Hall B</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200">DRAFT</span>
+</td>
+<td class="px-6 py-5">
+<div class="w-full bg-slate-100 h-1.5 rounded-full max-w-[100px] mb-2 overflow-hidden">
+<div class="bg-slate-300 h-full w-[0%] rounded-full"></div>
+</div>
+<span class="text-[11px] font-bold text-slate-500 tracking-tight">0/50</span>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-primary transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-secondary transition-all"><span class="material-symbols-outlined text-lg">bar_chart</span></button>
+<button class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-error transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+<span class="text-xs text-slate-500 font-medium">Showing 1 to 3 of 12 events</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1 text-xs font-bold text-slate-400 hover:text-primary transition-colors">Prev</button>
+<button class="px-3 py-1 text-xs font-bold bg-white rounded-lg shadow-sm text-primary">1</button>
+<button class="px-3 py-1 text-xs font-bold text-slate-500 hover:text-primary transition-colors">2</button>
+<button class="px-3 py-1 text-xs font-bold text-slate-500 hover:text-primary transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Calendar Sidebar Section -->
+<div class="col-span-12 lg:col-span-3 space-y-6">
+<div class="glass-panel p-6 rounded-3xl editorial-shadow">
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-sm font-extrabold text-on-surface tracking-tight">Calendar Preview</h4>
+<span class="text-[10px] font-bold text-primary uppercase">October 2026</span>
+</div>
+<!-- Simple Calendar Matrix -->
+<div class="grid grid-cols-7 gap-1 text-center mb-6">
+<div class="text-[10px] font-bold text-slate-400 pb-2">S</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">M</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">T</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">W</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">T</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">F</div>
+<div class="text-[10px] font-bold text-slate-400 pb-2">S</div>
+<!-- Dummy Dates -->
+<div class="text-xs p-2 text-slate-400">27</div>
+<div class="text-xs p-2 text-slate-400">28</div>
+<div class="text-xs p-2 text-slate-400">29</div>
+<div class="text-xs p-2 text-slate-400">30</div>
+<div class="text-xs p-2 font-medium">1</div>
+<div class="text-xs p-2 font-medium">2</div>
+<div class="text-xs p-2 font-medium">3</div>
+<div class="text-xs p-2 font-medium">4</div>
+<div class="text-xs p-2 font-medium">5</div>
+<div class="text-xs p-2 font-medium">6</div>
+<div class="text-xs p-2 font-medium">7</div>
+<div class="text-xs p-2 font-medium">8</div>
+<div class="text-xs p-2 font-medium">9</div>
+<div class="text-xs p-2 font-medium">10</div>
+<div class="text-xs p-2 font-medium">11</div>
+<div class="text-xs p-2 font-medium">12</div>
+<div class="text-xs p-2 font-medium">13</div>
+<div class="text-xs p-2 font-medium">14</div>
+<!-- Active Day -->
+<div class="text-xs p-2 font-extrabold bg-primary text-white rounded-lg relative">
+                                15
+                                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span>
+</div>
+<div class="text-xs p-2 font-medium">16</div>
+<div class="text-xs p-2 font-medium">17</div>
+<div class="text-xs p-2 font-medium">18</div>
+<div class="text-xs p-2 font-medium">19</div>
+<div class="text-xs p-2 font-medium">20</div>
+<div class="text-xs p-2 font-medium">21</div>
+<!-- Active Day -->
+<div class="text-xs p-2 font-extrabold bg-secondary text-white rounded-lg relative">
+                                22
+                                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span>
+</div>
+<div class="text-xs p-2 font-medium">23</div>
+<div class="text-xs p-2 font-medium">24</div>
+<div class="text-xs p-2 font-medium">25</div>
+<div class="text-xs p-2 font-medium">26</div>
+<div class="text-xs p-2 font-medium">27</div>
+<div class="text-xs p-2 font-medium">28</div>
+<div class="text-xs p-2 font-medium">29</div>
+<div class="text-xs p-2 font-medium">30</div>
+<div class="text-xs p-2 font-medium">31</div>
+</div>
+<div class="space-y-4">
+<h5 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Pinned Schedule</h5>
+<div class="flex items-start gap-3 p-3 rounded-xl bg-teal-50/50 border border-teal-100">
+<div class="text-center bg-white rounded-lg p-1.5 shadow-sm min-w-[36px]">
+<p class="text-[8px] font-bold text-slate-400 leading-none">OCT</p>
+<p class="text-xs font-black text-teal-700 leading-none mt-1">15</p>
+</div>
+<div>
+<p class="text-xs font-bold text-teal-900">Food Drive</p>
+<p class="text-[10px] text-teal-600 font-medium mt-0.5">09:00 AM - 05:00 PM</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+<div class="text-center bg-white rounded-lg p-1.5 shadow-sm min-w-[36px]">
+<p class="text-[8px] font-bold text-slate-400 leading-none">OCT</p>
+<p class="text-xs font-black text-blue-700 leading-none mt-1">22</p>
+</div>
+<div>
+<p class="text-xs font-bold text-blue-900">Medical Camp</p>
+<p class="text-[10px] text-blue-600 font-medium mt-0.5">08:00 AM - 06:00 PM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Map/Location Quick Widget -->
+<div class="glass-panel p-4 rounded-3xl editorial-shadow overflow-hidden group">
+<div class="relative h-48 rounded-2xl overflow-hidden mb-4">
+<img alt="Event Locations Map" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="stylized map view of a metropolitan area with medical and community center markers highlighted in teal and blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3QkIkQ-cxOcRmuS7NzY_29CvPqcKfA5dwKgUu5h3oUHlFVosS50Wjdc7AYAbIQohVLkBosaARpYXibxW69xhZX7PN5wj62FYT98nMC1UW4fJOjAuRwUlrbC0QdAMhXSWRuOlNl2j9ipRLP6uA1gTRquP90C3r6ZM6qH2t0J9HlBybvrX2FlXpuYvUQLQAeSfO82a73AQAqDay2WLV3c9J3ATod0izLACkNRQQmOVOioGpKK_MJtQDKvreD5KDJKFT0NmIThulzBM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-2 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm text-primary">location_on</span>
+<span class="text-[10px] font-bold">4 Active Venues</span>
+</div>
+</div>
+<p class="text-[11px] font-bold text-slate-500 text-center uppercase tracking-widest">Venue Analytics</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

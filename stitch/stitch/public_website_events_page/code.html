@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Events | Ethereal Charity</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "primary-fixed": "#79f6ed",
+              "secondary": "#0060ac",
+              "on-secondary-fixed-variant": "#004883",
+              "on-surface": "#1a1c1d",
+              "surface-container-high": "#e8e8ea",
+              "inverse-primary": "#59dad1",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e2e2e4",
+              "on-primary-fixed-variant": "#00504c",
+              "error-container": "#ffdad6",
+              "error": "#ba1a1a",
+              "primary-container": "#20b2aa",
+              "on-surface-variant": "#3c4948",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface": "#f9f9fb",
+              "secondary-container": "#68abff",
+              "outline-variant": "#bbc9c7",
+              "primary": "#006a65",
+              "outline": "#6c7a78",
+              "on-tertiary-container": "#632200",
+              "on-secondary-container": "#003e73",
+              "surface-container": "#eeeef0",
+              "surface-bright": "#f9f9fb",
+              "inverse-on-surface": "#f0f0f2",
+              "on-error": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#360f00",
+              "on-secondary-fixed": "#001c39",
+              "background": "#f9f9fb",
+              "inverse-surface": "#2f3132",
+              "primary-fixed-dim": "#59dad1",
+              "on-primary-container": "#003e3b",
+              "on-primary-fixed": "#00201e",
+              "surface-container-low": "#f3f3f5",
+              "on-error-container": "#93000a",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-secondary": "#ffffff",
+              "tertiary": "#984721",
+              "on-background": "#1a1c1d",
+              "tertiary-container": "#e9865b",
+              "surface-tint": "#006a65",
+              "surface-dim": "#d9dadc"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #006a65 0%, #20b2aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-teal-100/20 shadow-sm">
+<div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-teal-800 dark:text-teal-300">
+                Ethereal Charity
+            </div>
+<div class="hidden md:flex items-center gap-8 font-sans antialiased tracking-tight">
+<a class="text-slate-600 hover:text-teal-500 transition-colors duration-300" href="#">Our Story</a>
+<a class="text-teal-600 border-b-2 border-teal-600 pb-1" href="#">Events</a>
+<a class="text-slate-600 hover:text-teal-500 transition-colors duration-300" href="#">Impact</a>
+<a class="text-slate-600 hover:text-teal-500 transition-colors duration-300" href="#">Donate</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block px-6 py-2.5 bg-primary text-on-primary rounded-full font-semibold scale-95 active:scale-90 transition-transform">
+                    Get Involved
+                </button>
+<button class="md:hidden p-2 text-slate-600">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[409px] min-h-[400px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="Soft focused warm lighting on a community gathering in a bright modern hall with teal accents and glass windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6dINX5JFa9PrQiJTgZqhKOvRYOGtaedCoSc7oXYCYPMK0t68pfJ9xH-sxaMU2N0Vbh0HWmwXmSTukds5m17MAvaE0xjXaPaMX2wTUtMGF4tOYb93F_eiUChWbLc2YTTPfaP5hKfLL0VCidYZgtiiitkVD1DZ8L050vs5kTaMNvBbYq77d_TeDrM7j_E1tAobLaTLGbQ_pHB0aJQ_LiKMxk9m8cjyXRmy48Zs0pnJEY40CbRuWQJ3CEDn_YAES5_vwTgDmX9bmF1g"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-8 w-full">
+<h1 class="text-5xl md:text-7xl font-bold tracking-tighter text-teal-900 mb-4 max-w-2xl leading-tight">
+                    Every Action <br/><span class="text-gradient">Creates Ripples.</span>
+</h1>
+<p class="text-on-surface-variant text-lg max-w-lg font-medium leading-relaxed">
+                    Join our upcoming initiatives. From medical camps to educational workshops, find where you can make a difference.
+                </p>
+</div>
+</section>
+<!-- Filter and View Toggle Shell -->
+<section class="max-w-7xl mx-auto px-8 -mt-12 relative z-20">
+<div class="glass-panel rounded-2xl shadow-xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 border border-white/40">
+<div class="flex flex-wrap gap-3">
+<button class="px-5 py-2 rounded-full bg-primary text-on-primary font-medium text-sm transition-all hover:shadow-lg">All Events</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-primary-container hover:text-on-primary-container transition-all">Medical Camp</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-primary-container hover:text-on-primary-container transition-all">Food Drive</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-primary-container hover:text-on-primary-container transition-all">Education</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-primary-container hover:text-on-primary-container transition-all">Emergency</button>
+</div>
+<div class="flex items-center bg-surface-container-high rounded-full p-1.5">
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-lowest shadow-sm text-primary font-semibold text-sm">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+                        List View
+                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full text-on-surface-variant font-medium text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                        Calendar
+                    </button>
+</div>
+</div>
+</section>
+<!-- Events Bento Grid -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Main Featured Event (Large Card) -->
+<div class="md:col-span-8 group relative rounded-3xl overflow-hidden bg-surface-container-lowest border border-outline-variant shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Diverse group of cheerful volunteers distributing educational supplies to children in a bright classroom setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2b3tx7bBcTVpBmGb9IbdnbpthvDQz3fIiXDl_a9h0A0_lcRwdvhS2Q7LO3PoBU1aSKsXgwuu1hYhM9Tr-Zb9UuOsVd-H0c1iyiPmtZPuBA0rx_72vkabvP2QPq1oPLqbFcld5kibo4CNGT3JxOfhBdMWvLeo28H82h9eTqNuF9bcg91fmV5RrDqD23B2mc_C5OYpXgiAd8EERPQpLPr6c_aEdC3LkTnB96kTV-MAERYTidoosNkhBJXK5wgJmShHtGRlPYBjbbMQ"/>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-4 mb-4">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container rounded-lg text-xs font-bold tracking-widest uppercase">Education</span>
+<span class="text-sm font-semibold text-teal-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">event</span> Oct 24, 2024
+                            </span>
+</div>
+<h3 class="text-3xl font-bold text-on-surface mb-3 tracking-tight">Future Leaders: Primary Education Drive</h3>
+<p class="text-on-surface-variant mb-6 text-lg leading-relaxed max-w-2xl">
+                            Our quarterly workshop providing free textbooks and digital learning tools to over 500 students in the suburban districts. Volunteers needed for tutoring and logistics.
+                        </p>
+<div class="flex flex-wrap items-center justify-between gap-4 border-t border-surface-container-high pt-6">
+<div class="flex items-center gap-2 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-teal-600">location_on</span>
+                                City Community Center, Building B
+                            </div>
+<button class="px-8 py-3 bg-primary text-on-primary rounded-xl font-bold hover:shadow-lg transition-shadow">
+                                Register Now
+                            </button>
+</div>
+</div>
+</div>
+<!-- Side Event Card 1 -->
+<div class="md:col-span-4 flex flex-col bg-surface-container-lowest rounded-3xl border border-outline-variant overflow-hidden group">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Professional medical staff in white coats providing checkups to elderly patients in a clean outdoor medical tent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMgajbyHOaXd0SVf7YVPz96f34ogfzV6DerGxCBuAxpGD93X7nd9CYHG8dasdPzBH_djwNyCYBe68QHUdNvTOB0Ra1V5j7Tvz4etUhZaQdZjqb0eWlPddN2Un8hNS6vXEsDWevEiqJWyhCn_BkhgNbo1wU5kKNTxHq2R4Tc1pm7H2rwkfoO979jGgWM05--Dfm1sTkYzb59cONqU1h75HhVNhHgRxBng_7uVRDjeqGwgfiGqpvedpST8v4CcOUll2wMoxdNsE_tQc"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-secondary text-white rounded-lg text-xs font-bold uppercase tracking-wider">Medical</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="text-sm font-semibold text-teal-600 mb-2">Nov 02, 2024</div>
+<h4 class="text-xl font-bold mb-3 leading-tight">Health First: Free Pediatric Camp</h4>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-3">
+                            Providing essential health screenings, vaccinations, and nutrition consulting for families in underserved neighborhoods.
+                        </p>
+<div class="mt-auto space-y-4">
+<div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Downtown Wellness Hub
+                            </div>
+<button class="w-full py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-on-primary transition-all">
+                                View Details
+                            </button>
+</div>
+</div>
+</div>
+<!-- Side Event Card 2 -->
+<div class="md:col-span-4 flex flex-col bg-surface-container-lowest rounded-3xl border border-outline-variant overflow-hidden group">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A large steaming pot of nutritious soup being served by volunteers into bowls for a community line" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsPvHWYpln9XDLKf2PCDUps6ArpLpidFmbs7hajDdY1lwiTKZC3JoMyM3A-gFC7v1DR8kJo-1GBNVwisSxoUV9nmEiLn2Ww6hXKBiqeXmIsdNoGHLccJOA0LLH3FNekou_aBCWujzjEzK8gjLshPa9ibGC0rrEVyPU0FM7srdD10ne3ahuFAHIf-K4ssRNWNJs0Edqk0DlWmkNFmo1QjOc8XweHmFtJuU_2rEny1Cew6DMQ3JR_lCjxSOMAcxGJcE7vb3e1Qt1bXI"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-bold uppercase tracking-wider">Food Drive</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="text-sm font-semibold text-teal-600 mb-2">Nov 15, 2024</div>
+<h4 class="text-xl font-bold mb-3 leading-tight">Harvest Hope: Thanksgiving Drive</h4>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-3">
+                            Join us in distributing fresh produce and festive meals to those in need during the holiday season.
+                        </p>
+<div class="mt-auto space-y-4">
+<div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+<span class="material-symbols-outlined text-[16px]">location_on</span> St. Mary's Shelter Grounds
+                            </div>
+<button class="w-full py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-on-primary transition-all">
+                                View Details
+                            </button>
+</div>
+</div>
+</div>
+<!-- Side Event Card 3 (Text Focus) -->
+<div class="md:col-span-4 bg-teal-900 text-white rounded-3xl p-8 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-4xl mb-4 text-primary-fixed">emergency</span>
+<h4 class="text-2xl font-bold mb-4">Urgent: Flood Relief Coordination</h4>
+<p class="text-teal-100/80 leading-relaxed mb-6">
+                            We are mobilizing a fast-response team for the coastal areas. Emergency supplies are being packed today.
+                        </p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full bg-teal-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">alarm</span>
+</span>
+<div>
+<div class="text-[10px] uppercase font-bold text-teal-400">Time Left</div>
+<div class="text-sm font-bold">4 Hours Remaining</div>
+</div>
+</div>
+<button class="w-full py-3 bg-white text-teal-900 font-bold rounded-xl hover:bg-primary-fixed transition-colors">
+                            Apply to Help
+                        </button>
+</div>
+</div>
+<!-- Side Event Card 4 -->
+<div class="md:col-span-4 flex flex-col bg-surface-container-lowest rounded-3xl border border-outline-variant overflow-hidden group">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Abstract image of blurred medical supplies and clean technology representing high-quality health care initiatives" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnZUdwcJqBeoHkH1XG-jpT7UVRUFtWIyFeDpD8LjMryTxhs1Xp71IbqUa-3E4MBVuFRDbgzedZlcnT3qq0omaS9UOEDZ2g6SX42NdkbvyGTb-NWikWy0Y1ICWTzl2mw5w4ODeDnSONzMeeOplBAL_gW9MGSVkayx5nux9zkoBn4RpEOZqCFSMsvgum5G5lFd4aXD1HSg-62g8NhWCZb7STu7wlt_mAVgekwyR83DxNLEoVnOuvqVcFgGfD1Er6oi8cq1NppWwLPmQ"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-secondary text-white rounded-lg text-xs font-bold uppercase tracking-wider">Medical</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="text-sm font-semibold text-teal-600 mb-2">Dec 01, 2024</div>
+<h4 class="text-xl font-bold mb-3 leading-tight">Diabetes Awareness Seminar</h4>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-3">
+                            A educational session with leading specialists about management and prevention techniques.
+                        </p>
+<div class="mt-auto space-y-4">
+<div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Westside Medical Plaza
+                            </div>
+<button class="w-full py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-on-primary transition-all">
+                                View Details
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Google Maps Integration & Shared Location -->
+<section class="bg-surface-container-low py-20 overflow-hidden">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<h2 class="text-4xl font-bold tracking-tight text-on-surface">Find Our <span class="text-teal-600">Headquarters</span></h2>
+<p class="text-on-surface-variant text-lg leading-relaxed">
+                        Most our events depart from our main hub. If you're looking to donate physical goods or speak with our team, visit us during office hours.
+                    </p>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-teal-600">pin_drop</span>
+</div>
+<div>
+<h5 class="font-bold">Ethereal Guardian Center</h5>
+<p class="text-on-surface-variant text-sm">124 Heartwood Lane, Suite 400<br/>San Francisco, CA 94103</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-teal-600">phone</span>
+</div>
+<div>
+<h5 class="font-bold">Contact Support</h5>
+<p class="text-on-surface-variant text-sm">+1 (555) 000-HELP<br/>support@etherealcharity.org</p>
+</div>
+</div>
+</div>
+<div class="pt-8 flex gap-4">
+<span class="text-sm font-bold text-slate-400 uppercase tracking-widest block mb-4 w-full">Share our initiatives</span>
+<div class="flex gap-4">
+<button class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-teal-50 transition-colors">
+<img alt="WhatsApp" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdWtezHpHz7GazS-vR6__GHj-vaSB38pfNNy9qUmPtprSTYqtq5AfyJjXCKOJGoT3wbrc7RSkZog832wA_Mi2JQaRCbJT4v0oCImRbXcv_tw6qL8qkJVZivft-JuDs21MdyiPPwpG4tP59ewrp_AEh2X4IXmCn6cchHDAdeU590DQcWkmECLHKe-tV96Y9DUSEMzhKMOV8VPN_IP-wYD_WnmEoIV9dRuGEfRFACKUM827LYat6VDJMdUXqRu-wGPi0VLp0fW2sk1s"/>
+</button>
+<button class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-teal-50 transition-colors">
+<img alt="Facebook" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAye-7dtpQlNIGMm9fql4YpZB3yXt-PGq4pjP0N4Xg0I26G_boioZ2Up5v-SHqtnr6xldsDxzar9uxzk3oRMJCADmazkxhgipX9pApxvplQPZxtVaZd5erHvrUAddI6FtHm9kTflajk3xqJXrTTPpR2y1915_ZDrsQFzZPv_aXUKo1TgZDC_Gnpk6VAHR_PAxp31SNEarv9f0vNZMJOZm6MHBXTY7ZLon_X3OGzQjA7CNJREJp47DyeIC2TKpfM1TOePuOariucvp4"/>
+</button>
+<button class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-teal-50 transition-colors">
+<img alt="Twitter" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE_fZjubUXx9NV7ddj0_1I-yheIMOU3sBmrfUl6D40-mhs2u1rdIFznCdU8o4IVXFgzk4FZpT7eSCmCjPSaGxUbZPAXDvRYrgF3Z9ahoboNBXECg716oFohjdEGIeMCsFSTLEV90tojmcz5JQ03hmjDjNha_grrZ9OxFzs_jIJGRTrx2N5vPjLbxNCd84MYpD2VuPyfPO9jPPBVaP7UGhVzKNP133sdALwDv3Po_V4Qx-knIxI22hKZEEz0N5YxNKEvvba-tx2pi0"/>
+</button>
+</div>
+</div>
+</div>
+<div class="relative rounded-[40px] overflow-hidden shadow-2xl h-[500px] border-8 border-white">
+<div class="absolute inset-0 bg-slate-200">
+<img class="w-full h-full object-cover grayscale opacity-60" data-alt="A clean, minimalist map illustration of a city center with soft teal markers highlighting specific locations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVujcpuFhZfVzNKekw9g152y3UdtMXz_UGy8vmohDP3DeBe58tZ8_zL_hGawHYtxakLWOe5KtEXefyab-twyWPikqMQW3oBXoDrpNayBfqkWBmdggHeHjwYMVthjp9maMRy-N12RHNh7vQqnc1Iof0czhX1o-CDJGghed8EAMTmBkXNtnXsl279iGiRTG0vi-m-jA05BWceyCL38OVOzwXTFTqhDXBQtvG6SDcJM_zkUa4pG3-FC1KMZ2z_eokqiCpmv61Y6l7k6g"/>
+<!-- Simulated Interactive Map UI -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative">
+<div class="w-24 h-24 bg-teal-500/20 rounded-full animate-pulse flex items-center justify-center">
+<div class="w-6 h-6 bg-teal-600 rounded-full border-2 border-white shadow-lg"></div>
+</div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 bg-white p-3 rounded-xl shadow-xl text-center">
+<p class="text-xs font-bold text-teal-800">Ethereal HQ</p>
+<p class="text-[10px] text-on-surface-variant">We're here!</p>
+<div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / Registration CTA Overlay (Fixed at bottom) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-4xl z-50">
+<div class="glass-panel p-6 rounded-3xl border border-white shadow-2xl flex flex-col md:flex-row items-center gap-6">
+<div class="flex items-center gap-4 flex-grow">
+<div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white">volunteer_activism</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Become a Volunteer</p>
+<p class="text-sm text-on-surface-variant">Get notified first about new local events.</p>
+</div>
+</div>
+<div class="flex w-full md:w-auto gap-2">
+<input class="flex-grow md:w-64 px-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary text-sm" placeholder="Your Email" type="email"/>
+<button class="px-6 py-3 bg-primary text-white font-bold rounded-xl whitespace-nowrap">Join Us</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full py-12 px-8 border-t border-slate-200 dark:border-slate-800 mt-20 pb-32">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="space-y-4">
+<div class="text-lg font-black text-teal-900 dark:text-teal-100">
+                    Ethereal Guardian
+                </div>
+<p class="text-slate-500 max-w-xs text-sm">
+                    A global movement dedicated to bringing light to the darkest corners of humanity through collective action.
+                </p>
+</div>
+<div class="flex flex-wrap gap-x-12 gap-y-6">
+<div class="space-y-3">
+<h6 class="text-xs font-bold text-teal-700 uppercase tracking-widest">Resources</h6>
+<ul class="space-y-2 text-sm font-medium text-slate-500">
+<li><a class="hover:underline hover:text-teal-600 transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="hover:underline hover:text-teal-600 transition-colors" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div class="space-y-3">
+<h6 class="text-xs font-bold text-teal-700 uppercase tracking-widest">Connect</h6>
+<ul class="space-y-2 text-sm font-medium text-slate-500">
+<li><a class="hover:underline hover:text-teal-600 transition-colors" href="#">Contact Us</a></li>
+<li><a class="hover:underline hover:text-teal-600 transition-colors" href="#">Careers</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-200 text-sm font-medium text-slate-400">
+            © 2024 Ethereal Guardian. All rights reserved.
+        </div>
+</footer>
+<!-- Simple Modal Overlay (Logic not included, but visual design) -->
+<div class="hidden fixed inset-0 z-[100] bg-teal-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-white rounded-[32px] w-full max-w-xl shadow-2xl overflow-hidden">
+<div class="p-8 border-b border-surface-container-high flex justify-between items-center">
+<h3 class="text-2xl font-bold">Event Registration</h3>
+<button class="p-2 hover:bg-surface-container rounded-full"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="p-8 space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase">First Name</label>
+<input class="w-full px-4 py-3 bg-surface-container rounded-xl border-none" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase">Last Name</label>
+<input class="w-full px-4 py-3 bg-surface-container rounded-xl border-none" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase">Email Address</label>
+<input class="w-full px-4 py-3 bg-surface-container rounded-xl border-none" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase">Why do you want to join?</label>
+<textarea class="w-full px-4 py-3 bg-surface-container rounded-xl border-none h-32"></textarea>
+</div>
+<button class="w-full py-4 bg-primary text-white font-bold rounded-2xl text-lg shadow-xl shadow-primary/20">Confirm Registration</button>
+</div>
+</div>
+</div>
+</body></html>

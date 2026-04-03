@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Donations Management | Ethereal Guardian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        /* Custom scrollbar for clean editorial look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #bbc9c7; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-container": "#632200",
+              "on-surface-variant": "#3c4948",
+              "tertiary-fixed": "#ffdbcd",
+              "on-primary-container": "#003e3b",
+              "on-secondary-fixed-variant": "#004883",
+              "on-error-container": "#93000a",
+              "inverse-primary": "#59dad1",
+              "on-secondary-fixed": "#001c39",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "outline": "#6c7a78",
+              "inverse-on-surface": "#f0f0f2",
+              "surface-dim": "#d9dadc",
+              "on-tertiary-fixed-variant": "#79300b",
+              "error": "#ba1a1a",
+              "surface": "#f9f9fb",
+              "primary-fixed-dim": "#59dad1",
+              "background": "#f9f9fb",
+              "tertiary-container": "#e9865b",
+              "surface-container-low": "#f3f3f5",
+              "on-background": "#1a1c1d",
+              "on-surface": "#1a1c1d",
+              "tertiary-fixed-dim": "#ffb597",
+              "primary": "#006a65",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-bright": "#f9f9fb",
+              "primary-fixed": "#79f6ed",
+              "surface-container": "#eeeef0",
+              "surface-container-highest": "#e2e2e4",
+              "secondary": "#0060ac",
+              "on-tertiary": "#ffffff",
+              "outline-variant": "#bbc9c7",
+              "on-secondary": "#ffffff",
+              "surface-tint": "#006a65",
+              "secondary-container": "#68abff",
+              "surface-container-high": "#e8e8ea",
+              "on-primary-fixed": "#00201e",
+              "inverse-surface": "#2f3132",
+              "on-tertiary-fixed": "#360f00",
+              "surface-variant": "#e2e2e4",
+              "on-primary-fixed-variant": "#00504c",
+              "on-secondary-container": "#003e73",
+              "secondary-fixed": "#d4e3ff",
+              "primary-container": "#20b2aa",
+              "tertiary": "#984721"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 border-r fixed left-0 top-0 bg-slate-50 flex flex-col py-6 z-50">
+<div class="px-6 mb-8">
+<h1 class="text-xl font-bold text-teal-700 tracking-tight">Ethereal Guardian</h1>
+<p class="text-xs text-slate-500 font-medium">Charity Admin</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="group">group</span>
+<span class="text-sm font-medium">Volunteers</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="calendar_today">calendar_today</span>
+<span class="text-sm font-medium">Events</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-xl text-teal-700 font-bold border-r-4 border-teal-600 bg-teal-50/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="volunteer_activism" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+<span class="text-sm font-medium">Donations</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="auto_graph">auto_graph</span>
+<span class="text-sm font-medium">Impact</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-semibold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Campaign
+            </button>
+<div class="mt-6 flex items-center px-4 py-3 bg-white/50 rounded-2xl border border-outline-variant/30">
+<img alt="Admin Profile" class="w-8 h-8 rounded-full border border-primary/20 mr-3" data-alt="Admin user profile picture in a professional studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkCWO2pkpiT_V1ktIBhYDEAG0WBFdERwNX8YKkQkQF088XGX4GR29xKFUecc2-WMNq9wGYGWGzw_-xbMJtKYnMZV1PzgjnAc8gjgKvlHpbNJphuT5AL1vyFJQd2rCcrksluyRV9rngydjmSWnSU3Avhl6RHAWjXrOWIawYfD7NNxC8K-JtcQ6wNROpDEz0pnBtrp_CeCOy5oAaz7wvFDDtiGBd6CyZdoUM2uBhr_7g89fBINe03Anzc6fgqbcvJv5VCZuE2ahGHao"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Admin User</p>
+<p class="text-[10px] text-slate-400">Manage Account</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="flex justify-between items-center w-[calc(100%-16rem)] px-8 py-4 ml-64 bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200">
+<div class="flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-slate-500 hover:text-teal-700 transition-all text-sm font-medium" href="#">Overview</a>
+<a class="text-teal-600 border-b-2 border-teal-600 pb-1 text-sm font-bold" href="#">Transactions</a>
+<a class="text-slate-500 hover:text-teal-700 transition-all text-sm font-medium" href="#">Payouts</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="Search transactions..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<main class="ml-64 p-8 min-h-[calc(100vh-72px)] bg-surface">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Quick Stats - Bento Grid Style -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-xs font-semibold text-slate-500 tracking-wider">TOTAL DONATIONS</span>
+<span class="flex items-center text-xs font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="trending_up">trending_up</span>
+                            12%
+                        </span>
+</div>
+<p class="text-3xl font-extrabold tracking-tight text-on-surface">$842,500</p>
+</div>
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-xs font-semibold text-slate-500 tracking-wider">AVERAGE DONATION</span>
+<span class="material-symbols-outlined text-slate-300" data-icon="insights">insights</span>
+</div>
+<p class="text-3xl font-extrabold tracking-tight text-on-surface">$124.50</p>
+</div>
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-xs font-semibold text-slate-500 tracking-wider">RECURRING DONORS</span>
+<span class="material-symbols-outlined text-slate-300" data-icon="sync">sync</span>
+</div>
+<p class="text-3xl font-extrabold tracking-tight text-on-surface">3,241</p>
+</div>
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-xs font-semibold text-slate-500 tracking-wider">TOTAL PAYOUTS</span>
+<span class="material-symbols-outlined text-slate-300" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<p class="text-3xl font-extrabold tracking-tight text-on-surface">$512,000</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Main Content Column -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Filter Bar -->
+<div class="glass-panel p-5 rounded-3xl border border-white/40 shadow-sm flex flex-wrap gap-4 items-center">
+<div class="flex-1 min-w-[200px]">
+<label class="text-[10px] font-bold text-slate-400 mb-1 block px-2">DONOR OR TRANSACTION ID</label>
+<input class="w-full bg-surface-container/50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/10" placeholder="ID or name..." type="text"/>
+</div>
+<div>
+<label class="text-[10px] font-bold text-slate-400 mb-1 block px-2">DATE RANGE</label>
+<select class="bg-surface-container/50 border-none rounded-xl px-4 py-2 text-sm pr-10 focus:ring-2 focus:ring-primary/10 appearance-none">
+<option>Last 30 Days</option>
+<option>This Quarter</option>
+<option>This Year</option>
+</select>
+</div>
+<div>
+<label class="text-[10px] font-bold text-slate-400 mb-1 block px-2">METHOD</label>
+<div class="flex gap-2">
+<button class="p-2 bg-primary/10 text-primary rounded-xl border border-primary/20"><span class="material-symbols-outlined text-lg" data-icon="payments">payments</span></button>
+<button class="p-2 bg-surface-container/50 text-slate-400 rounded-xl hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined text-lg" data-icon="credit_card">credit_card</span></button>
+<button class="p-2 bg-surface-container/50 text-slate-400 rounded-xl hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined text-lg" data-icon="phone_iphone">phone_iphone</span></button>
+</div>
+</div>
+<div class="ml-auto flex gap-3 pt-4 lg:pt-0">
+<button class="px-5 py-2.5 bg-surface-container-highest rounded-xl text-xs font-bold text-on-surface hover:bg-surface-dim transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                                Export CSV
+                            </button>
+<button class="px-5 py-2.5 bg-secondary text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_circle">add_circle</span>
+                                Add Donation
+                            </button>
+</div>
+</div>
+<!-- Donations Table -->
+<div class="glass-panel rounded-3xl border border-white/40 shadow-sm overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 tracking-wider">DONOR</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 tracking-wider">CAUSE</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 tracking-wider text-right">AMOUNT</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 tracking-wider">METHOD</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 tracking-wider">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="group hover:bg-white/40 transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a smiling mature man with glasses in a soft lit office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2VcpV9-yyJjY4Q9rZI2hrYAFszfk5a79tn4UacOpNEakp6cBNE_sSgx-Tk3S16g8sACn8Reb22T0lzEY5r5ruukPcrZ7D2YpllyWcOvrZXJJj-lEcxZhoZqwKTDmnMkdmpHm14tezr7BypIaZboeZObySFOZxHiZj_hF2pAsLGmKQ7aG_Y6hNjLHTR7akarWtw0jzxV1PVbpn1s4maHHdCrNjWPBqyYevxlWNEBUAZ1BPu5dhUxLCcfB3U7ppV4dzv-aXJLzmkiw"/>
+<div>
+<p class="text-sm font-bold">Haris Khan</p>
+<p class="text-[10px] text-slate-400">#TRX-94821</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-teal-50 text-teal-700 text-[10px] font-bold rounded-full border border-teal-100 uppercase">Clean Water</span>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-slate-700">$2,500.00</p>
+<p class="text-[10px] text-slate-400">12 Oct, 2023</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined text-lg" data-icon="account_balance">account_balance</span>
+<span class="text-xs font-medium">JazzCash</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 text-teal-600">
+<span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+<span class="text-[11px] font-bold">Verified</span>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-white/40 transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Close up portrait of a smiling woman with curly hair against a vibrant abstract background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB8J0xp8a7vaOCFaUSm2x6wKH9oh95c7tcBRj5zGfa1yRSXxr-RRGGB-bkLKDOn7aiaj5q6O_BzXj5AtbSmoBe8aVfoOoTEPMcmd2ofNf1wSACi_XCJXcTaJiMfU6m_2VdLwvagHq1MVvcvT0vxUge2U6bGZJhet5dcMf-rPXxJRhgnTRT_al4onxnqDIrCxEwFkROvD9BU00DNokPY-JP5i3AuC9lJxqOLSHxRblj_7Nr2RhzezIFLDUFxKSc7MyOA53GVZUwvyw"/>
+<div>
+<p class="text-sm font-bold">Sarah Ahmed</p>
+<p class="text-[10px] text-slate-400">#TRX-82133</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-secondary-container/10 text-secondary text-[10px] font-bold rounded-full border border-secondary-container/20 uppercase">Education</span>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-slate-700">$450.00</p>
+<p class="text-[10px] text-slate-400">14 Oct, 2023</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined text-lg" data-icon="credit_card">credit_card</span>
+<span class="text-xs font-medium">Visa Card</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 text-amber-500">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+<span class="text-[11px] font-bold">Pending</span>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-white/40 transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a young professional man in a neutral gray background with natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdSe32m8hj2UpU6KTjrUiEIfLZSy31jp2xgQNcUxW4Xb5ghLJPdK6yIONB_0pjhjhld5LC1w1ebZXNQ3GvyBIGzYvPMGeuAlkTFiZsPA8Tx6EgNZwP_0q9fD3WpP1VTw1KD9sqscpFrhzjIgEuPp8K40O3-XkTdNyNLjRwh9ezJ1tYPSpSyvH3YeB60G-519P1tc8I3TTv67cOZhjC-eSKOzrCFaXd7osBosZer3i8E2rkOpWeBzQo7jk0Jzu9H4eGhoA0LoU49Wk"/>
+<div>
+<p class="text-sm font-bold">Zain Malik</p>
+<p class="text-[10px] text-slate-400">#TRX-77210</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-tertiary-container/10 text-tertiary text-[10px] font-bold rounded-full border border-tertiary-container/20 uppercase">Food Security</span>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-slate-700">$1,200.00</p>
+<p class="text-[10px] text-slate-400">15 Oct, 2023</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined text-lg" data-icon="smartphone">smartphone</span>
+<span class="text-xs font-medium">EasyPaisa</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 text-teal-600">
+<span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+<span class="text-[11px] font-bold">Verified</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-6 bg-surface-container-low/30 border-t border-slate-100 flex items-center justify-between">
+<p class="text-xs text-slate-400">Showing 1-10 of 1,248 transactions</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 hover:bg-white transition-colors"><span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span></button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-white text-xs font-bold">1</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-white transition-colors text-xs font-bold">2</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 hover:bg-white transition-colors"><span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar Panel -->
+<div class="space-y-8">
+<!-- Revenue Distribution Chart -->
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm">
+<h3 class="text-sm font-bold text-slate-700 mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-teal-600" data-icon="pie_chart">pie_chart</span>
+                            Revenue by Cause
+                        </h3>
+<div class="relative w-48 h-48 mx-auto mb-6">
+<!-- Visual placeholder for a pie chart using SVG and gradients -->
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="50%" cy="50%" fill="transparent" r="40%" stroke="#20b2aa" stroke-dasharray="100 100" stroke-dashoffset="0" stroke-width="25"></circle>
+<circle cx="50%" cy="50%" fill="transparent" r="40%" stroke="#68abff" stroke-dasharray="35 100" stroke-dashoffset="-65" stroke-width="25"></circle>
+<circle cx="50%" cy="50%" fill="transparent" r="40%" stroke="#e9865b" stroke-dasharray="15 100" stroke-dashoffset="-85" stroke-width="25"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-black text-slate-700">$842k</span>
+<span class="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Total</span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="text-xs font-medium text-slate-500">Clean Water</span>
+</div>
+<span class="text-xs font-bold">65%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="text-xs font-medium text-slate-500">Education</span>
+</div>
+<span class="text-xs font-bold">20%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="text-xs font-medium text-slate-500">Others</span>
+</div>
+<span class="text-xs font-bold">15%</span>
+</div>
+</div>
+</div>
+<!-- Payout Status -->
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="account_balance">account_balance</span>
+                                Payout Status
+                            </h3>
+<button class="text-[10px] font-bold text-primary hover:underline">View All</button>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500" data-icon="foundation">foundation</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold">Agha Khan Fund</p>
+<p class="text-xs font-bold">$12,400</p>
+</div>
+<div class="mt-1 w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+<div class="bg-teal-500 h-full w-full"></div>
+</div>
+<p class="text-[9px] text-teal-600 mt-1 font-bold">Transferred - Success</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500" data-icon="school">school</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold">Citizens Foundation</p>
+<p class="text-xs font-bold">$8,900</p>
+</div>
+<div class="mt-1 w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+<div class="bg-amber-400 h-full w-[60%]"></div>
+</div>
+<p class="text-[9px] text-amber-500 mt-1 font-bold">Processing - 60%</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500" data-icon="medical_services">medical_services</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold">Red Crescent</p>
+<p class="text-xs font-bold">$15,200</p>
+</div>
+<div class="mt-1 w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+<div class="bg-slate-300 h-full w-[20%]"></div>
+</div>
+<p class="text-[9px] text-slate-400 mt-1 font-bold">Scheduled (Oct 24)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- CTA Ad Section -->
+<div class="relative rounded-3xl overflow-hidden aspect-[4/3] flex items-end p-6 group">
+<img alt="Impact Visual" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Warm atmospheric image of a diverse group of children laughing together in an educational setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE2Q0NmFXkd-IpeGVGl-Yj8NtNaxtyB2GIrTzqno3gTq1Dd-jcgSM2_AQTB14c-4-0x48G3x0oaeLInG7z_xzvhlQOTivEMrCRB0jySE4AZBVRsERqH-y35N1MsnuwlrZ8slPs_bii6yuq0_Cgi4pv0Zp5eRmE5cnICiu7NLYVd5zoDl0mvDIC29of4a5NnF1yuwoPIap4u1XneIvJne5gw4kafNTVlG1GjmpltQW2YflV-maGq1oaLh0PFqCt568q_AatQyYWd0Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="relative z-10 text-white">
+<p class="text-[10px] font-bold tracking-widest text-teal-300 mb-2 uppercase">Impact Story</p>
+<h4 class="text-lg font-bold leading-tight mb-4">How your education funds helped 500 children.</h4>
+<button class="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl text-xs font-bold hover:bg-white/30 transition-colors">Read Report</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

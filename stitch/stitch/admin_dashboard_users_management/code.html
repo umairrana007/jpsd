@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management | CharityOS Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-tint": "#006a65",
+              "primary": "#006a65",
+              "on-error-container": "#93000a",
+              "primary-fixed": "#79f6ed",
+              "on-secondary-fixed": "#001c39",
+              "on-primary-fixed": "#00201e",
+              "on-surface-variant": "#3c4948",
+              "tertiary-fixed-dim": "#ffb597",
+              "secondary-fixed": "#d4e3ff",
+              "error-container": "#ffdad6",
+              "tertiary-fixed": "#ffdbcd",
+              "surface-dim": "#d9dadc",
+              "surface-container-low": "#f3f3f5",
+              "primary-container": "#20b2aa",
+              "on-secondary-container": "#003e73",
+              "on-tertiary-container": "#632200",
+              "tertiary-container": "#e9865b",
+              "surface-container-high": "#e8e8ea",
+              "on-primary-container": "#003e3b",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#00504c",
+              "primary-fixed-dim": "#59dad1",
+              "secondary-container": "#68abff",
+              "on-error": "#ffffff",
+              "surface-bright": "#f9f9fb",
+              "secondary": "#0060ac",
+              "on-tertiary-fixed": "#360f00",
+              "outline": "#6c7a78",
+              "surface-container": "#eeeef0",
+              "on-surface": "#1a1c1d",
+              "tertiary": "#984721",
+              "inverse-primary": "#59dad1",
+              "error": "#ba1a1a",
+              "on-background": "#1a1c1d",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#f9f9fb",
+              "inverse-surface": "#2f3132",
+              "inverse-on-surface": "#f0f0f2",
+              "on-secondary-fixed-variant": "#004883",
+              "on-primary": "#ffffff",
+              "background": "#f9f9fb",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-fixed-variant": "#79300b",
+              "outline-variant": "#bbc9c7",
+              "surface-variant": "#e2e2e4",
+              "secondary-fixed-dim": "#a4c9ff",
+              "surface-container-highest": "#e2e2e4"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+<!-- SideNavBar (Anchor) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 gap-2 bg-slate-50 dark:bg-slate-950 h-screen w-64 border-r border-slate-200 dark:border-slate-800 z-50">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-slate-900 dark:text-white leading-none">Global Relief</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-teal-700 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-900/20 rounded-lg translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-medium text-sm">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">volunteer_activism</span>
+<span class="font-medium text-sm">Donations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">auto_awesome_motion</span>
+<span class="font-medium text-sm">Programs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium text-sm">Reports</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1">
+<button class="mb-4 w-full py-2.5 px-4 bg-primary text-white rounded-xl font-bold text-sm shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Campaign
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium text-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar (Anchor) -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold text-teal-700 dark:text-teal-400 tracking-tight">CharityOS Admin</h2>
+<div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<nav class="flex gap-6">
+<a class="text-teal-700 dark:text-teal-400 font-semibold border-b-2 border-teal-600 h-16 flex items-center text-sm" href="#">Overview</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors h-16 flex items-center px-2 text-sm" href="#">Analytics</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors h-16 flex items-center px-2 text-sm" href="#">Permissions</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-lg">search</span>
+</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search records..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<img alt="Admin Profile Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-primary/20 cursor-pointer hover:opacity-80 transition-opacity" data-alt="professional headshot of a female administrator with a friendly expression in a modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABsSlMNu052l1C7uej1SHDdoXcJ4BS1xAXn3LlxZEF33sWBkxPNtxHX7U8d7vre_A3UGls6iqKOlvGN2kPaIHnQqnHBnaJTINIPjvUKmZFbwEzjYWwFwhbTdbG8Odfiqvs9nm4tboB6Avil3OsfCt_Ll4otjE-jD3uXzWC6WiLzoCo66iHt0kjbMiriplH8A2AEboYTpuc14YQaXvvxsjXCEjx_XGxM7L7vZO5Bk5v95rgAJeCIZCNpEJlJW2UyFI0JhIGNrG_H2c"/>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Header Section with Stats -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-1">
+<h3 class="text-3xl font-extrabold tracking-tight text-slate-900">User Management</h3>
+<p class="text-slate-500 font-medium">Manage organization roles, permissions, and account statuses.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-white text-slate-700 font-bold text-sm rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">file_download</span>
+                        Export List
+                    </button>
+<button class="px-5 py-2.5 bg-gradient-to-r from-primary to-primary-container text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">person_add</span>
+                        Invite Member
+                    </button>
+</div>
+</div>
+<!-- Dashboard Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/10 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<span class="text-[10px] font-black text-primary bg-primary-fixed/30 px-2 py-1 rounded-full">+12%</span>
+</div>
+<p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Users</p>
+<h4 class="text-2xl font-black text-slate-900 mt-1">12,482</h4>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-transparent hover:border-secondary/10 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary/10 rounded-lg text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<span class="text-[10px] font-black text-secondary bg-secondary-fixed/30 px-2 py-1 rounded-full">98%</span>
+</div>
+<p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Verified Donors</p>
+<h4 class="text-2xl font-black text-slate-900 mt-1">8,920</h4>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-transparent hover:border-tertiary/10 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-tertiary/10 rounded-lg text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<span class="text-[10px] font-black text-tertiary bg-tertiary-fixed/30 px-2 py-1 rounded-full">+5</span>
+</div>
+<p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Active Volunteers</p>
+<h4 class="text-2xl font-black text-slate-900 mt-1">1,142</h4>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-transparent hover:border-error/10 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-error/10 rounded-lg text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">report</span>
+</div>
+<span class="text-[10px] font-black text-error bg-error-container/50 px-2 py-1 rounded-full">2 Pending</span>
+</div>
+<p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Suspended</p>
+<h4 class="text-2xl font-black text-slate-900 mt-1">24</h4>
+</div>
+</div>
+<!-- RBAC Summary Panel -->
+<div class="glass-panel p-6 rounded-2xl border border-white/40 shadow-xl overflow-hidden relative">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+<div class="relative flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="space-y-2">
+<h5 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">security</span>
+                            Role-Based Access Control
+                        </h5>
+<p class="text-sm text-slate-600 max-w-xl">Global Relief uses hierarchical RBAC to ensure data security. Adjust core permission presets or override individual user roles from the management table below.</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg border border-primary/20">Admin (4)</span>
+<span class="px-3 py-1.5 bg-secondary/10 text-secondary text-xs font-bold rounded-lg border border-secondary/20">Manager (12)</span>
+<span class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg border border-slate-200">Moderator (8)</span>
+<button class="text-xs font-bold text-primary underline underline-offset-4 px-2">Edit Presets</button>
+</div>
+</div>
+</div>
+<!-- Filter & Search Bar -->
+<div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+<div class="flex flex-wrap gap-2 w-full md:w-auto">
+<div class="relative">
+<select class="appearance-none bg-surface-container-high border-none text-sm font-semibold text-slate-700 py-2.5 pl-4 pr-10 rounded-xl focus:ring-2 focus:ring-primary/20 min-w-[140px]">
+<option>All Roles</option>
+<option>Admin</option>
+<option>Donor</option>
+<option>Volunteer</option>
+<option>Content Manager</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-slate-400">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface-container-high border-none text-sm font-semibold text-slate-700 py-2.5 pl-4 pr-10 rounded-xl focus:ring-2 focus:ring-primary/20 min-w-[140px]">
+<option>Status: Any</option>
+<option>Active</option>
+<option>Suspended</option>
+<option>Pending</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-slate-400">filter_list</span>
+</div>
+<button class="p-2.5 bg-surface-container-high text-slate-600 rounded-xl hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+</div>
+<div class="w-full md:w-80 relative">
+<input class="w-full bg-white border-slate-200 border rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" placeholder="Search by name, email or ID..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400">search</span>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="bg-surface-container-lowest rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">User</th>
+<th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">Role</th>
+<th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">Status</th>
+<th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">Last Login</th>
+<th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="User Portrait" class="w-10 h-10 rounded-full object-cover" data-alt="middle-aged man with beard smiling in professional headshot with soft blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoabfjMjjB9e3MYfm3TJxDdY0iztAotJkQ3695qhEo9ZAzqBaV71c4pWOgArNRluYcoYAzXcInaW1I1PdsjPsFrFYsVGc3kQEjLgMQs_PFBh5kBA-Z-wa2lTwIFZu7iVyWrc2HDa2syOW7gJCsR-MXA9beBi1ZnDeRKSYy6oQRiiSa6umyv8O4-9ZM0TOoc0j96WNWhXseMgMPhz2xKjDo07yuT584vNQdh-DKOzwZEj0ZT_TSq0FEImttghzda7APGm6WUceaRTI"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<p class="font-bold text-slate-900 text-sm">Marcus Chen</p>
+<p class="text-xs text-slate-500">marcus.c@charityos.org</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-tight rounded-md">Admin</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-semibold text-slate-700">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">12 mins ago</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Edit User">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-secondary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-xl">lock_reset</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors" title="Suspend">
+<span class="material-symbols-outlined text-xl">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="User Portrait" class="w-10 h-10 rounded-full object-cover" data-alt="young woman with glasses and long dark hair in a professional portrait against a warm neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBftT2yLre9WS6pl5fTQC1W2FHjhhKL64tao3zKV-oKFo11Wu-a1rJgL4hVJc8UafinR_y37a4hIRLuUBG31zyD6vjTLt6yM_x71J4IOoqub7Z10guvCw3OJURB6EXAdLgS4__mBevI6NxRbCzJ-4LKU9le9EijwkPOPS9e6FUemSli_xiCTfxAWnyk6WvGQU_sU5uzDcyGuKxkw0QjCGMqZIF73Yk4cW36Wa0tvtXPuWtHQjECxziMxDi54WZsl_Mbc1oYLRHqt_g"/>
+<div>
+<p class="font-bold text-slate-900 text-sm">Sarah Jenkins</p>
+<p class="text-xs text-slate-500">s.jenkins@gmail.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-black uppercase tracking-tight rounded-md">Donor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-semibold text-slate-700">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">3 days ago</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Edit User">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-secondary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-xl">lock_reset</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors" title="Suspend">
+<span class="material-symbols-outlined text-xl">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="User Portrait" class="w-10 h-10 rounded-full object-cover" data-alt="headshot of a smiling young man in a casual t-shirt against a grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaA5_gHaYqnokwZOUOg_JHG7rQt4TlBsT8hi5rFsj9jhQUeUo6T9mYzxcjmwSIkDt_LxzBD49DFUOvBUjUygwPLbkciVkoCrghuLNphDyxzXwcnglWkZjHMmsI0z6gQGnWGyl21T8DYRA3OPz6bcfgZtR-bnv3wB-iODyqFGLvsmQnGcBaUTy8I5Vj8X3NKgb1Pe7Z-wZ1GDE0zEM6p0hhHBRqPZw1DQK6fxrLqp5nS_oi0pQHvO2x3yNewNZTYNhM_NglyB8jwyA"/>
+<div>
+<p class="font-bold text-slate-900 text-sm">Amir Khan</p>
+<p class="text-xs text-slate-500">amir.vols@relay.org</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary text-[10px] font-black uppercase tracking-tight rounded-md">Volunteer</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+<span class="text-sm font-semibold text-slate-700">Pending</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">Never</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Edit User">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-secondary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-xl">lock_reset</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors" title="Suspend">
+<span class="material-symbols-outlined text-xl">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="User Portrait" class="w-10 h-10 rounded-full object-cover grayscale opacity-60" data-alt="portrait of a woman with short hair and serious expression in a professional studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9Dv9DmE7ArWMrFNIZOAWwKgQOa83hNDcoRoXiABXCzIpZ9oIKHCR86KbrmHOYd7T88w4K3SUfHrE6KU2iH8P2QUlRiiu05vP13KOdO_MmzjJedSoFX46VCh-Av5ujQJvR38aYgYsK-KetU-pvxetDWAMQf3RBoLw28BLfinuzBshWCmqTwO8Xk3ck4X0kzmR1YtMKv7DUzts0e0gP45LSDH25sEj_iofdY4NPPEU0_KlDwt_Ss2-lJXsbTguCCbistCnt8p3xhb4"/>
+<div>
+<p class="font-bold text-slate-400 text-sm line-through">Elena Petrova</p>
+<p class="text-xs text-slate-400">elena.p@content.co</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-slate-200 text-slate-500 text-[10px] font-black uppercase tracking-tight rounded-md">Content Mgr</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-sm font-semibold text-error">Suspended</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">2 months ago</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Edit User">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-primary font-bold text-xs" title="Reactivate Account">
+                                        Reactivate
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-500">Showing 4 of 12,482 users</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary text-white text-xs font-bold shadow-md">1</button>
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-colors">3</button>
+<span class="px-1 text-slate-400 flex items-end">...</span>
+<button class="p-2 rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Asymmetric Informational Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-2 glass-panel p-8 rounded-3xl border border-white/50 shadow-lg flex gap-8 items-center overflow-hidden">
+<div class="flex-1 space-y-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full">Security Alert</div>
+<h6 class="text-2xl font-black text-slate-900 leading-tight">2-Factor Authentication Audit</h6>
+<p class="text-slate-600 text-sm leading-relaxed">Only 42% of administrative accounts have 2FA enabled. We recommend enforcing 2FA for all 'Admin' and 'Manager' roles to maintain compliance with Global Security Standards.</p>
+<button class="px-6 py-2.5 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 transition-colors shadow-lg">Enforce Now</button>
+</div>
+<div class="hidden lg:block w-1/3 relative">
+<div class="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent z-10"></div>
+<img alt="Security Interface" class="rounded-2xl shadow-inner object-cover h-40 w-full opacity-60" data-alt="abstract architectural glass reflecting blue and teal lighting in a high-tech data security center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0k3CUNwJz2SiPqpQsf23PXPuyub7Ygmtoi2zkhVMApOwGooeYSoCKFnkrobIffivRr4ALJmE2DjOvt0x-0w21BeOHLtGNoxHy62ybeGBoMCPRtbVkvNoonq9IT5P7Qbca6I3s5bPq15BNOAcNHo28MaxKGpnFsHazZ0STv82H7QQ18YYHAfp5zEMj7KKvTimFo8KHP6N1Bv_7BSjl7qVXLq3MrA5CKtJy-sOlu4jG5ngZ_9gfQOk_2TcNO7ROtulyzH2iV54lxDQ"/>
+</div>
+</div>
+<div class="bg-gradient-to-br from-primary to-primary-container p-8 rounded-3xl shadow-xl text-white flex flex-col justify-between">
+<div class="space-y-4">
+<span class="material-symbols-outlined text-4xl opacity-50">auto_awesome</span>
+<h6 class="text-xl font-black leading-tight">Smart Roles are Here!</h6>
+<p class="text-white/80 text-xs font-medium leading-relaxed">AI-driven permissions can now automatically assign roles based on volunteer activity and donation history. Want to try the beta?</p>
+</div>
+<button class="mt-6 w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-black text-xs uppercase tracking-widest transition-all">Configure Beta</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Only on Management Screens) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-50 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
+<span class="absolute right-full mr-4 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Quick Invite</span>
+</button>
+</body></html>
