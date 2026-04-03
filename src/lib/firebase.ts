@@ -1,5 +1,5 @@
 // Firebase Configuration and Initialization
-// Lazy initialization to prevent build-time crashes
+// Safe initialization to prevent Vercel client crashes if env variables are missing
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
@@ -14,66 +14,40 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Check if we have a real API key (not a placeholder)
-const isValidConfig = firebaseConfig.apiKey && 
-  !firebaseConfig.apiKey.includes('DUMMY') && 
-  !firebaseConfig.apiKey.includes('REPLACE');
+let app: FirebaseApp | undefined;
+let db: Firestore | undefined;
+let auth: Auth | undefined;
+let storage: FirebaseStorage | undefined;
 
-let app: FirebaseApp | null = null;
-let _db: Firestore | null = null;
-let _auth: Auth | null = null;
-let _storage: FirebaseStorage | null = null;
-
-function getFirebaseApp(): FirebaseApp {
-  if (!app) {
-    if (!isValidConfig) {
-      throw new Error('Firebase not configured. Please add valid environment variables.');
-    }
+try {
+  // Check if we actually have keys
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey !== '' && !firebaseConfig.apiKey.includes('DUMMY')) {
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+  } else {
+    console.warn("FIREBASE IS NOT CONFIGURED! Using mocked services.");
   }
-  return app;
+} catch (error) {
+  console.error("Firebase Initialization Error:", error);
 }
 
-export function getDb(): Firestore {
-  if (!_db) {
-    _db = getFirestore(getFirebaseApp());
-  }
-  return _db;
-}
-
-export function getAuthInstance(): Auth {
-  if (!_auth) {
-    _auth = getAuth(getFirebaseApp());
-  }
-  return _auth;
-}
-
-export function getStorageInstance(): FirebaseStorage {
-  if (!_storage) {
-    _storage = getStorage(getFirebaseApp());
-  }
-  return _storage;
-}
-
-// Legacy exports for backward compatibility - these are lazy getters
-export const db = new Proxy({} as Firestore, {
-  get(_target, prop) {
-    return getDb()[prop as keyof Firestore];
-  }
+// Fallback empty proxies so the app doesn't crash if Firebase fails to load
+const dummyDb = new Proxy({} as Firestore, { get: () => () => ({}) });
+const dummyAuth = new Proxy({} as Auth, { 
+    get: (target, prop) => {
+        if (prop === 'currentUser') return null;
+        return () => {};
+    }
 });
+const dummyStorage = new Proxy({} as FirebaseStorage, { get: () => () => ({}) });
 
-export const auth = new Proxy({} as Auth, {
-  get(_target, prop) {
-    return getAuthInstance()[prop as keyof Auth];
-  }
-});
+export { app };
+export const dbInstance = db || dummyDb;
+export const authInstance = auth || dummyAuth;
+export const storageInstance = storage || dummyStorage;
 
-export const storage = new Proxy({} as FirebaseStorage, {
-  get(_target, prop) {
-    return getStorageInstance()[prop as keyof FirebaseStorage];
-  }
-});
-
-export default {
-  get app() { return getFirebaseApp(); }
-};
+// Exporting as the original names used in the app
+export { dbInstance as db, authInstance as auth, storageInstance as storage };
+export default app;
