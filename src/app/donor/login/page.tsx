@@ -103,7 +103,7 @@ export default function DonorLoginPage() {
               <div className="space-y-2">
                 <div className="flex justify-between px-2">
                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Secret Key</label>
-                   <Link href="/donor/forgot-password" size="sm" className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Revive Access?</Link>
+                   <Link href="/donor/forgot-password" className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Revive Access?</Link>
                 </div>
                 <div className="relative group">
                   <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1ea05f] transition-colors" />
