@@ -1,7 +1,7 @@
 // Firebase Configuration and Initialization
-// Safe initialization to prevent Vercel client crashes if env variables are missing
+// Safe initialization to prevent Vercel client crashes
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, collection, doc } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 
@@ -15,39 +15,32 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp | undefined;
-let db: Firestore | undefined;
-let auth: Auth | undefined;
-let storage: FirebaseStorage | undefined;
+let db: any;
+let auth: any;
+let storage: any;
 
-try {
-  // Check if we actually have keys
-  if (firebaseConfig.apiKey && firebaseConfig.apiKey !== '' && !firebaseConfig.apiKey.includes('DUMMY')) {
+const isConfigured = !!(firebaseConfig.apiKey && firebaseConfig.apiKey !== '' && !firebaseConfig.apiKey.includes('DUMMY'));
+
+if (isConfigured) {
+  try {
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     db = getFirestore(app);
     auth = getAuth(app);
     storage = getStorage(app);
-  } else {
-    console.warn("FIREBASE IS NOT CONFIGURED! Using mocked services.");
+  } catch (error) {
+    console.error("Firebase Initialization Error:", error);
   }
-} catch (error) {
-  console.error("Firebase Initialization Error:", error);
 }
 
-// Fallback empty proxies so the app doesn't crash if Firebase fails to load
-const dummyDb = new Proxy({} as Firestore, { get: () => () => ({}) });
-const dummyAuth = new Proxy({} as Auth, { 
-    get: (target, prop) => {
-        if (prop === 'currentUser') return null;
-        return () => {};
-    }
-});
-const dummyStorage = new Proxy({} as FirebaseStorage, { get: () => () => ({}) });
+// Fallback logic to prevent "collection() expected Firestore" crashes
+if (!db) {
+  console.warn("FIREBASE NOT CONFIGURED! Using safety proxies.");
+  // Mock db as something that won't crash standard calls but won't return data
+  db = { type: 'firestore', _databaseId: { projectId: 'mock' } } as any; 
+  auth = { currentUser: null } as any;
+  storage = {} as any;
+}
 
 export { app };
-export const dbInstance = db || dummyDb;
-export const authInstance = auth || dummyAuth;
-export const storageInstance = storage || dummyStorage;
-
-// Exporting as the original names used in the app
-export { dbInstance as db, authInstance as auth, storageInstance as storage };
+export { db, auth, storage };
 export default app;
