@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Events - Ethereal Guardian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#00201e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#59dad1",
+                        "secondary": "#0060ac",
+                        "inverse-on-surface": "#f0f0f2",
+                        "surface": "#f9f9fb",
+                        "secondary-container": "#68abff",
+                        "surface-tint": "#006a65",
+                        "on-secondary-fixed": "#001c39",
+                        "primary-container": "#20b2aa",
+                        "primary-fixed-dim": "#59dad1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e2e4",
+                        "secondary-fixed-dim": "#a4c9ff",
+                        "on-tertiary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e8e8ea",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#003e3b",
+                        "tertiary": "#984721",
+                        "surface-variant": "#e2e2e4",
+                        "on-tertiary-container": "#632200",
+                        "inverse-surface": "#2f3132",
+                        "outline-variant": "#bbc9c7",
+                        "error": "#ba1a1a",
+                        "outline": "#6c7a78",
+                        "tertiary-fixed": "#ffdbcd",
+                        "surface-container": "#eeeef0",
+                        "primary": "#006a65",
+                        "on-surface-variant": "#3c4948",
+                        "surface-bright": "#f9f9fb",
+                        "surface-container-low": "#f3f3f5",
+                        "on-secondary-fixed-variant": "#004883",
+                        "primary-fixed": "#79f6ed",
+                        "on-tertiary-fixed-variant": "#79300b",
+                        "tertiary-fixed-dim": "#ffb597",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#e9865b",
+                        "on-secondary-container": "#003e73",
+                        "on-surface": "#1a1c1d",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-background": "#1a1c1d",
+                        "background": "#f9f9fb",
+                        "surface-dim": "#d9dadc",
+                        "on-primary-fixed-variant": "#00504c"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .ethereal-bg {
+            background: radial-gradient(circle at top right, #e0f2f1 0%, #f9f9fb 50%, #e3f2fd 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen ethereal-bg pb-24">
+<!-- TopAppBar from JSON -->
+<header class="sticky top-0 w-full z-50 flex items-center px-4 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-sm dark:shadow-none">
+<div class="flex items-center w-full justify-between">
+<div class="flex items-center gap-3">
+<button class="text-teal-600 dark:text-teal-400 active:scale-95 transition-transform p-2 rounded-full hover:bg-teal-50/50 dark:hover:bg-teal-900/20">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Inter'] font-semibold text-lg tracking-tight text-on-surface">Events</h1>
+</div>
+<div class="flex items-center">
+<span class="text-teal-600 dark:text-teal-400 font-bold tracking-tighter text-xl">Ethereal Guardian</span>
+</div>
+</div>
+</header>
+<main class="px-5 pt-4">
+<!-- Search Bar Section -->
+<section class="mb-6">
+<div class="glass-panel rounded-2xl flex items-center px-4 py-3 shadow-sm group focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-outline mr-3" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface w-full placeholder:text-outline/70" placeholder="Find an impactful event..." type="text"/>
+<span class="material-symbols-outlined text-outline ml-3" data-icon="tune">tune</span>
+</div>
+</section>
+<!-- View Toggle & Filter Section -->
+<section class="mb-6">
+<div class="flex items-center justify-between mb-5">
+<div class="bg-surface-container-low p-1 rounded-full flex gap-1 border border-outline-variant/30">
+<button class="bg-white shadow-sm px-4 py-1.5 rounded-full text-sm font-semibold text-primary transition-all">List View</button>
+<button class="px-4 py-1.5 rounded-full text-sm font-medium text-on-surface-variant hover:text-primary transition-all">Calendar</button>
+</div>
+<div class="flex items-center text-primary font-semibold text-sm gap-1 group cursor-pointer">
+<span>This Month</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Categories Scroll -->
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar -mx-5 px-5">
+<button class="flex-shrink-0 bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-medium shadow-md shadow-primary/20">All</button>
+<button class="flex-shrink-0 glass-panel border-none text-on-surface-variant px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-container/20 transition-colors">Medical</button>
+<button class="flex-shrink-0 glass-panel border-none text-on-surface-variant px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-container/20 transition-colors">Food</button>
+<button class="flex-shrink-0 glass-panel border-none text-on-surface-variant px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-container/20 transition-colors">Education</button>
+<button class="flex-shrink-0 glass-panel border-none text-on-surface-variant px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-container/20 transition-colors">Emergency</button>
+</div>
+</section>
+<!-- Events List -->
+<div class="space-y-6">
+<!-- Event Card 1 -->
+<div class="glass-panel rounded-[2.5rem] overflow-hidden flex flex-col shadow-sm border-none">
+<div class="relative h-56 w-full">
+<img alt="Medical Camp" class="w-full h-full object-cover" data-alt="Modern mobile clinic setup in a bright community center with professional doctors in white coats caring for local residents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKaLOc0u6PB94cwq8SEEPjpHe-96el5yXgbDyMB0XR53fj53tI6VZ3txVEWHWGAC4yi9HuGKje6v9z6LK8oBTRYU4dlhgVDAwOITN75AxSiUOcb1RLprtQNUz2lDQGTO9ZgGE8dQ1EUNxsxUccEVxXI4AJLVNqtuOgKa28p33fqVLkLdy-tspIi9iiyei_q7PBnMQWG49FGavqwlCmH6dqsQ0kCTgbCfIDu-LUIo3akI2F-FGW7Z0koweUJ2znTCx6aIiX9Rd5zpA"/>
+<div class="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-2xl flex flex-col items-center min-w-[50px]">
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary leading-none">Oct</span>
+<span class="text-xl font-black text-on-surface leading-none">24</span>
+</div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-4 mb-3">
+<span class="flex items-center gap-1 text-[11px] font-semibold text-primary uppercase tracking-wider bg-primary-container/20 px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="medical_services">medical_services</span>
+                            Medical
+                        </span>
+<span class="flex items-center gap-1 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                            Downtown Community Hub
+                        </span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight text-on-surface mb-2 leading-tight">Free Medical Camp &amp; Wellness Checkup</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed line-clamp-2">Join our volunteer doctors providing comprehensive health screenings, vaccinations, and essential medicine distributions for local families.</p>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary font-bold py-4 rounded-2xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">Register Now</button>
+<button class="aspect-square glass-panel flex items-center justify-center p-4 rounded-2xl text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Event Card 2 -->
+<div class="glass-panel rounded-[2.5rem] overflow-hidden flex flex-col shadow-sm border-none">
+<div class="relative h-56 w-full">
+<img alt="Food Drive" class="w-full h-full object-cover" data-alt="Diverse group of cheerful volunteers packing boxes with fresh vegetables and grains in a brightly lit industrial kitchen space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTczPp6CoAoeOo0zFoChU71QPX0gpn3S0NxYbTiQZqg0CC_KkyEJra-4sGt_r6yJ0pO0oHpDA4TzsNUHEdvxE3npjXrK2vF5Q-pilqqR0gbZFD_6-J3mS_DCl_mMNvggUm5q7dc4lFnK6ZNUKxp2WinjdxYKk2ppYG7rRoESm_wS0IZAhVVGQ-3ngtsXwfmk6u-f8NQY-U_iMbg-s73sJDD8RfT2dMy02aq4eoUN-CI8BXDR_E3L4johyJoJqfS42tiXARQr1Dgwg"/>
+<div class="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-2xl flex flex-col items-center min-w-[50px]">
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary leading-none">Nov</span>
+<span class="text-xl font-black text-on-surface leading-none">02</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-4 mb-3">
+<span class="flex items-center gap-1 text-[11px] font-semibold text-secondary uppercase tracking-wider bg-secondary-container/20 px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="volunteer_activism">volunteer_activism</span>
+                            Food Drive
+                        </span>
+<span class="flex items-center gap-1 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                            Central Square Plaza
+                        </span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight text-on-surface mb-2 leading-tight">Harvest Moon Food Security Drive</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed line-clamp-2">Help us package and distribute over 5,000 nutritional meals to families in need within our urban districts this weekend.</p>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary font-bold py-4 rounded-2xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">Register Now</button>
+<button class="aspect-square glass-panel flex items-center justify-center p-4 rounded-2xl text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Event Card 3 (Bento-style summary) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-5 rounded-[2rem] flex flex-col justify-between aspect-square">
+<div class="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface leading-tight mb-1">Education Fair</h4>
+<p class="text-[10px] text-on-surface-variant font-medium tracking-wider uppercase">Nov 15 • Virtual</p>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-[2rem] flex flex-col justify-between aspect-square">
+<div class="bg-error/10 w-10 h-10 rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-error" data-icon="emergency">emergency</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface leading-tight mb-1">Crisis Relief Training</h4>
+<p class="text-[10px] text-on-surface-variant font-medium tracking-wider uppercase">Dec 01 • HQ</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-teal-500/10 dark:border-teal-400/10">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1.5 hover:text-teal-500 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-['Inter'] text-[10px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1.5 hover:text-teal-500 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-['Inter'] text-[10px] font-medium tracking-wide">Causes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1.5 hover:text-teal-500 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="card_giftcard">card_giftcard</span>
+<span class="font-['Inter'] text-[10px] font-medium tracking-wide">Donate</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-2xl px-3 py-1.5 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="event" style="font-variation-settings: 'FILL' 1;">event</span>
+<span class="font-['Inter'] text-[10px] font-medium tracking-wide">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1.5 hover:text-teal-500 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Inter'] text-[10px] font-medium tracking-wide">Profile</span>
+</a>
+</nav>
+</body></html>

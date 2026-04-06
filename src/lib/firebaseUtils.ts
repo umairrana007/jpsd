@@ -1,6 +1,6 @@
 // Firebase utility functions for common operations
 
-import { db } from './firebase';
+import { db, isFirebaseConfigured } from './firebase';
 import { 
   collection, 
   addDoc, 
@@ -14,11 +14,19 @@ import {
   where,
   orderBy,
   limit,
-  Timestamp
+  Timestamp,
+  Firestore
 } from 'firebase/firestore';
-import { Cause, Event, BlogPost, Volunteer, User } from '@/types';
-import { MOCK_CAUSES, MOCK_EVENTS, MOCK_BLOG_POSTS } from '@/data/mockData';
+import { Cause, Event, BlogPost, Volunteer, User, UserRole } from '@/types';
 import { getSafeImageUrl } from './imageUtils';
+
+// Helper to get non-null db reference (throws if not configured)
+const getDb = (): Firestore => {
+  if (!db) {
+    throw new Error('Firebase not configured. Set environment variables.');
+  }
+  return db;
+};
 
 // Helper for timing out database calls
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 1000): Promise<T> => {
@@ -30,42 +38,31 @@ const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 1000): Promise<
   ]);
 };
 
+// Global check for Firebase availability
+const isDBAvailable = () => isFirebaseConfigured && db !== null;
+
 // Donation Operations
 export const createDonation = async (donationData: any) => {
+  if (!isDBAvailable()) return null;
+
   try {
-    // Attempt real database operation
-    const docPromise = addDoc(collection(db, 'donations'), {
+    const donationRef = await addDoc(collection(getDb() as Firestore, 'donations'), {
       ...donationData,
       createdAt: Timestamp.now(),
       status: 'pending'
     });
-
-    // Create a timeout promise to prevent infinite loading
-    let timeoutId: NodeJS.Timeout;
-    const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('Network Timeout')), 2000);
-    });
-
-    // Race between the real DB call and a 2s timeout
-    const donationRef = await Promise.race([docPromise, timeoutPromise]) as any;
-    
-    // Clear the timeout if the database operation succeeded quickly
-    clearTimeout(timeoutId!);
     
     return donationRef.id;
   } catch (error) {
-    console.error('Error creating donation, falling back to mock success:', error);
-    
-    // Simulate short network delay for UX then return mock ID
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return `MOCK-TXN-${Date.now()}`;
+    console.error('Error creating donation:', error);
+    throw error;
   }
 };
 
 export const getDonations = async () => {
   try {
     const donationsQuery = query(
-      collection(db, 'donations'),
+      collection(getDb(), 'donations'),
       orderBy('createdAt', 'desc')
     );
     const snapshot = await getDocs(donationsQuery);
@@ -79,7 +76,7 @@ export const getDonations = async () => {
 export const getUserDonations = async (userId: string) => {
   try {
     const donationsQuery = query(
-      collection(db, 'donations'),
+      collection(getDb(), 'donations'),
       where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
@@ -97,55 +94,23 @@ export const getUserDonations = async (userId: string) => {
 
 // Program Operations
 export const getPrograms = async () => {
-  try {
-    const programsQuery = query(collection(db, 'programs'));
-    const snapshot = await withTimeout(getDocs(programsQuery), 1000);
-    return snapshot.docs.map(doc => {
-      const data = doc.data() as any;
-      return {
-        ...data,
-        id: doc.id,
-        image: getSafeImageUrl(data.image)
-      };
-    });
-  } catch (error: any) {
-    if (error.message === 'TIMEOUT') {
-      console.log('Database too slow, using local sample programs...');
-    } else {
-      console.error('Error getting programs:', error);
-    }
-    return []; // Component will fallback to sample data
-  }
+  return getCauses(); // Synchronizing with 'causes'
 };
 
 export const getProgramById = async (id: string) => {
-  try {
-    const programRef = doc(db, 'programs', id);
-    const programSnap = await withTimeout(getDoc(programRef), 1000);
-    if (programSnap.exists()) {
-      const data = programSnap.data() as any;
-      return { 
-        ...data,
-        id: programSnap.id,
-        image: getSafeImageUrl(data.image)
-      };
-    }
-    return null;
-  } catch (error: any) {
-    console.error('Error getting program:', error);
-    return null;
-  }
+  return getCauseById(id); // Synchronizing with 'causes'
 };
 
 // Cause Operations
 export const getCauses = async (): Promise<Cause[]> => {
+  if (!isDBAvailable()) return [];
+
   try {
     const causesQuery = query(
-      collection(db, 'causes'),
+      collection(getDb() as Firestore, 'causes'),
       orderBy('createdAt', 'desc')
     );
-    const snapshot = await withTimeout(getDocs(causesQuery), 1000);
-    if (snapshot.empty) return MOCK_CAUSES;
+    const snapshot = await getDocs(causesQuery);
     
     return snapshot.docs.map(doc => {
       const data = doc.data() as any;
@@ -159,18 +124,14 @@ export const getCauses = async (): Promise<Cause[]> => {
       } as Cause;
     });
   } catch (error: any) {
-    if (error.message === 'TIMEOUT') {
-      console.log('Database too slow, loading local causes...');
-    } else {
-      console.error('Database Error:', error);
-    }
-    return MOCK_CAUSES;
+    console.error('Database Error:', error);
+    return [];
   }
 };
 
 export const getCauseById = async (id: string): Promise<Cause | null> => {
   try {
-    const causeRef = doc(db, 'causes', id);
+    const causeRef = doc(getDb(), 'causes', id);
     const causeSnap = await getDoc(causeRef);
     if (causeSnap.exists()) {
       const data = causeSnap.data() as any;
@@ -183,23 +144,22 @@ export const getCauseById = async (id: string): Promise<Cause | null> => {
         updatedAt: data.updatedAt?.toDate(),
       } as Cause;
     }
-    // Check mocks if not found in firebase
-    return MOCK_CAUSES.find(c => c.id === id) || null;
   } catch (error) {
-    console.error('Error getting cause:', error);
-    return MOCK_CAUSES.find(c => c.id === id) || null;
+    console.error('Error getting cause detail:', error);
   }
+  return null;
 };
 
 // Event Operations
 export const getEvents = async (): Promise<Event[]> => {
+  if (!isDBAvailable()) return [];
+
   try {
     const eventsQuery = query(
-      collection(db, 'events'),
+      collection(getDb() as Firestore, 'events'),
       orderBy('startDate', 'asc')
     );
-    const snapshot = await withTimeout(getDocs(eventsQuery), 1000);
-    if (snapshot.empty) return MOCK_EVENTS;
+    const snapshot = await getDocs(eventsQuery);
 
     return snapshot.docs.map(doc => {
       const data = doc.data() as any;
@@ -214,25 +174,44 @@ export const getEvents = async (): Promise<Event[]> => {
       } as Event;
     });
   } catch (error: any) {
-    if (error.message === 'TIMEOUT') {
-      console.log('Database too slow, loading local events...');
-    } else {
-      console.error('Database Error:', error);
-    }
-    return MOCK_EVENTS;
+    console.error('Database Error:', error);
+    return [];
   }
+};
+
+export const getEventById = async (id: string): Promise<Event | null> => {
+  try {
+    const eventRef = doc(getDb(), 'events', id);
+    const eventSnap = await getDoc(eventRef);
+    if (eventSnap.exists()) {
+      const data = eventSnap.data() as any;
+      return {
+        ...data,
+        id: eventSnap.id,
+        image: getSafeImageUrl(data.image),
+        startDate: data.startDate?.toDate(),
+        endDate: data.endDate?.toDate(),
+        registrationDeadline: data.registrationDeadline?.toDate(),
+        createdAt: data.createdAt?.toDate(),
+      } as Event;
+    }
+  } catch (error) {
+    console.error('Error getting event detail:', error);
+  }
+  return null;
 };
 
 // Blog Post Operations
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
+  if (!isDBAvailable()) return [];
+
   try {
     const postsQuery = query(
-      collection(db, 'blog_posts'),
+      collection(getDb() as Firestore, 'blog_posts'),
       where('published', '==', true),
       orderBy('publishedAt', 'desc')
     );
-    const snapshot = await withTimeout(getDocs(postsQuery), 1000);
-    if (snapshot.empty) return MOCK_BLOG_POSTS;
+    const snapshot = await getDocs(postsQuery);
 
     return snapshot.docs.map(doc => {
       const data = doc.data() as any;
@@ -246,19 +225,36 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
       } as BlogPost;
     });
   } catch (error: any) {
-    if (error.message === 'TIMEOUT') {
-      console.log('Database too slow, loading local blog posts...');
-    } else {
-      console.error('Database Error:', error);
-    }
-    return MOCK_BLOG_POSTS;
+    console.error('Database Error:', error);
+    return [];
   }
+};
+
+export const getBlogPostById = async (id: string): Promise<BlogPost | null> => {
+  try {
+    const postRef = doc(getDb(), 'blog_posts', id);
+    const postSnap = await getDoc(postRef);
+    if (postSnap.exists()) {
+      const data = postSnap.data() as any;
+      return {
+        ...data,
+        id: postSnap.id,
+        image: getSafeImageUrl(data.image),
+        publishedAt: data.publishedAt?.toDate(),
+        createdAt: data.createdAt?.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+      } as BlogPost;
+    }
+  } catch (error) {
+    console.error('Error getting blog post details:', error);
+  }
+  return null;
 };
 
 // Volunteer Operations
 export const createVolunteer = async (volunteerData: Partial<Volunteer>) => {
   try {
-    const docRef = await addDoc(collection(db, 'volunteers'), {
+    const docRef = await addDoc(collection(getDb(), 'volunteers'), {
       ...volunteerData,
       status: 'pending',
       hoursLogged: 0,
@@ -269,13 +265,13 @@ export const createVolunteer = async (volunteerData: Partial<Volunteer>) => {
     return docRef.id;
   } catch (error) {
     console.error('Error creating volunteer:', error);
-    return `MOCK-VOL-${Date.now()}`;
+    throw error;
   }
 };
 
 export const getVolunteers = async (): Promise<Volunteer[]> => {
   try {
-    const volunteersQuery = query(collection(db, 'volunteers'), orderBy('joinedAt', 'desc'));
+    const volunteersQuery = query(collection(getDb(), 'volunteers'), orderBy('joinedAt', 'desc'));
     const snapshot = await getDocs(volunteersQuery);
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -291,7 +287,7 @@ export const getVolunteers = async (): Promise<Volunteer[]> => {
 
 export const registerForEvent = async (volunteerId: string, eventId: string) => {
   try {
-    const registrationRef = await addDoc(collection(db, 'event_registrations'), {
+    const registrationRef = await addDoc(collection(getDb(), 'event_registrations'), {
       volunteerId,
       eventId,
       status: 'registered',
@@ -299,7 +295,7 @@ export const registerForEvent = async (volunteerId: string, eventId: string) => 
     });
     
     // Update volunteer's assignedEvents
-    const volunteerRef = doc(db, 'volunteers', volunteerId);
+    const volunteerRef = doc(getDb(), 'volunteers', volunteerId);
     const volunteerSnap = await getDoc(volunteerRef);
     if (volunteerSnap.exists()) {
       const currentEvents = volunteerSnap.data().assignedEvents || [];
@@ -318,7 +314,7 @@ export const registerForEvent = async (volunteerId: string, eventId: string) => 
 // Admin Configuration Operations
 export const getGlobalSettings = async () => {
   try {
-    const docRef = doc(db, 'settings', 'global');
+    const docRef = doc(getDb(), 'global_config', 'site-settings');
     const snap = await getDoc(docRef);
     return snap.exists() ? snap.data() : null;
   } catch (error) {
@@ -329,7 +325,7 @@ export const getGlobalSettings = async () => {
 
 export const updateGlobalSettings = async (settings: any) => {
   try {
-    await setDoc(doc(db, 'settings', 'global'), {
+    await setDoc(doc(getDb(), 'global_config', 'site-settings'), {
       ...settings,
       updatedAt: Timestamp.now()
     }, { merge: true });
@@ -342,7 +338,7 @@ export const updateGlobalSettings = async (settings: any) => {
 
 export const getThemeSettings = async () => {
   try {
-    const docRef = doc(db, 'settings', 'theme');
+    const docRef = doc(getDb(), 'settings', 'theme');
     const snap = await getDoc(docRef);
     return snap.exists() ? snap.data() : null;
   } catch (error) {
@@ -353,7 +349,7 @@ export const getThemeSettings = async () => {
 
 export const updateThemeSettings = async (theme: any) => {
   try {
-    await setDoc(doc(db, 'settings', 'theme'), {
+    await setDoc(doc(getDb(), 'settings', 'theme'), {
       ...theme,
       updatedAt: Timestamp.now()
     }, { merge: true });
@@ -366,7 +362,7 @@ export const updateThemeSettings = async (theme: any) => {
 
 export const getNavigationSettings = async () => {
   try {
-    const docRef = doc(db, 'settings', 'navigation');
+    const docRef = doc(getDb(), 'settings', 'navigation');
     const snap = await getDoc(docRef);
     return snap.exists() ? snap.data() : { items: [] };
   } catch (error) {
@@ -377,7 +373,7 @@ export const getNavigationSettings = async () => {
 
 export const updateNavigationSettings = async (items: any[]) => {
   try {
-    await setDoc(doc(db, 'settings', 'navigation'), {
+    await setDoc(doc(getDb(), 'settings', 'navigation'), {
       items,
       updatedAt: Timestamp.now()
     });
@@ -390,32 +386,25 @@ export const updateNavigationSettings = async (items: any[]) => {
 
 // Live Stats Operations
 export const getLiveStats = async () => {
+  if (!isDBAvailable()) return null;
+
   try {
-    const statsQuery = query(collection(db, 'live_stats'), limit(1));
-    const snapshot = await withTimeout(getDocs(statsQuery), 500);
+    const statsQuery = query(collection(getDb() as Firestore, 'live_stats'), limit(1));
+    const snapshot = await getDocs(statsQuery);
     if (!snapshot.empty) {
       return snapshot.docs[0].data();
     }
-    return { totalLivesServed: 0, totalDonationsReceived: 0 };
+    return null;
   } catch (error: any) {
-    if (error.message === 'TIMEOUT') {
-      console.log('Database too slow, loading local stats...');
-    } else {
-      console.error('Database Error:', error);
-    }
-    return { 
-      totalLivesServed: 125000, 
-      totalDonationsReceived: 850000,
-      activePrograms: 42,
-      volunteersCount: 1560
-    };
+    console.error('Database Error:', error);
+    return null;
   }
 };
 
 // User Operations
 export const createUser = async (userData: any) => {
   try {
-    const userRef = await doc(db, 'users', userData.uid);
+    const userRef = await doc(getDb(), 'users', userData.uid);
     await setDoc(userRef, {
       ...userData,
       createdAt: Timestamp.now()
@@ -429,7 +418,7 @@ export const createUser = async (userData: any) => {
 
 export const getUsers = async () => {
   try {
-    const usersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+    const usersQuery = query(collection(getDb(), 'users'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(usersQuery);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
@@ -438,14 +427,21 @@ export const getUsers = async () => {
   }
 };
 
-export const updateUserStatus = async (userId: string, status: 'approved' | 'rejected' | 'inactive', isActive: boolean) => {
+export const updateUserStatus = async (userId: string, status: 'approved' | 'rejected' | 'inactive' | 'pending' | 'pending_deletion', isActive: boolean) => {
   try {
-    const userRef = doc(db, 'users', userId);
+    const userRef = doc(getDb(), 'users', userId);
     await updateDoc(userRef, {
       status,
       isActive,
       updatedAt: Timestamp.now()
     });
+    
+    await logActivity({
+      type: 'USER_ADMIN',
+      message: `User ${userId} status updated to ${status} (${isActive ? 'Active' : 'Inactive'})`,
+      icon: '👤'
+    });
+
     return true;
   } catch (error) {
     console.error('Error updating user status:', error);
@@ -453,10 +449,31 @@ export const updateUserStatus = async (userId: string, status: 'approved' | 'rej
   }
 };
 
+export const updateUserRole = async (userId: string, role: UserRole) => {
+  try {
+    const userRef = doc(getDb(), 'users', userId);
+    await updateDoc(userRef, {
+      role,
+      updatedAt: Timestamp.now()
+    });
+
+    await logActivity({
+      type: 'USER_ROLE',
+      message: `User ${userId} role changed to ${role}`,
+      icon: '🛡️'
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error updating user role:', error);
+    throw error;
+  }
+};
+
 // Newsletter Subscription Operations
 export const subscribeToNewsletter = async (email: string) => {
   try {
-    const subscriptionRef = await addDoc(collection(db, 'subscriptions'), {
+    const subscriptionRef = await addDoc(collection(getDb(), 'subscriptions'), {
       email,
       subscribedAt: Timestamp.now(),
       status: 'active'
@@ -464,18 +481,17 @@ export const subscribeToNewsletter = async (email: string) => {
     return subscriptionRef.id;
   } catch (error) {
     console.error('Error subscribing to newsletter:', error);
-    // Silent fallback for demo purposes
-    return `MOCK-SUB-${Date.now()}`;
+    throw error;
   }
 };
 // System Stats Aggregator (HQ Stats)
 export const getSystemStats = async () => {
   try {
     const [donorsSnap, donationsSnap, volunteersSnap, eventsSnap] = await Promise.all([
-      getDocs(collection(db, 'users')), // Filter role=donor if needed
-      getDocs(collection(db, 'donations')),
-      getDocs(collection(db, 'volunteers')),
-      getDocs(collection(db, 'events'))
+      getDocs(collection(getDb(), 'users')), // Filter role=donor if needed
+      getDocs(collection(getDb(), 'donations')),
+      getDocs(collection(getDb(), 'volunteers')),
+      getDocs(collection(getDb(), 'events'))
     ]);
 
     const totalDonations = donationsSnap.docs.reduce((acc, doc) => acc + (doc.data().amount || 0), 0);
@@ -495,20 +511,13 @@ export const getSystemStats = async () => {
     };
   } catch (e) {
     console.error('HQ Sync Failure:', e);
-    return {
-      totalDonors: 1245,
-      totalDonations: 850000,
-      todayDonations: 45000,
-      activeVolunteers: 850,
-      upcomingMissions: 12,
-      systemHealth: 'Simulation Mode'
-    };
+    return null;
   }
 };
 // HQ Command Intelligence: Global Search
 export const searchUsers = async (searchTerm: string) => {
   try {
-    const usersCol = collection(db, 'users');
+    const usersCol = collection(getDb(), 'users');
     const q = query(
       usersCol,
       orderBy('name'),
@@ -532,10 +541,21 @@ export const searchUsers = async (searchTerm: string) => {
   }
 };
 
+export const logActivity = async (activity: { type: string, message: string, userId?: string, icon?: string }) => {
+  try {
+    await addDoc(collection(getDb(), 'activity_logs'), {
+      ...activity,
+      timestamp: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error logging activity:', error);
+  }
+};
+
 // Tactical Activity Stream
 export const getRecentActivity = async () => {
   try {
-    const logsCol = collection(db, 'activity_logs');
+    const logsCol = collection(getDb(), 'activity_logs');
     const q = query(logsCol, orderBy('timestamp', 'desc'), limit(15));
     const snapshot = await getDocs(q);
     

@@ -9,8 +9,10 @@ import {
 } from 'react-icons/fi';
 import { updateSiteSettings } from './actions';
 import { getGlobalConfig, SiteSettings } from '@/lib/settings';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
 
-export default function LayoutManagerPage() {
+function LayoutManagerPage() {
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -21,6 +23,10 @@ export default function LayoutManagerPage() {
     heroTitleUr: '',
     primaryColor: '#1ea05f',
     secondaryColor: '#3b82f6',
+    livesServed: 0,
+    donationsReceived: 0,
+    volunteersCount: 0,
+    programsCount: 0,
   });
 
   useEffect(() => {
@@ -45,6 +51,10 @@ export default function LayoutManagerPage() {
         heroTitleUr: settings.heroTitleUr || '',
         primaryColor: settings.primaryColor || '#1ea05f',
         secondaryColor: settings.secondaryColor || '#3b82f6',
+        livesServed: Number(settings.livesServed) || 0,
+        donationsReceived: Number(settings.donationsReceived) || 0,
+        volunteersCount: Number(settings.volunteersCount) || 0,
+        programsCount: Number(settings.programsCount) || 0,
       });
 
       if (result.success) {
@@ -173,6 +183,55 @@ export default function LayoutManagerPage() {
                 </div>
              </motion.section>
            )}
+
+           {/* Impact Metrics Overrides */}
+           <section className="bg-white/70 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-sm space-y-10 mt-10">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500">
+                  <FiTable size={24} />
+                </div>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase">Impact Metrics Overrides</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Lives Served Count</label>
+                    <input 
+                       type="number" 
+                       value={settings.livesServed} 
+                       onChange={(e) => setSettings({...settings, livesServed: Number(e.target.value)})}
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none" 
+                    />
+                 </div>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Total Donations ($)</label>
+                    <input 
+                       type="number" 
+                       value={settings.donationsReceived} 
+                       onChange={(e) => setSettings({...settings, donationsReceived: Number(e.target.value)})}
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none" 
+                    />
+                 </div>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Active Programs Count</label>
+                    <input 
+                       type="number" 
+                       value={settings.programsCount} 
+                       onChange={(e) => setSettings({...settings, programsCount: Number(e.target.value)})}
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none" 
+                    />
+                 </div>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Total Volunteers</label>
+                    <input 
+                       type="number" 
+                       value={settings.volunteersCount} 
+                       onChange={(e) => setSettings({...settings, volunteersCount: Number(e.target.value)})}
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none" 
+                    />
+                 </div>
+              </div>
+           </section>
         </div>
 
         {/* Live Status SideCard */}
@@ -225,3 +284,6 @@ export default function LayoutManagerPage() {
     </div>
   );
 }
+export default withAuth(LayoutManagerPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

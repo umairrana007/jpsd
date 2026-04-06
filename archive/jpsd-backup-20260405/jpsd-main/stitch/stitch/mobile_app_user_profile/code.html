@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Noto+Nastaliq+Urdu:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#006a65",
+              "on-surface-variant": "#3c4948",
+              "surface-container-low": "#f3f3f5",
+              "on-secondary-fixed-variant": "#004883",
+              "surface-bright": "#f9f9fb",
+              "outline": "#6c7a78",
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container": "#eeeef0",
+              "on-secondary-container": "#003e73",
+              "secondary-fixed": "#d4e3ff",
+              "on-background": "#1a1c1d",
+              "background": "#f9f9fb",
+              "on-surface": "#1a1c1d",
+              "surface-dim": "#d9dadc",
+              "on-primary-fixed-variant": "#00504c",
+              "primary-fixed": "#79f6ed",
+              "on-tertiary-fixed-variant": "#79300b",
+              "tertiary-fixed-dim": "#ffb597",
+              "tertiary-container": "#e9865b",
+              "on-tertiary": "#ffffff",
+              "primary-container": "#20b2aa",
+              "surface-tint": "#006a65",
+              "on-secondary-fixed": "#001c39",
+              "primary-fixed-dim": "#59dad1",
+              "on-primary-fixed": "#00201e",
+              "secondary": "#0060ac",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#59dad1",
+              "surface": "#f9f9fb",
+              "secondary-container": "#68abff",
+              "inverse-on-surface": "#f0f0f2",
+              "on-primary-container": "#003e3b",
+              "on-primary": "#ffffff",
+              "on-tertiary-container": "#632200",
+              "tertiary": "#984721",
+              "surface-variant": "#e2e2e4",
+              "outline-variant": "#bbc9c7",
+              "error": "#ba1a1a",
+              "inverse-surface": "#2f3132",
+              "surface-container-highest": "#e2e2e4",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed": "#360f00",
+              "on-error": "#ffffff",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#e8e8ea"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .ethereal-bg {
+            background: radial-gradient(circle at 0% 0%, #e0f2f1 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, #e3f2fd 0%, transparent 50%),
+                        #f9f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="ethereal-bg font-body text-on-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<button class="text-teal-700 dark:text-teal-400 hover:bg-white/20 transition-colors p-2 rounded-full active:scale-95">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Inter'] font-semibold text-lg tracking-tight text-teal-800 dark:text-teal-200">Profile</h1>
+<button class="text-teal-700 dark:text-teal-400 hover:bg-white/20 transition-colors p-2 rounded-full active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="pt-24 px-6 space-y-6">
+<!-- Profile Header Section -->
+<section class="glass-panel rounded-[2rem] p-6 flex flex-col items-center text-center relative overflow-hidden">
+<!-- Decorative Glow -->
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary-container/20 blur-3xl rounded-full"></div>
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-primary to-primary-container">
+<img alt="User Avatar" class="w-full h-full object-cover rounded-full border-2 border-white" data-alt="portrait of a confident man with a friendly smile, professional lighting, soft bokeh background, high-end editorial photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc17FHSj72McmmtNvjlmFlMmsIE78oRlyQKkh361SUpAiP4ZlRsKdbocSAH5910pANcpI9sjc0YFqph2vrG6yngvXrpgHSFNS54o8o4HLiI4JzFzUZJxI5dxxSZOcC2U0TodgeTRtAfkX5L3awMyLX-bJvMiaQGDZ7S-NrbPd65BxSalkIemmH3GDIeoxayU4uDnp7aO5XRij04NN0Rqx0Pbnn7jFTc1fPkKGfrEkBI_3I7SrSuQBVCTShbjZ-sS92joQujqIe2LI"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-white px-3 py-1 rounded-full shadow-sm flex items-center gap-1 border border-outline-variant">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase">Level 4</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold tracking-tight text-on-background">Alex Guardian</h2>
+<p class="text-primary font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                Global Volunteer
+            </p>
+</section>
+<!-- Impact Stats -->
+<section class="glass-panel rounded-3xl p-5 grid grid-cols-3 divide-x divide-outline-variant/30">
+<div class="flex flex-col items-center justify-center space-y-1">
+<span class="text-xl font-extrabold text-on-background">12</span>
+<span class="text-[10px] uppercase tracking-wider text-outline font-semibold">Donations</span>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<span class="text-xl font-extrabold text-on-background">$540</span>
+<span class="text-[10px] uppercase tracking-wider text-outline font-semibold">Total</span>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<span class="text-xl font-extrabold text-on-background">4</span>
+<span class="text-[10px] uppercase tracking-wider text-outline font-semibold">Events</span>
+</div>
+</section>
+<!-- Profile Menu List -->
+<section class="space-y-3">
+<!-- Donation History -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between group active:scale-[0.98] transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Donation History</p>
+<p class="text-xs text-outline">Manage your contributions</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">New</span>
+<span class="material-symbols-outlined text-outline text-lg">chevron_right</span>
+</div>
+</div>
+<!-- Saved Causes -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between active:scale-[0.98] transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Saved Causes</p>
+<p class="text-xs text-outline">Causes close to your heart</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-lg">chevron_right</span>
+</div>
+<!-- Volunteer Dashboard -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between active:scale-[0.98] transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">dashboard_customize</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Volunteer Dashboard</p>
+<p class="text-xs text-outline">Active assignments &amp; hours</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-lg">chevron_right</span>
+</div>
+<!-- Language Toggle -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-on-surface-variant/5 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">translate</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Language Toggle</p>
+<p class="text-[10px] text-primary font-bold tracking-tight">ENGLISH / اردو</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-1 rounded-full flex gap-1">
+<button class="bg-white text-primary text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">EN</button>
+<button class="text-outline text-[10px] font-bold px-3 py-1 rounded-full">اردو</button>
+</div>
+</div>
+<!-- Biometric Security -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">fingerprint</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Biometric Security</p>
+<p class="text-xs text-outline">FaceID/Fingerprint login</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<div class="w-10 h-5 bg-primary rounded-full relative">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Logout Action -->
+<div class="pt-6">
+<button class="w-full py-4 text-error font-bold text-sm tracking-wider uppercase flex items-center justify-center gap-2 hover:bg-error/5 rounded-2xl transition-colors">
+<span class="material-symbols-outlined text-lg">logout</span>
+                Logout
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg rounded-t-3xl z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1.5 transition-transform duration-300 ease-out active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1.5 transition-transform duration-300 ease-out active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide">Causes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1.5 transition-transform duration-300 ease-out active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide">Donate</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-2xl px-4 py-1.5 transition-transform duration-300 ease-out active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide">Profile</span>
+</a>
+</nav>
+</body></html>

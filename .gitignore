@@ -40,5 +40,23 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
 .env*.local
+
+# misc documentation (keep only essential docs)
+*_SUMMARY.md
+*_REPORT.md
+*_FIXED.md
+*_GUIDE.md
+*_VALIDATION.md
+*_INSTRUCTIONS.md
+*_REFERENCE.md
+
+# migration/temp scripts
+*.migration.js
+prepare_*.js
+migrate_*.js
+create_*.js
+*migration_data.json
+
+# archive folder (optional - uncomment if you don't want to commit backups)
+# /archive/

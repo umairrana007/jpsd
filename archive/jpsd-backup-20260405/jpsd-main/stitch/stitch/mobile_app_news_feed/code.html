@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "primary-fixed": "#79f6ed",
+              "secondary": "#0060ac",
+              "on-secondary-fixed-variant": "#004883",
+              "on-surface": "#1a1c1d",
+              "surface-container-high": "#e8e8ea",
+              "inverse-primary": "#59dad1",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e2e2e4",
+              "on-primary-fixed-variant": "#00504c",
+              "error-container": "#ffdad6",
+              "error": "#ba1a1a",
+              "primary-container": "#20b2aa",
+              "on-surface-variant": "#3c4948",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface": "#f9f9fb",
+              "secondary-container": "#68abff",
+              "outline-variant": "#bbc9c7",
+              "primary": "#006a65",
+              "outline": "#6c7a78",
+              "on-tertiary-container": "#632200",
+              "on-secondary-container": "#003e73",
+              "surface-container": "#eeeef0",
+              "surface-bright": "#f9f9fb",
+              "inverse-on-surface": "#f0f0f2",
+              "on-error": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#360f00",
+              "on-secondary-fixed": "#001c39",
+              "background": "#f9f9fb",
+              "inverse-surface": "#2f3132",
+              "primary-fixed-dim": "#59dad1",
+              "on-primary-container": "#003e3b",
+              "on-primary-fixed": "#00201e",
+              "surface-container-low": "#f3f3f5",
+              "on-error-container": "#93000a",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-secondary": "#ffffff",
+              "tertiary": "#984721",
+              "on-background": "#1a1c1d",
+              "tertiary-container": "#e9865b",
+              "surface-tint": "#006a65",
+              "surface-dim": "#d9dadc"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen pb-24">
+<!-- TopAppBar Navigation Shell -->
+<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-teal-50/50 dark:border-slate-800/50 shadow-sm dark:shadow-none">
+<div class="flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="transition-all duration-300 ease-in-out active:scale-95 text-teal-600">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Inter'] font-semibold tracking-tight text-xl font-bold text-teal-800">Impact Stories</h1>
+</div>
+<div class="h-8 w-8 rounded-full bg-teal-100 overflow-hidden ring-2 ring-teal-50">
+<img alt="User Profile" data-alt="Close up portrait of a friendly smiling man with professional lighting and soft blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkqO3C6np5MEFHUGTB11Hxmm54r2LXagN8T-dZb0IgDJLRi6FJMemn_i2S0eeGO5SL3sTxgBCJt5_K5CUx3wGpj2iOfoFSCQALhUEdivyhtd50s0AS-Q9FA0vIH26cQgCv-qL8gDDoRKB6JkUHxYcrci02UjWmcoJ-W4BVMDlT3RoV849Gg93PR8dRaSjqrgMCgDtf0hYtjnD1apHn3hGj6FWH70Oe-r6TGZ3IX-PucZigMWjt1Z5rLyrKWtwlUu9gT_o2sgzBW_U"/>
+</div>
+</div>
+</header>
+<main class="pt-20 px-4 space-y-6">
+<!-- Featured Highlight Section (Asymmetric Layout) -->
+<section class="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden shadow-xl">
+<img alt="Community Empowerment" class="absolute inset-0 w-full h-full object-cover" data-alt="Heartwarming photo of diverse community members working together in a lush community garden during a sun-drenched afternoon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPn3V3rsVTxeVORdggOqlnJKpRjNRLfmYAh0yG0K1ffPkbsvtpcErTlvVDlzw1nRqWF2aLNG8TdifIhkVDhbTLAkE0kjDroU2CthgP4uPBJHQGeKtZ2RmBaXqpHgnmEegmoQxaUoC0x_ajHVatsnvtK488iM0AO3r-Y3BDZwWQYqJ9T0A4YIhUHrKROdwzIftujaQdQWbbmKbu9wcZNsVDKg0LliXPbnsCvAXiSplTDG9hBuYaoWEdRgvHuECyXNlPnfEx7s1HOYo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 space-y-3">
+<span class="inline-block px-3 py-1 rounded-full bg-primary-container text-on-primary-container text-xs font-bold tracking-widest uppercase">Stories</span>
+<h2 class="text-3xl font-bold text-white leading-tight tracking-tight">Voices from the Community: Our Impact in 2024</h2>
+<div class="flex items-center gap-3 text-white/80 text-sm font-medium">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>8 min read</span>
+</div>
+</div>
+</section>
+<!-- Category Pills -->
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-semibold whitespace-nowrap text-sm shadow-md">All Updates</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium whitespace-nowrap text-sm transition-colors hover:bg-teal-50">Health</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium whitespace-nowrap text-sm transition-colors hover:bg-teal-50">Stories</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium whitespace-nowrap text-sm transition-colors hover:bg-teal-50">Crisis Relief</button>
+</div>
+<!-- Feed Grid -->
+<div class="grid grid-cols-1 gap-6">
+<!-- News Card 1 -->
+<article class="glass-card rounded-[1.5rem] overflow-hidden ring-1 ring-outline-variant/30 flex flex-col group active:scale-[0.98] transition-all duration-300">
+<div class="relative h-48 w-full">
+<img alt="Health News" class="w-full h-full object-cover" data-alt="Clean clinical setting with a medical professional holding a digital tablet displaying health statistics in soft turquoise lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf4LX_rvaq_B4U-zItQTJ2DjWo3DyUkBYIs1F0PvunB70w2sJ3ukGEedmLbF40X-8GD2lv8_rONklloPFiMOvAH5xdZ3ExhX9umd92FgslDx_zaDyMOiooePk5SkcRpoy__tcWc9tC6WpeLb9xB6GKdcgdIGwyzyl7UaUUmzRBOghLIVx-vmJft0NzBA4FF_0HjKrbfdk_LB-mTfXusT09zQqkTTQe5_mLiHtiH4pnW3o6BKZuFpfJ-rkzMnGk2kDpaIFuxyeXw_4"/>
+<div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-teal-800 text-[10px] font-bold uppercase tracking-wider shadow-sm">Health</div>
+</div>
+<div class="p-6 space-y-2">
+<h3 class="text-xl font-bold text-on-surface leading-snug">Nutrition Programs Update: Reaching Remote Villages</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">Our mobile health clinics have successfully distributed essential nutrients to over 500 families this month.</p>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2 text-outline text-xs font-medium">
+<span class="material-symbols-outlined text-sm">timer</span>
+<span>5 min read</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Read More <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- News Card 2 -->
+<article class="glass-card rounded-[1.5rem] overflow-hidden ring-1 ring-outline-variant/30 flex flex-col group active:scale-[0.98] transition-all duration-300">
+<div class="relative h-48 w-full">
+<img alt="Education Initiative" class="w-full h-full object-cover" data-alt="A group of enthusiastic children sitting in a bright airy classroom setting with colorful educational materials and natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMAxd0OMAfgy0ps6Wn30I29MUjx7UaYvXbnQxCLqia0fwZVgiD9ymtx3Wh2yKC3h_PBYfSUifYD5ncEdnwsoIc90QTijVk0O_7AxN5lqiBxPRmfbxWaVVPj-TYDUdzUl3rAFe_nzjoehlwJrwwpEzuFnxeYVy7G_XXLWd-3O9D0wI96LkYLy8ABy4gGBxjrtvKVmoBxbqQKd92-oeJRKM2KGA0gbM_X2OHjMe40v-gwfXtxNYzcBvl-s24Juz4JYB6D5RUGpKfz28"/>
+<div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-teal-800 text-[10px] font-bold uppercase tracking-wider shadow-sm">Stories</div>
+</div>
+<div class="p-6 space-y-2">
+<h3 class="text-xl font-bold text-on-surface leading-snug">Building Futures: The New Education Center Opens</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">Step inside our newest facility dedicated to digital literacy and vocational training for local youth.</p>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2 text-outline text-xs font-medium">
+<span class="material-symbols-outlined text-sm">timer</span>
+<span>4 min read</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Read More <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- News Card 3 (Text Focus) -->
+<article class="glass-card rounded-[1.5rem] p-6 ring-1 ring-outline-variant/30 flex flex-col border-l-4 border-secondary shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-widest">Update</span>
+<span class="text-outline text-xs">2 hours ago</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 italic">"We finally have clean water in our school. Everything has changed."</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Read Sarah's full story on how a single solar-powered well transformed her entire community's health and economy.</p>
+<div class="flex items-center gap-4">
+<img alt="Author" class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of a smiling young woman with a warm expression and natural outdoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyRQvC303YxvQzBLVAvqIqfu-eJZ6nmms1fiLRX5SrgjQprQmS6-Tev8O5feNAr_mpkbF-qjV20KFbaC7Ki97_y0KGy-d-uV73q2zXTVXYze2vJY18jy69NHLJyOZ-ZL1RGkl-2f9pQsT-Ie-MT4yGEBqB5FF2ZPZRrdoyYJZ5nCHK4YSsTOsSitA3I3f2zKkzVuIUPeXZSx8CCAMmGQZjQvP3KB8ukhfC7ZWzUGpUEWn3ABiiRObuAInM-i0aqPXuxLIlD3jrxr4"/>
+<div>
+<p class="text-sm font-bold">Sarah M.</p>
+<p class="text-xs text-outline">Community Ambassador</p>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar Navigation Shell -->
+<nav class="bg-white/90 dark:bg-slate-950/90 backdrop-blur-lg fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 z-50 rounded-t-3xl shadow-[0_-4px_20px_0_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 transition-transform duration-200 active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-200 rounded-2xl px-5 py-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">newspaper</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">News</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 transition-transform duration-200 active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined">volunteer_activism</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Donate</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 transition-transform duration-200 active:scale-90 hover:text-teal-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

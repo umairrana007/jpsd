@@ -33,7 +33,8 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
             <Image 
               src="/logo.png" 
               alt="JPSD Logo" 
-              fill 
+              fill
+              sizes="280px"
               className="object-contain"
               priority
             />

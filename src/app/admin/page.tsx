@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { FiHome, FiDollarSign, FiUsers, FiUser, FiBarChart2, FiSettings, FiPlus, FiActivity, FiShield, FiDatabase, FiCheck, FiX } from 'react-icons/fi';
 import { getSystemStats, getRecentActivity } from '@/lib/firebaseUtils';
 import GlobalSearch from '@/components/admin/GlobalSearch';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
 
-export default function AdminDashboardPage() {
+function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ export default function AdminDashboardPage() {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">HQ Command Center</h2>
-          <p className="text-slate-500 font-medium">Baitussalam Global Management & Tactical Operations.</p>
+          <p className="text-slate-500 font-medium">JPSD Global Management & Tactical Operations.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -285,3 +287,7 @@ export default function AdminDashboardPage() {
     </>
   );
 }
+
+export default withAuth(AdminDashboardPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

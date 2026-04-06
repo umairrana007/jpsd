@@ -55,7 +55,8 @@ export default function UserDashboardLayout({
                   <Image 
                     src="/logo.png" 
                     alt="JPSD Logo" 
-                    fill 
+                    fill
+                    sizes="280px"
                     className="object-contain" 
                     priority
                   />
@@ -145,7 +146,7 @@ export default function UserDashboardLayout({
              className={`relative w-80 bg-white h-full shadow-2xl flex flex-col p-10 ${isUrdu ? 'rtl' : 'ltr'}`}
            >
               <div className="flex justify-between items-center mb-12">
-                 <div className="text-xl font-black text-slate-950 uppercase italic tracking-tighter">Baitussalam</div>
+                 <div className="text-xl font-black text-slate-950 uppercase italic tracking-tighter">JPSD</div>
                  <button onClick={() => setSidebarOpen(false)} className="text-slate-400 p-2"><FiX size={24} /></button>
               </div>
               <nav className="flex-1 space-y-2">
@@ -191,4 +192,5 @@ export default function UserDashboardLayout({
     </div>
   );
 }
+
 

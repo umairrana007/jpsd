@@ -4,17 +4,38 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+import { db } from '@/lib/firebase';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+
 export const PartnersSection: React.FC = () => {
   const { language } = useLanguage();
+  const [partners, setPartners] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const partners = [
-    { name: 'Partner 1', logo: '🏢' },
-    { name: 'Partner 2', logo: '🏛️' },
-    { name: 'Partner 3', logo: '🏗️' },
-    { name: 'Partner 4', logo: '🏭' },
-    { name: 'Partner 5', logo: '🏬' },
-    { name: 'Partner 6', logo: '🏪' },
-  ];
+  React.useEffect(() => {
+    async function fetchPartners() {
+      if (!db) return;
+      try {
+        setLoading(true);
+        const q = query(
+          collection(db as any, 'partners'), 
+          where('isPublished', '==', true),
+          orderBy('order', 'asc')
+        );
+        const snapshot = await getDocs(q);
+        const fetched = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPartners(fetched);
+      } catch (error) {
+        console.error('Partners Fetch Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPartners();
+  }, []);
 
   return (
     <section className="py-20 bg-white">
@@ -36,20 +57,38 @@ export const PartnersSection: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-          {partners.map((partner, index) => (
-            <motion.div
-              key={partner.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="flex items-center justify-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-all"
-            >
-              <div className="text-6xl">{partner.logo}</div>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 animate-pulse">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-40 bg-gray-100 rounded-xl"></div>
+            ))}
+          </div>
+        ) : partners.length === 0 ? (
+          <div className="text-center py-10 text-gray-400 font-medium">
+            {language === 'ur' ? 'کوئی شراکت دار نہیں ملا' : 'No partners found'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+            {partners.map((partner, index) => (
+              <motion.div
+                key={partner.id || index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-center justify-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-all"
+              >
+                {partner.logo ? (
+                  <div className="text-6xl">{partner.logo}</div>
+                ) : partner.image ? (
+                  <img src={partner.image} alt={partner.name} className="max-h-16 h-auto grayscale hover:grayscale-0 transition-all duration-300" />
+                ) : (
+                  <div className="text-xl font-bold text-gray-400">{partner.name}</div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

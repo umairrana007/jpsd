@@ -95,36 +95,117 @@ export default function UserSettingsFinal() {
                            </div>
                         </div>
 
-                        <form className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                           <div className="space-y-2">
-                              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'مکمل نام' : 'Full Name'}</label>
-                              <div className="relative">
-                                 <FiUser className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
-                                 <input 
-                                    type="text" 
-                                    defaultValue={currentUserData?.name || ''}
-                                    className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-[#1ea05f] focus:ring-4 focus:ring-emerald-50 outline-none transition-all font-medium`}
-                                 />
-                              </div>
-                           </div>
-                           <div className="space-y-2">
-                              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'ای میل پتہ' : 'Email Address'}</label>
-                              <div className="relative">
-                                 <FiMail className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
-                                 <input 
-                                    type="email" 
-                                    readOnly
-                                    value={currentUserData?.email || ''}
-                                    className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-400 cursor-not-allowed font-medium`}
-                                 />
-                              </div>
-                           </div>
-                           <div className="md:col-span-2 pt-6">
-                              <button className="px-10 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-[#1ea05f] transition-all shadow-xl">
-                                 {isUrdu ? 'معلومات محفوظ کریں' : 'Save Changes'}
-                              </button>
-                           </div>
-                        </form>
+                         <form className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'مکمل نام' : 'Full Name'}</label>
+                               <div className="relative">
+                                  <FiUser className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
+                                  <input 
+                                     type="text" 
+                                     defaultValue={currentUserData?.name || ''}
+                                     className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-[#1ea05f] focus:ring-4 focus:ring-emerald-50 outline-none transition-all font-medium`}
+                                  />
+                               </div>
+                            </div>
+                            <div className="space-y-2">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'ای میل پتہ' : 'Email Address'}</label>
+                               <div className="relative">
+                                  <FiMail className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
+                                  <input 
+                                     type="email" 
+                                     readOnly
+                                     value={currentUserData?.email || ''}
+                                     className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-400 cursor-not-allowed font-medium`}
+                                  />
+                               </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'فون نمبر' : 'Phone Number'}</label>
+                               <div className="relative">
+                                  <FiPhone className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
+                                  <input 
+                                     type="text" 
+                                     defaultValue={currentUserData?.phone || ''}
+                                     className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl outline-none transition-all font-medium`}
+                                  />
+                               </div>
+                            </div>
+
+                            <div className="space-y-2">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'شناختی کارڈ نمبر' : 'CNIC Number'}</label>
+                               <div className="relative">
+                                  <FiShield className={`absolute ${isUrdu ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-slate-300`} />
+                                  <input 
+                                     type="text" 
+                                     defaultValue={currentUserData?.cnic || ''}
+                                     className={`w-full ${isUrdu ? 'pr-12 pl-6' : 'pl-12 pr-6'} py-4 bg-slate-50 border border-slate-100 rounded-xl outline-none transition-all font-medium`}
+                                  />
+                               </div>
+                            </div>
+
+                            {currentUserData?.role === 'VOLUNTEER' && (
+                               <div className="md:col-span-2 space-y-2">
+                                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'مہارتیں' : 'Skills & Expertise'}</label>
+                                  <textarea 
+                                     defaultValue={currentUserData?.skills || ''}
+                                     className={`w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl outline-none transition-all font-medium h-32`}
+                                  />
+                               </div>
+                            )}
+
+                            <div className="md:col-span-2 p-6 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 mt-4">
+                               <h5 className="text-sm font-bold text-slate-800 flex items-center gap-2 mb-2">
+                                  <FiCheckCircle className="text-[#1ea05f]" /> 
+                                  {isUrdu ? 'ڈیٹا کی شفافیت' : 'Data Transparency'}
+                               </h5>
+                               <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                                  {isUrdu 
+                                    ? 'آپ جو ڈیٹا فراہم کرتے ہیں وہ صرف انسانی خدمت کے کاموں اور سیکیورٹی کی تصدیق کے لیے استعمال کیا جاتا ہے۔ آپ کسی بھی وقت اپنے ڈیٹا کو حذف کرنے کی درخواست کر سکتے ہیں۔'
+                                    : 'The data you provide is used strictly for humanitarian coordination and security verification. We value your privacy and you can request data deletion at any time.'}
+                               </p>
+                            </div>
+
+                            <div className="md:col-span-2 pt-6">
+                                <button className="px-10 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-[#1ea05f] transition-all shadow-xl">
+                                   {isUrdu ? 'معلومات محفوظ کریں' : 'Save Changes'}
+                                </button>
+
+                                <div className="p-1 px-4 border border-red-50 rounded-2xl flex items-center gap-4 bg-red-50/10">
+                                   <div className="text-[10px] text-red-400 font-bold uppercase tracking-widest">
+                                      {isUrdu ? 'ڈیٹا حذف کریں' : 'Danger Zone'}
+                                   </div>
+                                   <button 
+                                      type="button"
+                                      className="text-[10px] items-center gap-2 text-red-500 font-black uppercase tracking-widest hover:underline disabled:opacity-50"
+                                      disabled={currentUserData?.deletionRequested}
+                                      onClick={async () => {
+                                         if(confirm(isUrdu ? 'کیا آپ واقعی اپنا ڈیٹا حذف کرنے کی درخواست کرنا چاہتے ہیں؟' : 'Are you sure you want to request data deletion? This action cannot be undone.')) {
+                                            try {
+                                               const { updateUserStatus, logActivity } = await import('@/lib/firebaseUtils');
+                                               // Update user doc with a special flag
+                                               await updateUserStatus(currentUserData.uid, 'pending_deletion', true);
+                                               await logActivity({
+                                                  type: 'PRIVACY_REQUEST',
+                                                  message: `User ${currentUserData.email} requested data deletion.`,
+                                                  userId: currentUserData.uid,
+                                                  icon: '🗑️'
+                                               });
+                                               alert(isUrdu ? 'درخواست بھیج دی گئی ہے۔' : 'Deletion request submitted successfully. Our team will review it within 24 hours.');
+                                               window.location.reload();
+                                            } catch (err) {
+                                               alert('Error submitting request. Please try again later.');
+                                            }
+                                         }
+                                      }}
+                                   >
+                                      {currentUserData?.deletionRequested 
+                                        ? (isUrdu ? 'حذف کرنے کی درخواست بھیجی گئی' : 'Deletion Requested') 
+                                        : (isUrdu ? 'حذف کرنے کی درخواست' : 'Request Data Deletion')}
+                                   </button>
+                                </div>
+                            </div>
+                         </form>
                      </div>
                   )}
 

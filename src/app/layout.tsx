@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   keywords: ["welfare", "charity", "donation", "pakistan", "JPSD", "Jamiyat", "zakat", "sadaqah"],
 };
 
+import BilingualChatbot from "@/components/BilingualChatbot";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,8 +43,9 @@ export default function RootLayout({
           <LanguageProvider>
             <FontLoader />
             <Navbar />
-            <main className="flex-grow pt-32 md:pt-40">{children}</main>
+            <main className="flex-grow pt-24">{children}</main>
             <Footer />
+            <BilingualChatbot />
           </LanguageProvider>
         </AuthProvider>
       </body>

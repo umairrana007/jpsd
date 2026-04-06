@@ -26,14 +26,14 @@ const translations = {
     'nav.askShariah': 'Ask Shariah Advisor',
     'nav.shariahAdvisory': 'Shariah Advisory',
     'nav.globalOutreach': 'Global Outreach',
-    'nav.volunteer': 'Volunteer',
+    'nav.volunteer': 'Be a Volunteer',
     'nav.contact': 'Contact Us',
     'nav.about': 'About Us',
     'nav.timeline': 'Timeline',
     'nav.duas': 'Duas',
     'nav.bayanat': 'Bayanat',
     'nav.login': 'Login',
-    'nav.signup': 'Join Us',
+    'nav.signup': 'Be a Donor',
     'nav.dashboard': 'My Dashboard',
     'nav.adminPortal': 'Admin Portal',
     'nav.volunteerPortal': 'Volunteer Portal',
@@ -66,12 +66,12 @@ const translations = {
     'common.loading': 'Loading...',
     'common.error': 'Error',
     'common.success': 'Success',
-    'common.baitussalam': 'JPSD',
+    'common.JPSD': 'JPSD',
     'common.management': 'Management',
     'common.rs': 'Rs.',
     'common.perMonth': 'per month',
     'common.reset': 'Reset Inputs',
-    'common.goBack': 'Go Back',
+    'common.goBack': 'Back',
     'common.nextStep': 'Next Step',
     
     // Home
@@ -225,29 +225,75 @@ const translations = {
     'admin.search.placeholder': 'Find Donor / Volunteer (Phone or CNIC)',
     'admin.stats.activeMissions': 'Active Missions',
     'admin.stats.impactMagnitude': 'Impact Magnitude',
-    'admin.activity.stream': 'Tactical Activity Stream',
+    'admin.activity.stream': 'Recent Activity Stream',
 
     // Volunteer Portal
-    'volunteer.hub.title': 'Tactical Hub',
-    'volunteer.hub.subtitle': 'Operational Deployment Unit',
+    'volunteer.hub.title': 'Volunteer Hub',
+    'volunteer.hub.subtitle': 'Field Deployment Unit',
     'volunteer.stats.hours': 'Hours Deployed',
-    'volunteer.stats.rank': 'Operational Rank',
-    'volunteer.mission.initiate': 'Initiate Deployment',
-    'volunteer.mission.status.open': 'Open for Deployment',
+    'volunteer.stats.rank': 'Active Rank',
+    'volunteer.mission.initiate': 'Initiate Mission',
+    'volunteer.mission.status.open': 'Open for Mission',
 
     // Donor Portal
     'donor.heritage.title': 'Impact Heritage',
     'donor.heritage.welcome': 'Welcome, Humanitarian',
     'donor.stats.lives': 'Lives Sustained',
     'donor.stats.impact': 'Impact Score',
-    'donor.transactions.title': 'Sacred Transactions',
-    'donor.receipt.download': 'Download Tactical Receipt',
+    'donor.transactions.title': 'Impact Transactions',
+    'donor.receipt.download': 'Download Official Receipt',
 
     // Chatbot
     // Chatbot
-    'chatbot.title': 'JPSD HQ Intelligence',
-    'chatbot.status': 'Operational',
-    'chatbot.placeholder': 'Type mission-critical query...',
+    'chatbot.title': 'JPSD Assistant',
+    'signup.title': 'Join the Mission',
+    'signup.subtitle': 'Help us reach those who need it most.',
+    'signup.donor': 'Be a Donor',
+    'signup.volunteer': 'Be a Volunteer',
+    'signup.professional': 'Be a Professional',
+    'signup.youth': 'Be a Youth Member',
+    'signup.fullName': 'Full Identity Name',
+    'signup.fullNamePlaceholder': 'Full Name',
+    'signup.email': 'Email Directive',
+    'signup.emailPlaceholder': 'Email Address',
+    'signup.cnicPlaceholder': 'CNIC (00000-0000000-0)',
+    'signup.communityPlaceholder': 'Community / Biradri',
+    'signup.phone': 'Mobile Number',
+    'signup.phonePlaceholder': 'Phone (03XX-XXXXXXX)',
+    'signup.password': 'Choose a Strong Password',
+    'signup.passwordPlaceholder': '••••••••',
+    'signup.skills': 'Expertise / Skills',
+    'signup.skillsPlaceholder': 'What is your profession or contribution area?',
+    'signup.institution': 'Educational Institution',
+    'signup.institutionPlaceholder': 'Where do you study? (For Youth Member)',
+    'signup.next': 'Next Step',
+    'signup.submit': 'Complete Signup',
+    'signup.loading': 'Creating Account...',
+    'signup.error': 'Form Data Correction Required',
+    'signup.alreadyRegistered': 'Already registered?',
+    'signup.signIn': 'Sign in here',
+    'signup.success.title': 'Verification Sent',
+    'signup.success.donor': 'Account created! You can now log in and start your journey.',
+    'signup.success.volunteer': 'Account created! Please check your email for verification. Once verified, an admin will review your profile.',
+    'signup.success.professional': 'Account created! You can now offer your specialized services to the community.',
+    'signup.success.youth': 'Account created! Welcome to the JPSD Youth Division. We have exciting opportunities for you.',
+    'signup.success.button': 'Proceed to Login',
+    'chatbot.status': 'Active',
+    'chatbot.placeholder': 'Type your query here...',
+    
+    // Login
+    'login.title': 'Welcome Back',
+    'login.subtitle': 'Continue your journey of making an impact.',
+    'login.emailLabel': 'Email Address',
+    'login.passwordLabel': 'Secure Password',
+    'login.staySignedIn': 'Stay Signed In',
+    'login.forgotPassword': 'Forgot Password?',
+    'login.signIn': 'Sign In',
+    'login.authenticating': 'Authenticating...',
+    'login.noAccount': "Don't have an account?",
+    'login.joinMission': 'Join the Mission',
+    'login.resetSent': 'Password reset link has been sent to ',
+    'login.enterEmail': 'Please enter your email to reset password.',
   },
   ur: {
     // Navigation
@@ -273,12 +319,12 @@ const translations = {
     'nav.inflight': 'ان فلائٹ',
     'nav.zakatCalculator': 'زکوٰۃ کیلکولیٹر',
     'nav.askShariah': 'شریعہ ایڈوائزر سے پوچھیں',
-    'nav.volunteer': 'رضاکار',
+    'nav.volunteer': 'رضاکار بنیں',
     'nav.contact': 'رابطہ کریں',
     'nav.about': 'ہمارے بارے میں',
     'nav.timeline': 'ٹائم لائن',
     'nav.login': 'لاگ ان',
-    'nav.signup': 'شامل ہوں',
+    'nav.signup': 'ڈونر بنیں',
     'nav.dashboard': 'میرا ڈیش بورڈ',
     'nav.adminPortal': 'ایڈمن پورٹل',
     'nav.volunteerPortal': 'رضاکار پورٹل',
@@ -311,7 +357,7 @@ const translations = {
     'common.loading': 'لوڈ ہو رہا ہے...',
     'common.error': 'خرابی',
     'common.success': 'کامیابی',
-    'common.baitussalam': 'جمعیت پنجابی سوداگرانِ دہلی (JPSD)',
+    'common.JPSD': 'جمعیت پنجابی سوداگرانِ دہلی (JPSD)',
     'common.management': 'مینجمنٹ',
     'common.rs': 'روپے',
     'common.perMonth': 'ماہانہ',
@@ -473,10 +519,10 @@ const translations = {
     'admin.activity.stream': 'سسٹم کی سرگرمیوں کی تفصیل',
 
     // Volunteer Portal
-    'volunteer.hub.title': 'آپریشنل ہب',
+    'volunteer.hub.title': 'رضاکار ہب',
     'volunteer.hub.subtitle': 'فیلڈ آپریشن یونٹ',
     'volunteer.stats.hours': 'خدمت کے گھنٹے',
-    'volunteer.stats.rank': 'آپریشنل رینک',
+    'volunteer.stats.rank': 'فعال رینک',
     'volunteer.mission.initiate': 'مشن شروع کریں',
     'volunteer.mission.status.open': 'مشن کے لیے دستیاب',
 
@@ -491,12 +537,62 @@ const translations = {
     // Chatbot
     // Chatbot
     'chatbot.title': 'جے پی ایس ڈی ہیڈ کوارٹر انٹیلی جنس',
+    'signup.title': 'مشق میں شامل ہوں',
+    'signup.subtitle': 'ان لوگوں تک پہنچنے میں ہماری مدد کریں جنہیں اس کی سب سے زیادہ ضرورت ہے۔',
+    'signup.donor': 'عطیہ دہندہ بنیں',
+    'signup.volunteer': 'رضاکار بنیں',
+    'signup.professional': 'پروفیشنل بنیں',
+    'signup.youth': 'نوجوان رکن بنیں',
+    'signup.fullName': 'مکمل شناختی نام',
+    'signup.fullNamePlaceholder': 'مکمل نام',
+    'signup.email': 'ای میل ایڈریس',
+    'signup.emailPlaceholder': 'ای میل ایڈریس',
+    'signup.cnicPlaceholder': 'شناختی کارڈ نمبر (XXXXX-XXXXXXX-X)',
+    'signup.communityPlaceholder': 'برادری / کمیونٹی',
+    'signup.phone': 'موبائل نمبر',
+    'signup.phonePlaceholder': 'فون نمبر (03XX-XXXXXXX)',
+    'signup.password': 'ایک مضبوط پاس ورڈ منتخب کریں',
+    'signup.passwordPlaceholder': '••••••••',
+    'signup.skills': 'مہارتیں اور تجربہ',
+    'signup.skillsPlaceholder': 'آپ کا پیشہ یا مہارت کا شعبہ کیا ہے؟',
+    'signup.institution': 'تعلیمی ادارہ',
+    'signup.institutionPlaceholder': 'آپ کہاں تعلیم حاصل کرتے ہیں؟ (صرف نوجوان اراکین کے لیے)',
+    'signup.next': 'اگلا مرحلہ',
+    'signup.submit': 'رجسٹریشن مکمل کریں',
+    'signup.loading': 'اکاؤنٹ بنایا جا رہا ہے...',
+    'signup.error': 'فارم ڈیٹا کی تصحیح درکار ہے',
+    'signup.alreadyRegistered': 'پہلے سے رجسٹرڈ ہیں؟',
+    'signup.signIn': 'یہاں سائن ان کریں',
+    'signup.success.title': 'تصدیق ای میل ارسال کر دی گئی',
+    'signup.success.donor': 'اکاؤنٹ بن گیا ہے! اب آپ لاگ ان کر کے اپنا سفر شروع کر سکتے ہیں۔',
+    'signup.success.volunteer': 'اکاؤنٹ بن گیا ہے! براہ کرم تصدیق کے لیے اپنی ای میل چیک کریں۔ تصدیق کے بعد، ایک ایڈمن آپ کے پروفائل کا جائزہ لے گا۔',
+    'signup.success.professional': 'اکاؤنٹ بن گیا ہے! اب آپ کمیونٹی کو اپنی خصوصی خدمات پیش کر سکتے ہیں۔',
+    'signup.success.youth': 'اکاؤنٹ بن گیا ہے! جے پی ایس ڈی یوتھ ڈویژن میں خوش آمدید۔ ہمارے پاس آپ کے لیے دلچسپ مواقع ہیں۔',
+    'signup.success.button': 'لاگ ان کی طرف بڑھیں',
     'chatbot.status': 'فعال',
     'chatbot.placeholder': 'اپنی درخواست یہاں لکھیں...',
+
+    // Login
+    'login.title': 'خوش آمدید',
+    'login.subtitle': 'خیر کے اس سفر میں اپنی شراکت جاری رکھیں۔',
+    'login.emailLabel': 'ای میل ایڈریس',
+    'login.passwordLabel': 'پاس ورڈ',
+    'login.staySignedIn': 'سائن ان رہیں',
+    'login.forgotPassword': 'پاس ورڈ بھول گئے؟',
+    'login.signIn': 'لاگ ان کریں',
+    'login.authenticating': 'تصدیق ہو رہی ہے...',
+    'login.noAccount': 'اکاؤنٹ نہیں ہے؟',
+    'login.joinMission': 'خیر کے کاموں کا حصہ بنیں',
+    'login.resetSent': 'پاس ورڈ ری سیٹ لنک اس ای میل پر بھیج دیا گیا ہے: ',
+    'login.enterEmail': 'پاس ورڈ ری سیٹ کرنے کے لیے براہ کرم اپنا ای میل درج کریں۔',
   },
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType>({
+  language: 'en',
+  setLanguage: () => {},
+  t: (key) => key,
+});
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<'en' | 'ur'>('en');
@@ -533,7 +629,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations['en']] || key;
+    // @ts-ignore - Handle missing keys gracefully
+    return translations[language][key] || key;
   };
 
   return (
@@ -544,9 +641,6 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 };
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
+  return useContext(LanguageContext);
 };
+

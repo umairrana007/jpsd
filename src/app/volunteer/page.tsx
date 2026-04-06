@@ -19,6 +19,7 @@ export default function VolunteerPage() {
     availability: 'weekends',
     experience: '',
     emergencyContact: '',
+    community: '', // Community-Biradri
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,6 +35,7 @@ export default function VolunteerPage() {
       availability: 'weekends',
       experience: '',
       emergencyContact: '',
+      community: '',
     });
   };
 
@@ -47,7 +49,7 @@ export default function VolunteerPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl font-bold text-[#2c3e50] mb-4">Become a Volunteer</h1>
+          <h1 className="text-5xl font-bold text-[#2c3e50] mb-4">Be a Volunteer</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Join our network of dedicated volunteers making a real difference in people's lives
           </p>
@@ -60,7 +62,7 @@ export default function VolunteerPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-16"
         >
-          <h2 className="text-4xl font-bold text-[#2c3e50] text-center mb-12">Why Volunteer With Us?</h2>
+          <h2 className="text-4xl font-bold text-[#2c3e50] text-center mb-12">Why be a Volunteer with us?</h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -235,6 +237,14 @@ export default function VolunteerPage() {
                   onChange={(e) => setFormData({ ...formData, cnic: e.target.value })}
                   id="volunteer-cnic"
                 />
+
+                <Input
+                  label="Community-Biradri"
+                  placeholder="Enter your community/biradri"
+                  value={formData.community}
+                  onChange={(e) => setFormData({ ...formData, community: e.target.value })}
+                  id="volunteer-community"
+                />
               </div>
 
               <div>
@@ -324,7 +334,7 @@ export default function VolunteerPage() {
                   </li>
                   <li className="flex items-start">
                     <input type="checkbox" required className="mt-1 mr-2 rtl:mr-0 rtl:ml-2" />
-                    Follow Baitussalam's code of conduct and policies
+                    Follow JPSD's code of conduct and policies
                   </li>
                   <li className="flex items-start">
                     <input type="checkbox" required className="mt-1 mr-2 rtl:mr-0 rtl:ml-2" />
@@ -336,6 +346,12 @@ export default function VolunteerPage() {
               <Button type="submit" variant="primary" size="lg" className="w-full">
                 Submit Application
               </Button>
+
+              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                 <p className="text-sm text-[#27ae60] font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                    <FiCheck className="text-xl" /> Registered at JPSD
+                 </p>
+              </div>
             </form>
           </div>
         </motion.section>
@@ -359,3 +375,4 @@ export default function VolunteerPage() {
     </div>
   );
 }
+

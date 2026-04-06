@@ -7,16 +7,41 @@ import {
   FiGlobe, FiX, FiCheck, FiDollarSign, FiUsers
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { db } from '@/lib/firebase';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  deleteDoc, 
+  updateDoc, 
+  query, 
+  orderBy,
+  serverTimestamp,
+  Timestamp 
+} from 'firebase/firestore';
 
-const causesData = [
-  { id: 1, title: 'Clean Water Initiative', category: 'Water', raised: '$245,000', target: '$300,000', status: 'Active', donors: 1240 },
-  { id: 2, title: 'Emergency Food Relief', category: 'Food', raised: '$89,200', target: '$100,000', status: 'Active', donors: 850 },
-  { id: 3, title: 'Gaza Medical Support', category: 'Health', raised: '$1.2M', target: '$2.0M', status: 'Active', donors: 4500 },
-  { id: 4, title: 'Winter Blanket Drive', category: 'Shelter', raised: '$15,000', target: '$15,000', status: 'Completed', donors: 320 },
-];
+interface Program {
+  id: string;
+  title: string;
+  titleUrdu?: string;
+  description: string;
+  descriptionUrdu?: string;
+  category: string;
+  goalAmount: number;
+  raisedAmount: number;
+  active: boolean;
+  donors?: number;
+}
 
-export default function AdminCausesPage() {
+function AdminCausesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [formData, setFormData] = useState({
     titleEn: '',
     titleUr: '',
@@ -26,6 +51,86 @@ export default function AdminCausesPage() {
     target: ''
   });
   const [translating, setTranslating] = useState<string | null>(null);
+
+  const fetchPrograms = async () => {
+    if (!db) return;
+    try {
+      const q = query(collection(db as any, 'causes'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        title: doc.data().title || doc.data().titleEn, // Handle different schema names
+      })) as Program[];
+      setPrograms(items);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  const handleSave = async () => {
+    if (!db) return;
+    setSaving(true);
+    try {
+      const programData = {
+        title: formData.titleEn,
+        titleUrdu: formData.titleUr,
+        description: formData.descEn,
+        descriptionUrdu: formData.descUr,
+        category: formData.category,
+        goalAmount: Number(formData.target),
+        raisedAmount: 0,
+        active: true,
+        featured: false,
+        createdAt: serverTimestamp(),
+        image: '/images/jpsd_main.jpg' // Default image
+      };
+
+      if (editingId) {
+        await updateDoc(doc(db as any, 'causes', editingId), programData);
+      } else {
+        await addDoc(collection(db as any, 'causes'), programData);
+      }
+
+      setIsModalOpen(false);
+      setEditingId(null);
+      setFormData({ titleEn: '', titleUr: '', descEn: '', descUr: '', category: '', target: '' });
+      fetchPrograms();
+    } catch (err) {
+      console.error("Save error:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEdit = (p: any) => {
+    setFormData({
+      titleEn: p.title || '',
+      titleUr: p.titleUrdu || '',
+      descEn: p.description || '',
+      descUr: p.descriptionUrdu || '',
+      category: p.category || '',
+      target: String(p.goalAmount || 0)
+    });
+    setEditingId(p.id);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!db || !window.confirm('Are you sure you want to delete this mission?')) return;
+    try {
+      await deleteDoc(doc(db as any, 'causes', id));
+      fetchPrograms();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
 
   const handleTranslate = async (field: 'title' | 'desc') => {
     setTranslating(field);
@@ -74,48 +179,54 @@ export default function AdminCausesPage() {
                      <th className="px-10 py-6 text-right">Intervention</th>
                   </tr>
                </thead>
-               <tbody className="divide-y divide-slate-50/50">
-                  {causesData.map((cause) => (
-                    <tr key={cause.id} className="group hover:bg-slate-50/30 transition-all">
-                       <td className="px-10 py-8">
-                          <div>
-                             <p className="text-base font-black text-slate-800 tracking-tightest italic">{cause.title}</p>
-                             <div className="flex items-center gap-2 mt-1">
-                                <FiUsers size={12} className="text-slate-400" />
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">{cause.donors} Patrons active</p>
-                             </div>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8">
-                          <span className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100 shadow-sm">{cause.category}</span>
-                       </td>
-                       <td className="px-10 py-8">
-                          <div className="space-y-3 max-w-[200px]">
-                             <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-600 italic">
-                                <span>{cause.raised}</span>
-                                <span className="text-slate-300">/ {cause.target}</span>
-                             </div>
-                             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
-                                <div className="h-full bg-gradient-to-r from-[#1ea05f] to-[#15804a] rounded-full shadow-[0_0_8px_#10b98150]" style={{ width: '70%' }}></div>
-                             </div>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8">
-                          <div className="flex items-center gap-3">
-                             <div className={`w-2 h-2 rounded-full ${cause.status === 'Active' ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : 'bg-slate-300'}`}></div>
-                             <span className={`text-[10px] font-black uppercase tracking-widest ${cause.status === 'Active' ? 'text-slate-800' : 'text-slate-400'}`}>{cause.status}</span>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8 text-right">
-                          <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                             <button className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
-                             <button className="p-3 text-slate-400 hover:text-blue-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiBarChart size={18} /></button>
-                             <button className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
-                          </div>
-                       </td>
-                    </tr>
-                  ))}
-               </tbody>
+                <tbody className="divide-y divide-slate-50/50">
+                   {loading ? (
+                     <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">Synchronizing Mission Ledger...</td></tr>
+                   ) : programs.length === 0 ? (
+                     <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400">No active missions found in the records.</td></tr>
+                   ) : programs.map((cause) => {
+                    const percentage = Math.min(100, Math.round((cause.raisedAmount / cause.goalAmount) * 100) || 0);
+                    return (
+                      <tr key={cause.id} className="group hover:bg-slate-50/30 transition-all">
+                        <td className="px-10 py-8">
+                           <div>
+                              <p className="text-base font-black text-slate-800 tracking-tightest italic">{cause.title}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                 <FiUsers size={12} className="text-slate-400" />
+                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">{cause.donors || 0} Patrons active</p>
+                              </div>
+                           </div>
+                        </td>
+                        <td className="px-10 py-8">
+                           <span className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100 shadow-sm">{cause.category}</span>
+                        </td>
+                        <td className="px-10 py-8">
+                           <div className="space-y-3 max-w-[200px]">
+                              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-600 italic">
+                                 <span>${cause.raisedAmount.toLocaleString()}</span>
+                                 <span className="text-slate-300">/ ${cause.goalAmount.toLocaleString()}</span>
+                              </div>
+                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
+                                 <div className="h-full bg-gradient-to-r from-[#1ea05f] to-[#15804a] rounded-full shadow-[0_0_8px_#10b98150]" style={{ width: `${percentage}%` }}></div>
+                              </div>
+                           </div>
+                        </td>
+                        <td className="px-10 py-8">
+                           <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${cause.active ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : 'bg-slate-300'}`}></div>
+                              <span className={`text-[10px] font-black uppercase tracking-widest ${cause.active ? 'text-slate-800' : 'text-slate-400'}`}>{cause.active ? 'Active' : 'Draft'}</span>
+                           </div>
+                        </td>
+                         <td className="px-10 py-8 text-right">
+                            <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                               <button onClick={() => handleEdit(cause)} className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
+                               <button onClick={() => handleDelete(cause.id)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
+                            </div>
+                         </td>
+                      </tr>
+                    )
+                   })}
+                </tbody>
             </table>
          </div>
       </div>
@@ -250,8 +361,12 @@ export default function AdminCausesPage() {
                 </div>
 
                 <div className="pt-6 flex gap-4">
-                  <button className="flex-1 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all uppercase text-xs tracking-widest">
-                    Confirm Mission
+                  <button 
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="flex-1 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all uppercase text-xs tracking-widest disabled:opacity-50"
+                  >
+                    {saving ? 'Initializing...' : 'Confirm Mission'}
                   </button>
                   <button onClick={() => setIsModalOpen(false)} className="px-10 py-4 bg-slate-50 text-slate-400 font-black rounded-2xl hover:bg-slate-100 transition-all uppercase text-xs tracking-widest">
                     Abort
@@ -265,3 +380,6 @@ export default function AdminCausesPage() {
     </div>
   );
 }
+export default withAuth(AdminCausesPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

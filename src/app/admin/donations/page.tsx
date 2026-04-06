@@ -7,6 +7,8 @@ import {
   FiPieChart, FiTrendingUp, FiX
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
 
 const initialDonationsData = [
   { id: 'TRX-94821', donor: 'Haris Khan', cause: 'Clean Water', amount: 2500, date: '12 Oct, 2026', method: 'JazzCash', status: 'Verified' },
@@ -15,7 +17,7 @@ const initialDonationsData = [
   { id: 'TRX-65412', donor: 'Ali Raza', cause: 'Healthcare', amount: 3000, date: '18 Oct, 2026', method: 'Bank Transfer', status: 'Verified' },
 ];
 
-export default function AdminDonationsPage() {
+function AdminDonationsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -39,7 +41,7 @@ export default function AdminDonationsPage() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Baitussalam_Donations_${new Date().toLocaleDateString()}.csv`);
+    link.setAttribute("download", `JPSD_Donations_${new Date().toLocaleDateString()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -231,3 +233,7 @@ export default function AdminDonationsPage() {
     </div>
   );
 }
+
+export default withAuth(AdminDonationsPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

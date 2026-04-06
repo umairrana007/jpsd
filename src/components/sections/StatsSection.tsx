@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getLiveStats } from '@/lib/firebaseUtils';
-import { LiveStats as LiveStatsType } from '@/types';
+import { SiteSettings } from '@/lib/settings';
 
 interface StatItemProps {
   value: number;
@@ -72,31 +71,15 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
   );
 };
 
-export const StatsSection: React.FC = () => {
-  const { t, language } = useLanguage();
+export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }) => {
+  const { language } = useLanguage();
   
-  const [stats, setStats] = useState<LiveStatsType>({
-    totalLivesServed: 500000,
-    totalDonationsReceived: 150000,
-    activePrograms: 50,
-    volunteersCount: 1000,
-  });
-
-  useEffect(() => {
-    // Fetch real stats from Firebase
-    const fetchStats = async () => {
-      try {
-        const liveStats = await getLiveStats();
-        if (liveStats) {
-          setStats(liveStats as LiveStatsType);
-        }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const stats = {
+    totalLivesServed: settings?.livesServed ?? 500000,
+    totalDonationsReceived: settings?.donationsReceived ?? 1240000,
+    activePrograms: settings?.programsCount ?? 42,
+    volunteersCount: settings?.volunteersCount ?? 1500,
+  };
 
   return (
     <section className="py-32 bg-white relative overflow-hidden">
@@ -118,7 +101,7 @@ export const StatsSection: React.FC = () => {
           </div>
 
           {/* Asymmetric Stats Grid */}
-          <div className={`lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8 relative ${language === 'ur' ? 'lg:pr-16 text-right' : ''}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
+            <div className={`lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8 relative ${language === 'ur' ? 'lg:pr-16 text-right' : ''}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <div className="space-y-8">
               <StatItem
                 value={stats.totalLivesServed}
@@ -126,7 +109,7 @@ export const StatsSection: React.FC = () => {
                 delay={0}
                 icon="🤝"
               />
-              <div className={language === 'ur' ? 'md:-translate-x-12' : 'md:translate-x-12'}>
+              <div className={language === 'ur' ? 'lg:-translate-x-12' : 'lg:translate-x-12'}>
                 <StatItem
                   value={stats.activePrograms}
                   label={language === 'ur' ? 'فعال پروگرام' : 'Active Programs'}
@@ -135,14 +118,14 @@ export const StatsSection: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="space-y-8 pt-12">
+            <div className="space-y-8 pt-0 md:pt-12">
               <StatItem
                 value={stats.totalDonationsReceived}
                 label={language === 'ur' ? 'مجموعی عطیات' : 'Donations'}
                 delay={0.2}
                 icon="💰"
               />
-              <div className={language === 'ur' ? 'md:translate-x-12' : 'md:-translate-x-12'}>
+              <div className={language === 'ur' ? 'lg:translate-x-12' : 'lg:-translate-x-12'}>
                 <StatItem
                   value={stats.volunteersCount}
                   label={language === 'ur' ? 'رضاکار' : 'Volunteers'}

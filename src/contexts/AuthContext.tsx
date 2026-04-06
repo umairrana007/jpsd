@@ -12,8 +12,9 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification,
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, Firestore } from 'firebase/firestore';
+import { Auth } from 'firebase/auth';
 import { UserRole } from '@/types';
 
 interface AuthContextType {
@@ -21,13 +22,16 @@ interface AuthContextType {
   loading: boolean;
   currentUserData: any | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, role: UserRole) => Promise<void>;
+  register: (email: string, password: string, name: string, role: UserRole, extraData?: any) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUserRole: (userId: string, role: UserRole) => Promise<void>;
+  updateUserPermissions: (userId: string, permissions: string[]) => Promise<void>;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   isContentManager: boolean;
   isVolunteer: boolean;
+  permissions: string[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,8 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Log Activity Helper
   const logLoginActivity = async (userId: string, email: string) => {
+    if (!db) return;
     try {
-      await addDoc(collection(db, 'login_activity'), {
+      await addDoc(collection(db as Firestore, 'login_activity'), {
         userId,
         email,
         timestamp: serverTimestamp(),
@@ -81,9 +86,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      if (user) {
+      if (user && db) {
         // Fetch user data from Firestore
         try {
           const userRef = doc(db, 'users', user.uid);
@@ -99,12 +109,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               role: UserRole.DONOR,
               isActive: true,
               createdAt: new Date(),
+              updatedAt: new Date(),
               lastLogin: new Date(),
+              permissions: [],
             });
             setCurrentUserData({
               email: user.email,
               name: user.displayName || '',
               role: UserRole.DONOR,
+              isActive: true,
+              permissions: [],
             });
           }
         } catch (error) {
@@ -119,35 +133,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+
   const login = async (email: string, password: string) => {
+    if (!isFirebaseConfigured || !auth || !db) {
+      throw new Error('Authentication system is currently offline. Please check your environment variables.');
+    }
+
     try {
-      // DEVELOPER OVERRIDE: Mock Admin Login for UI testing without Firebase keys
-      if (email === "admin@test.com" && password === "123456") {
-         console.log("Mock Admin Login Activated");
-         setUser({ uid: 'mock-admin-999', email: 'admin@test.com', displayName: 'System Admin' } as any);
-         setCurrentUserData({ name: 'System Admin', email: 'admin@test.com', role: UserRole.ADMIN, isActive: true });
-         setLoading(false);
-         return;
-      }
-      
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Fetch user data from Firestore to check activation status
-      const userRef = doc(db, 'users', result.user.uid);
+      const result = await signInWithEmailAndPassword(auth as Auth, email, password);
+      const userRef = doc(db as Firestore, 'users', result.user.uid);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
         const data = userSnap.data();
         if (data.isActive === false) {
-          await signOut(auth); // Log out immediately if not active
+          await signOut(auth as Auth);
           throw new Error('Your account is currently pending approval by an administrator.');
         }
-        
-        await updateDoc(userRef, {
-          lastLogin: new Date(),
-        });
-        
-        // Log Activity
+        await updateDoc(userRef, { lastLogin: new Date() });
         await logLoginActivity(result.user.uid, email);
       }
     } catch (error: any) {
@@ -156,9 +159,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
 
-  const register = async (email: string, password: string, name: string, role: UserRole = UserRole.DONOR) => {
+  const register = async (email: string, password: string, name: string, role: UserRole = UserRole.DONOR, extraData: any = {}) => {
+    if (!auth || !db) {
+      throw new Error('Registration system is currently offline.');
+    }
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const result = await createUserWithEmailAndPassword(auth as Auth, email, password);
       await updateProfile(result.user, {
         displayName: name,
       });
@@ -167,18 +173,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const autoApprove = role === UserRole.DONOR;
       
       // Create user document in Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
+      await setDoc(doc(db as Firestore, 'users', result.user.uid), {
         email,
         name,
         role: role,
         isActive: autoApprove,
         status: autoApprove ? 'approved' : 'pending',
         createdAt: new Date(),
+        updatedAt: new Date(),
         lastLogin: new Date(),
+        permissions: [],
         preferences: {
           language: 'en',
           newsletter: false,
         },
+        ...extraData,
       });
 
       // Send email verification
@@ -189,8 +198,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    if (!auth) return;
     try {
-      await signOut(auth);
+      await signOut(auth as Auth);
       setCurrentUserData(null);
     } catch (error: any) {
       throw new Error(error.message || 'Failed to logout');
@@ -198,16 +208,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string) => {
+    if (!auth) throw new Error('Auth system offline');
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth as Auth, email);
     } catch (error: any) {
       throw new Error(error.message || 'Failed to send password reset email');
     }
   };
 
   const updateUserRole = async (userId: string, role: UserRole) => {
+    if (!db) return;
     try {
-      const userRef = doc(db, 'users', userId);
+      const userRef = doc(db as Firestore, 'users', userId);
       await updateDoc(userRef, { role });
       if (currentUserData) {
         setCurrentUserData({ ...currentUserData, role });
@@ -217,9 +229,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isAdmin = currentUserData?.role === UserRole.ADMIN;
+  const updateUserPermissions = async (userId: string, permissions: string[]) => {
+    if (!db) return;
+    try {
+      const userRef = doc(db as Firestore, 'users', userId);
+      await updateDoc(userRef, { 
+        permissions,
+        updatedAt: new Date()
+      });
+      if (currentUserData && userId === user?.uid) {
+        setCurrentUserData({ ...currentUserData, permissions });
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to update user permissions');
+    }
+  };
+
+  // Super Admin Fallback (Hardcoded UID or Env Var)
+  const SUPER_ADMIN_UIDS = [process.env.NEXT_PUBLIC_SUPER_ADMIN_UID || ''];
+  const isSuperAdmin = user ? (SUPER_ADMIN_UIDS.includes(user.uid) || currentUserData?.role === UserRole.ADMIN) : false;
+
+  const isAdmin = currentUserData?.role === UserRole.ADMIN || isSuperAdmin;
   const isContentManager = currentUserData?.role === UserRole.CONTENT_MANAGER;
   const isVolunteer = currentUserData?.role === UserRole.VOLUNTEER;
+  const permissions = currentUserData?.permissions || [];
 
   const value: AuthContextType = {
     user,
@@ -230,9 +263,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     resetPassword,
     updateUserRole,
+    updateUserPermissions,
     isAdmin,
+    isSuperAdmin,
     isContentManager,
     isVolunteer,
+    permissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

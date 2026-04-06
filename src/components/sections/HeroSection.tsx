@@ -7,8 +7,18 @@ import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  settings?: {
+    heroTitleEn?: string;
+    heroTitleUr?: string;
+  }
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
   const { t, language } = useLanguage();
+
+  const displayTitleEn = settings?.heroTitleEn || t('home.hero.title.part1');
+  const displayTitleUr = settings?.heroTitleUr || t('home.hero.title.full');
 
   return (
     <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-gradient-to-br from-white via-[#f8fafc] to-[#f0fdf4] overflow-hidden">
@@ -23,8 +33,8 @@ export const HeroSection: React.FC = () => {
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
       />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-16 md:gap-24">
+      <div className="container mx-auto px-4 relative z-10 pt-16 md:pt-24 lg:pt-0">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
           {/* Left Side: Content */}
           <motion.div
             initial={{ opacity: 0, x: language === 'ur' ? 50 : -50 }}
@@ -48,13 +58,11 @@ export const HeroSection: React.FC = () => {
               
               {language === 'ur' ? (
                 <h1 className="urdu-text text-5xl md:text-7xl lg:text-[80px] font-black text-[#0f172a] leading-tight drop-shadow-sm text-center lg:text-right">
-                  {t('home.hero.title.full')}
+                  {displayTitleUr}
                 </h1>
               ) : (
                 <h1 className="english-text text-6xl md:text-8xl lg:text-[100px] font-black text-[#0f172a] leading-[0.95] tracking-tightest">
-                  {t('home.hero.title.part1')} <br />
-                  <span className="bg-gradient-to-r from-[#1ea05f] to-[#3b82f6] bg-clip-text text-transparent">{t('home.hero.title.highlight')}</span>, <br />
-                  {t('home.hero.title.part3')}
+                  {displayTitleEn}
                 </h1>
               )}
               
@@ -84,7 +92,7 @@ export const HeroSection: React.FC = () => {
               </Link>
             </div>
 
-            <div className={`grid grid-cols-3 gap-12 pt-12 border-t border-slate-100 max-w-xl mx-auto ${language === 'ur' ? 'flex-row-reverse lg:mr-0 lg:ml-auto' : 'lg:mx-0'}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
+            <div className={`grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12 border-t border-slate-100 max-w-xl mx-auto ${language === 'ur' ? 'lg:mr-0 lg:ml-auto' : 'lg:mx-0'}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
               {[
                 { label: t('home.hero.stat.beneficiaries'), value: '5M+' },
                 { label: t('home.hero.stat.volunteers.label'), value: '10K+' },
@@ -107,7 +115,7 @@ export const HeroSection: React.FC = () => {
           >
             <div className="relative z-10 rounded-[4rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)] aspect-[4/5] border-[12px] border-white/80 backdrop-blur-3xl">
               <Image
-                src="/images/hero-banner.JPG"
+                src="/images/jpsd_hero.png"
                 alt="JPSD Hero Banner"
                 width={1200}
                 height={1500}

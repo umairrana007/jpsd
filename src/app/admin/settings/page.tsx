@@ -7,15 +7,18 @@ import {
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { getGlobalSettings, updateGlobalSettings } from '@/lib/firebaseUtils';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
 
-export default function AdminSettingsPage() {
+function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    siteTitle: 'Baitussalam Welfare Trust',
-    contactEmail: 'info@baitussalam.org',
-    contactPhone: '+92 21 111 298 111',
-    address: 'Plot 15, Sector 24, Korangi, Karachi',
+    siteName: 'JPSD Foundation',
+    siteDescription: 'Advancing humanity through education, health, and welfare solutions.',
+    contactEmail: 'info@jpsd.org.pk',
+    contactPhone: '+92 21 34135826 - 29',
+    address: 'Jamiyat House, 9 Faran Society, Hyder Ali Road, Karachi, Pakistan',
     operatingHours: 'Mon - Sat: 9:00 AM - 6:00 PM',
     mapsApiKey: 'AIzaSyA_****************',
     maintenanceMode: false
@@ -106,8 +109,17 @@ export default function AdminSettingsPage() {
                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Foundation Name</label>
                      <input 
                         type="text" 
-                        value={settings.siteTitle} 
-                        onChange={(e) => setSettings({...settings, siteTitle: e.target.value})}
+                        value={settings.siteName} 
+                        onChange={(e) => setSettings({...settings, siteName: e.target.value})}
+                        className="w-full px-6 py-3.5 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20" 
+                     />
+                  </div>
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Foundation Mission Statement (Description)</label>
+                     <input 
+                        type="text" 
+                        value={settings.siteDescription} 
+                        onChange={(e) => setSettings({...settings, siteDescription: e.target.value})}
                         className="w-full px-6 py-3.5 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20" 
                      />
                   </div>
@@ -229,7 +241,7 @@ export default function AdminSettingsPage() {
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Meta Description</label>
-                        <textarea rows={3} defaultValue="Baitussalam Welfare Trust is providing global relief and sustainable charity programs." className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 text-xs focus:ring-0 shadow-inner" />
+                        <textarea rows={3} defaultValue="JPSD Welfare Trust is providing global relief and sustainable charity programs." className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 text-xs focus:ring-0 shadow-inner" />
                      </div>
                      <div className="flex items-center justify-between p-6 bg-red-500/5 border border-red-500/10 rounded-2xl group cursor-pointer" 
                           onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})}>
@@ -250,3 +262,7 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+export default withAuth(AdminSettingsPage, { 
+  allowedRoles: [UserRole.ADMIN] 
+});

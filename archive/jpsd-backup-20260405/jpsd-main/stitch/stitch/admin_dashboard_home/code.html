@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethereal Guardian Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Noto+Nastaliq+Urdu&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#e9865b",
+                        "on-secondary-container": "#003e73",
+                        "primary-container": "#20b2aa",
+                        "on-secondary-fixed": "#001c39",
+                        "surface-container-high": "#e8e8ea",
+                        "surface-tint": "#006a65",
+                        "on-surface": "#1a1c1d",
+                        "surface": "#f9f9fb",
+                        "surface-container": "#eeeef0",
+                        "primary": "#006a65",
+                        "on-tertiary-container": "#632200",
+                        "on-secondary-fixed-variant": "#004883",
+                        "surface-container-highest": "#e2e2e4",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcd",
+                        "secondary-fixed": "#d4e3ff",
+                        "primary-fixed-dim": "#59dad1",
+                        "surface-container-low": "#f3f3f5",
+                        "surface-variant": "#e2e2e4",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bbc9c7",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#0060ac",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb597",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#79f6ed",
+                        "on-surface-variant": "#3c4948",
+                        "surface-dim": "#d9dadc",
+                        "on-tertiary-fixed-variant": "#79300b",
+                        "inverse-primary": "#59dad1",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2f3132",
+                        "inverse-on-surface": "#f0f0f2",
+                        "tertiary": "#984721",
+                        "background": "#f9f9fb",
+                        "secondary-container": "#68abff",
+                        "on-primary": "#ffffff",
+                        "outline": "#6c7a78",
+                        "on-primary-fixed": "#00201e",
+                        "on-primary-fixed-variant": "#00504c",
+                        "on-background": "#1a1c1d",
+                        "surface-bright": "#f9f9fb",
+                        "secondary-fixed-dim": "#a4c9ff",
+                        "on-primary-container": "#003e3b"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9fb;
+            background-image: radial-gradient(at 0% 0%, rgba(32, 178, 170, 0.1) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(0, 96, 172, 0.1) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface selection:bg-primary-container/30">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 border-r border-slate-200/50 dark:border-slate-800/50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl flex flex-col h-full p-4 sticky top-0">
+<div class="mb-10 px-4">
+<h1 class="text-lg font-black text-teal-700 dark:text-teal-300">Admin Panel</h1>
+<p class="text-xs text-slate-500 font-medium">Global Overview</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-200 font-semibold rounded-lg px-4 py-2 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-sans text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-sans text-sm">Donations</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-sans text-sm">Volunteers</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-sans text-sm">Users</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-sans text-sm">Reports</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-sans text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-slate-200/50 px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center overflow-hidden">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="professional headshot of a middle-aged male administrator with a warm smile in a brightly lit modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFuO_g2pCySLtVHhrTZahf7iZxMXHLwZ37ys5yhtbaSpC-pBW2KehIWcxuJjkeO0MLMhHKwPypd9cUnRi1Mgfww6Ca6Uq4Qwp7ogSR4RhCaV1IaxUhQW6SvothibghT5LrAhoUNDPocEPj45UiUv2gtXAjqEmIwz6JgGbcpBy1tUFXHOmTd63gOrtAmR900BuWpW2sdekeNFCm1789krH6rCuoflaePYun1RjjQufxgxTYSLarljGcL69W3R26ZC6wDhZyAEC_g7Y"/>
+</div>
+<div>
+<p class="text-sm font-bold">Alex Rivers</p>
+<p class="text-xs text-slate-400">Super Admin</p>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8 lg:p-12 overflow-y-auto">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+<div>
+<h2 class="text-3xl font-bold tracking-tight text-on-surface">Good Morning, Alex</h2>
+<p class="text-slate-500 mt-1">Here is what's happening with Ethereal Guardian today.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-surface-container-lowest text-primary font-semibold rounded-xl border border-outline-variant/30 hover:bg-surface-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-xl" data-icon="add_circle">add_circle</span>
+                        Add Cause
+                    </button>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl" data-icon="event">event</span>
+                        Create Event
+                    </button>
+</div>
+</header>
+<!-- Quick Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<!-- Stat 1 -->
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<span class="text-xs font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded-full">+12.5%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Today's Donations</p>
+<h3 class="text-3xl font-bold mt-1 text-on-surface">$14,280.00</h3>
+</div>
+<!-- Stat 2 -->
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-2xl bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl" data-icon="person_celebrate">person_celebrate</span>
+</div>
+<span class="text-xs font-bold text-secondary bg-secondary-fixed px-2 py-1 rounded-full">+48 new</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Total Donors</p>
+<h3 class="text-3xl font-bold mt-1 text-on-surface">1,240</h3>
+</div>
+<!-- Stat 3 -->
+<div class="glass-panel p-6 rounded-3xl border border-white/40 shadow-sm relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-tertiary-container/5 rounded-full blur-2xl group-hover:bg-tertiary-container/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-2xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-2xl" data-icon="campaign">campaign</span>
+</div>
+<span class="text-xs font-bold text-on-tertiary-container bg-tertiary-fixed px-2 py-1 rounded-full">8 Active</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Live Campaigns</p>
+<h3 class="text-3xl font-bold mt-1 text-on-surface">24</h3>
+</div>
+</section>
+<!-- Main Dashboard Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Revenue Chart & Trends -->
+<div class="xl:col-span-2 space-y-8">
+<div class="glass-panel p-8 rounded-3xl border border-white/40 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="text-xl font-bold">Revenue Insights</h4>
+<p class="text-sm text-slate-500">Weekly donation performance</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-xs font-semibold rounded-lg bg-surface-container">Week</button>
+<button class="px-3 py-1 text-xs font-semibold rounded-lg hover:bg-surface-container">Month</button>
+</div>
+</div>
+<!-- Mock Graph Area -->
+<div class="h-64 flex items-end justify-between gap-4 px-2">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[40%] hover:bg-primary-container/40 transition-colors"></div>
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[65%] hover:bg-primary-container/40 transition-colors"></div>
+<div class="w-full bg-primary-container/40 rounded-t-lg h-[55%] hover:bg-primary-container/60 transition-colors"></div>
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[85%] hover:bg-primary-container/40 transition-colors"></div>
+<div class="w-full bg-primary-container/80 rounded-t-lg h-[95%] shadow-lg shadow-primary/20"></div>
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[45%] hover:bg-primary-container/40 transition-colors"></div>
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[60%] hover:bg-primary-container/40 transition-colors"></div>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Recent Donations Table -->
+<div class="glass-panel p-8 rounded-3xl border border-white/40 shadow-sm overflow-hidden">
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-xl font-bold">Recent Donations</h4>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="border-b border-slate-100">
+<tr class="text-xs text-slate-400 uppercase tracking-wider">
+<th class="pb-4 font-semibold">Donor</th>
+<th class="pb-4 font-semibold">Cause</th>
+<th class="pb-4 font-semibold">Amount</th>
+<th class="pb-4 font-semibold">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50">
+<tr class="group hover:bg-slate-50/50 transition-colors">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold text-xs">SM</div>
+<span class="text-sm font-semibold">Sarah Mitchell</span>
+</div>
+</td>
+<td class="py-4 text-sm text-slate-600">Clean Water Initiative</td>
+<td class="py-4 text-sm font-bold text-on-surface">$250.00</td>
+<td class="py-4">
+<span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50/50 transition-colors">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-xs">JH</div>
+<span class="text-sm font-semibold">James Hensen</span>
+</div>
+</td>
+<td class="py-4 text-sm text-slate-600">Ocean Plastic Rescue</td>
+<td class="py-4 text-sm font-bold text-on-surface">$1,200.00</td>
+<td class="py-4">
+<span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50/50 transition-colors">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold text-xs">LB</div>
+<span class="text-sm font-semibold">Lena Bourne</span>
+</div>
+</td>
+<td class="py-4 text-sm text-slate-600">Rural Education Fund</td>
+<td class="py-4 text-sm font-bold text-on-surface">$50.00</td>
+<td class="py-4">
+<span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-amber-100 text-amber-700 uppercase tracking-tighter">Pending</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Sidebar Content -->
+<div class="space-y-8">
+<!-- Upcoming Events Countdown -->
+<div class="bg-gradient-to-br from-secondary to-on-secondary-container p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<h4 class="text-lg font-bold mb-6">Upcoming Main Event</h4>
+<div class="flex flex-col gap-4">
+<p class="text-secondary-fixed text-sm font-medium">Gala for the Amazon</p>
+<div class="grid grid-cols-3 gap-2">
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+<span class="block text-2xl font-black">04</span>
+<span class="text-[10px] uppercase font-bold opacity-70">Days</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+<span class="block text-2xl font-black">12</span>
+<span class="text-[10px] uppercase font-bold opacity-70">Hours</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+<span class="block text-2xl font-black">45</span>
+<span class="text-[10px] uppercase font-bold opacity-70">Mins</span>
+</div>
+</div>
+<button class="mt-4 w-full py-3 bg-white text-secondary font-bold rounded-xl hover:bg-secondary-fixed transition-colors">Manage RSVP</button>
+</div>
+</div>
+<!-- Volunteer Activity -->
+<div class="glass-panel p-8 rounded-3xl border border-white/40 shadow-sm">
+<h4 class="text-lg font-bold mb-6">Active Volunteers</h4>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img alt="Volunteer" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling young woman with dark hair and bright expressive eyes in an outdoor setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoyMZR7cwT2MwfosdJExvV0n_nalpDxUpAfg5_mWuQQIJ8hr1GG4zs6-xN5yOByM0k7dHJUio5l5RYlcUupO4Uy8tufUnJCUrU0Uvnb0Wj9Pcjf9Vn0ryRvO5p5g0HBpCBbARsqhN3YlJ9c6GYeWOqwsVRIVYrlf2z6qktG3--lOGwJuEJtGE9CdxGNyPD4EKGSQ1wLL7z8c6dofvNA8CzRDky5bIjTq4VhL70Kt3NblIB8Xf_AUO8hUpTnBO3XeEPm2vVVunTRM8"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Diana Ross</p>
+<p class="text-xs text-slate-500">Logistics - 2h ago</p>
+</div>
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img alt="Volunteer" class="w-full h-full object-cover" data-alt="Headshot of a confident smiling man with short beard and professional attire against a neutral backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjI5dXXmEL-q9THKVZ_kBx22i5_-LFzxeUcKzybasMawdyahtlvvUbrSrZg6xAMKhBpFY_CZH51YGENGCEzIYzJIi2XYtF1izHSKbgK_aeqa7Dzn2AIxPmuBxbPD4Z2ppMAQT9JY2QJqnb4USuO_Yd_PUk-0IIBHHyXKklEh92ATDNpy3DAyW_xyPGw6IWZJxwHrYXuDC3yvqfcXPKwwfj9ZwOThPhgC_LUnLs0GqkUiBqCqisBz6BHHpcZutDIjh7s8W3d_gcIS0"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Marcus Thorne</p>
+<p class="text-xs text-slate-500">Media Support - 5h ago</p>
+</div>
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+</div>
+</div>
+<button class="w-full mt-8 py-3 text-slate-500 font-semibold border border-dashed border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">See All Volunteers</button>
+</div>
+<!-- Impact Map Preview -->
+<div class="glass-panel p-4 rounded-3xl border border-white/40 shadow-sm overflow-hidden h-48 relative">
+<img alt="Impact Map" class="w-full h-full object-cover rounded-2xl opacity-60" data-alt="A stylized minimalist world map showing glowing points of light representing global impact locations in shades of teal and blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuX3JAoGYDdPUDVUwOSeAIkSatXMj3OL78YvVxqtnvM4_6GLZcaIbQr4DLDbSxzRoSsfxQPm-fnRPpp8dbgmVQS_ySm-kUkrVjNes7AfHDJcWwhqZUqyJICr40qVOJ4m5ZKp1ZWnXYvc88uRwbQulDjnPaNSQhA7ecjLtYfvJBJoPD5KGEoOwBqAH1dZ0hKk9mTDsV7zfGaTJ8sikCKbTnbW3qNd8yR-MFgcEPkvpHz6WwxfUBY8eU7uMa4HZ2Rae81QXKGHPkaqY"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/40">
+<span class="text-xs font-bold text-primary flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                    Live Global Impact
+                                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom NavBar (Visible on small screens) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-white/20 dark:border-slate-800/50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-3xl z-50">
+<a class="flex flex-col items-center justify-center bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 rounded-2xl px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-medium Inter">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="newspaper">newspaper</span>
+<span class="text-[10px] font-medium Inter">News</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500" href="#">
+<div class="bg-primary p-2 rounded-full -mt-8 shadow-lg shadow-primary/40 border-4 border-white">
+<span class="material-symbols-outlined text-white" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<span class="text-[10px] font-medium Inter mt-1">Donate</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="text-[10px] font-medium Inter">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-[10px] font-medium Inter">Profile</span>
+</a>
+</nav>
+</body></html>

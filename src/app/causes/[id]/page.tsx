@@ -8,40 +8,23 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { MOCK_CAUSES } from '@/data/mockData';
-import { getPrograms } from '@/lib/firebaseUtils';
-import { Cause, Program, UrgencyLevel, CauseCategory } from '@/types';
+import { getCauseById } from '@/lib/firebaseUtils';
+import { Cause } from '@/types';
 import { FiMapPin, FiCalendar, FiUsers, FiClock, FiShield, FiHeart, FiShare2, FiArrowLeft } from 'react-icons/fi';
 
 export default function CauseDetailPage() {
   const { id } = useParams();
   const { t, language } = useLanguage();
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<Cause | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       setLoading(true);
       try {
-        // 1. Try to find in MOCK_CAUSES
-        const cause = MOCK_CAUSES.find(c => c.id === id || c.id === `cause-${id}`);
-        if (cause) {
-          setItem(cause);
-          setLoading(false);
-          return;
-        }
-
-        // 2. Try to find in Programs
-        const programs = await getPrograms();
-        const program = (programs as any[]).find(p => p.id === id || p.id === `program-${id}`);
-        if (program) {
-          setItem(program);
-          setLoading(false);
-          return;
-        }
-
-        // 3. Fallback if not found
-        setItem(null);
+        const data = await getCauseById(id as string);
+        setItem(data);
       } catch (error) {
         console.error('Error fetching details:', error);
       } finally {
@@ -105,7 +88,7 @@ export default function CauseDetailPage() {
               className="relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white"
             >
               <Image 
-                src={item.image} 
+                src={item.image || '/images/hero-banner.jpg'} 
                 alt={title} 
                 fill 
                 className="object-cover"
@@ -113,7 +96,7 @@ export default function CauseDetailPage() {
               />
               <div className={`absolute top-8 ${language === 'ur' ? 'left-8' : 'right-8'} bg-white/90 backdrop-blur-md px-6 py-2 rounded-2xl shadow-xl border border-white/20`}>
                 <span className={`text-[#1ea05f] font-black uppercase text-xs tracking-widest ${language === 'ur' ? 'urdu-text' : ''}`}>
-                  {language === 'ur' ? t(`category.${(item.category || 'all').toLowerCase()}`) : item.category}
+                  {item.category}
                 </span>
               </div>
             </motion.div>

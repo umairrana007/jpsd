@@ -8,15 +8,41 @@ import {
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/firebase';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  deleteDoc, 
+  query, 
+  orderBy,
+  serverTimestamp,
+  updateDoc,
+  Timestamp
+} from 'firebase/firestore';
 
-const eventsData = [
-  { id: 1, title: 'Annual Zakat Distribution', location: 'Karachi HQ', date: 'Oct 24, 2026', time: '09:00 AM', status: 'Upcoming', volunteers: 42 },
-  { id: 2, title: 'Medical Camp - Thar', location: 'District Tharparkar', date: 'Nov 05, 2026', time: '08:00 AM', status: 'Draft', volunteers: 15 },
-  { id: 3, title: 'Digital Skills Workshop', location: 'Virtual / Zoom', date: 'Oct 30, 2026', time: '02:00 PM', status: 'Active', volunteers: 8 },
-];
+interface Event {
+  id: string;
+  title: string;
+  titleUrdu?: string;
+  description: string;
+  descriptionUrdu?: string;
+  location: string;
+  startDate?: any;
+  endDate?: any;
+  status: string;
+  volunteers?: number;
+}
 
-export default function AdminEventsPage() {
+function AdminEventsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
   const [formData, setFormData] = useState({
     titleEn: '',
     titleUr: '',
@@ -28,9 +54,100 @@ export default function AdminEventsPage() {
   });
   const [translating, setTranslating] = useState<string | null>(null);
 
+  const fetchEvents = async () => {
+    if (!db) return;
+    try {
+      const q = query(collection(db as any, 'events'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Event[];
+      setEvents(items);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleSave = async () => {
+    if (!db) return;
+    setSaving(true);
+    try {
+      // Combine date and time into a single JS Date object
+      const startDateTime = new Date(`${formData.date}T${formData.time || '00:00'}`);
+      
+      const eventData = {
+        title: formData.titleEn,
+        titleUrdu: formData.titleUr,
+        description: formData.descEn,
+        descriptionUrdu: formData.descUr,
+        location: formData.location,
+        startDate: Timestamp.fromDate(startDateTime),
+        endDate: Timestamp.fromDate(new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000)), // Default 2 hours duration
+        registrationDeadline: Timestamp.fromDate(startDateTime),
+        status: 'upcoming',
+        type: 'other',
+        maxParticipants: 100,
+        currentParticipants: 0,
+        volunteers: 0,
+        createdAt: serverTimestamp(),
+        image: '/images/jpsd_main.jpg'
+      };
+
+      if (editingId) {
+        await updateDoc(doc(db as any, 'events', editingId), eventData);
+      } else {
+        await addDoc(collection(db as any, 'events'), eventData);
+      }
+
+      setIsModalOpen(false);
+      setEditingId(null);
+      setFormData({ titleEn: '', titleUr: '', descEn: '', descUr: '', location: '', date: '', time: '' });
+      fetchEvents();
+    } catch (err) {
+      console.error("Save error:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEdit = (ev: any) => {
+    // Convert Timestamp back to string for input[type="date"]
+    const dateObj = ev.startDate?.toDate ? ev.startDate.toDate() : new Date();
+    const dateStr = dateObj.toISOString().split('T')[0];
+    const timeStr = dateObj.toTimeString().split(' ')[0].substring(0, 5);
+
+    setFormData({
+      titleEn: ev.title || '',
+      titleUr: ev.titleUrdu || '',
+      descEn: ev.description || '',
+      descUr: ev.descriptionUrdu || '',
+      location: ev.location || '',
+      date: dateStr,
+      time: timeStr
+    });
+    setEditingId(ev.id);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!db || !window.confirm('Are you sure you want to delete this mission?')) return;
+    try {
+      await deleteDoc(doc(db as any, 'events', id));
+      fetchEvents();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
   const handleTranslate = async (field: 'title' | 'desc') => {
     setTranslating(field);
-    // Mock translation logic
     setTimeout(() => {
       if (field === 'title') {
         setFormData(prev => ({ ...prev, titleUr: 'سالانہ زکوٰۃ کی تقسیم' }));
@@ -76,51 +193,57 @@ export default function AdminEventsPage() {
                      <th className="px-10 py-6 text-right">Intervention</th>
                   </tr>
                </thead>
-               <tbody className="divide-y divide-slate-50/50">
-                  {eventsData.map((ev) => (
-                    <tr key={ev.id} className="group hover:bg-slate-50/30 transition-all">
-                       <td className="px-10 py-8">
-                          <div>
-                             <p className="text-base font-black text-slate-800 tracking-tightest italic">{ev.title}</p>
-                             <span className={`mt-2 inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-lg ${
-                                ev.status === 'Upcoming' ? 'bg-amber-100 text-amber-600' : 
-                                ev.status === 'Active' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'bg-slate-100 text-slate-400'
-                             }`}>{ev.status}</span>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8">
-                          <div className="flex items-center gap-3 text-slate-600 font-bold text-sm">
-                             <div className="p-2 bg-slate-50 rounded-lg text-[#1ea05f]"><FiMapPin /></div>
-                             <span>{ev.location}</span>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8">
-                          <div className="space-y-2">
-                             <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-tighter italic">
-                                <FiCalendar className="text-[#1ea05f]" /> {ev.date}
-                             </div>
-                             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-                                <FiClock size={10} /> {ev.time}
-                             </div>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8">
-                          <div className="flex -space-x-3">
-                             {[1,2,3].map((u) => (
-                               <div key={u} className="w-10 h-10 rounded-2xl border-4 border-white bg-slate-100 flex-shrink-0 shadow-sm"></div>
-                             ))}
-                             <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-[10px] font-black border-4 border-white shadow-md">+{ev.volunteers - 3}</div>
-                          </div>
-                       </td>
-                       <td className="px-10 py-8 text-right">
-                          <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                             <button className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
-                             <button className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
-                          </div>
-                       </td>
-                    </tr>
-                  ))}
-               </tbody>
+                <tbody className="divide-y divide-slate-50/50">
+                   {loading ? (
+                     <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">Accessing Event Archives...</td></tr>
+                   ) : events.length === 0 ? (
+                     <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400">No missions deployed in the records.</td></tr>
+                   ) : events.map((ev) => (
+                     <tr key={ev.id} className="group hover:bg-slate-50/30 transition-all">
+                        <td className="px-10 py-8">
+                           <div>
+                              <p className="text-base font-black text-slate-800 tracking-tightest italic">{ev.title}</p>
+                              <span className={`mt-2 inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-lg ${
+                                 ev.status === 'Upcoming' ? 'bg-amber-100 text-amber-600' : 
+                                 ev.status === 'Active' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'bg-slate-100 text-slate-400'
+                              }`}>{ev.status}</span>
+                           </div>
+                        </td>
+                        <td className="px-10 py-8">
+                           <div className="flex items-center gap-3 text-slate-600 font-bold text-sm">
+                              <div className="p-2 bg-slate-50 rounded-lg text-[#1ea05f]"><FiMapPin /></div>
+                              <span>{ev.location}</span>
+                           </div>
+                        </td>
+                         <td className="px-10 py-8">
+                            <div className="space-y-2">
+                               <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-tighter italic">
+                                  <FiCalendar className="text-[#1ea05f]" /> 
+                                  {ev.startDate?.toDate ? ev.startDate.toDate().toLocaleDateString() : 'TBD'}
+                               </div>
+                               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                  <FiClock size={10} /> 
+                                  {ev.startDate?.toDate ? ev.startDate.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TBD'}
+                               </div>
+                            </div>
+                         </td>
+                        <td className="px-10 py-8">
+                           <div className="flex -space-x-3">
+                              {[1,2,3].map((u) => (
+                                <div key={u} className="w-10 h-10 rounded-2xl border-4 border-white bg-slate-100 flex-shrink-0 shadow-sm"></div>
+                              ))}
+                              <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-[10px] font-black border-4 border-white shadow-md">+{ev.volunteers || 0}</div>
+                           </div>
+                        </td>
+                         <td className="px-10 py-8 text-right">
+                            <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                               <button onClick={() => handleEdit(ev)} className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
+                               <button onClick={() => handleDelete(ev.id)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
+                            </div>
+                         </td>
+                     </tr>
+                   ))}
+                </tbody>
             </table>
          </div>
       </div>
@@ -254,9 +377,13 @@ export default function AdminEventsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 flex gap-4">
-                  <button className="flex-1 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all uppercase text-xs tracking-widest">
-                    Confirm Deployment
+                 <div className="pt-6 flex gap-4">
+                  <button 
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="flex-1 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all uppercase text-xs tracking-widest disabled:opacity-50"
+                  >
+                    {saving ? 'Deploying...' : 'Confirm Deployment'}
                   </button>
                   <button onClick={() => setIsModalOpen(false)} className="px-10 py-4 bg-slate-50 text-slate-400 font-black rounded-2xl hover:bg-slate-100 transition-all uppercase text-xs tracking-widest">
                     Cancel
@@ -270,3 +397,6 @@ export default function AdminEventsPage() {
     </div>
   );
 }
+export default withAuth(AdminEventsPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

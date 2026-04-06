@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
+import { getGlobalConfig, type SiteSettings } from '@/lib/settings';
 
 export default function ContactPage() {
   const { t } = useLanguage();
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,6 +18,14 @@ export default function ContactPage() {
     subject: '',
     message: '',
   });
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const config = await getGlobalConfig();
+      setSettings(config);
+    }
+    fetchSettings();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +66,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-[#2c3e50] mb-1">Our Location</h3>
-                    <p className="text-gray-600">
-                      Jamiyat House, 9 Faran Society,<br />
-                      Hyder Ali Road,<br />
-                      Karachi, Pakistan
+                    <p className="text-gray-600 whitespace-pre-line">
+                      {settings?.address || 'Jamiyat House, 9 Faran Society,\nHyder Ali Road,\nKarachi, Pakistan'}
                     </p>
                   </div>
                 </div>
@@ -71,11 +79,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-[#2c3e50] mb-1">Phone Number</h3>
                     <p className="text-gray-600">
-                      <a href="tel:+922134135826" className="hover:text-[#2980b9]">
-                        (+92) 21 34135826 - 29
-                      </a><br />
-                      <a href="tel:+923212898200" className="hover:text-[#2980b9]">
-                        (+92) 321 2898200
+                      <a href={`tel:${settings?.contactPhone || '+922134135826'}`} className="hover:text-[#2980b9]">
+                        {settings?.contactPhone || '(+92) 21 34135826 - 29'}
                       </a>
                     </p>
                   </div>
@@ -88,8 +93,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-[#2c3e50] mb-1">Email Address</h3>
                     <p className="text-gray-600">
-                      <a href="mailto:info@jpsd.org.pk" className="hover:text-[#f39c12]">
-                        info@jpsd.org.pk
+                      <a href={`mailto:${settings?.contactEmail || 'info@jpsd.org.pk'}`} className="hover:text-[#f39c12]">
+                        {settings?.contactEmail || 'info@jpsd.org.pk'}
                       </a>
                     </p>
                   </div>

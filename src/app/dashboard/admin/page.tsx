@@ -34,6 +34,8 @@ export default function AdminOverview() {
   }, [isAdmin]);
 
   const fetchAdminData = async () => {
+    if (!db) return; // Firebase not configured
+    
     try {
       // Mock data for initial UI - in real app, these would be separate Firestore queries
       const usersRef = collection(db, 'users');
@@ -61,6 +63,8 @@ export default function AdminOverview() {
   };
 
   const handleApprove = async (userId: string) => {
+    if (!db) return;
+    
     try {
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, { 

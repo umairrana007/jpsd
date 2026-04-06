@@ -7,15 +7,17 @@ import {
   FiMapPin, FiActivity, FiAward
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
 
 const volunteersData = [
   { id: 1, name: 'Sarah Chen', email: 'sarah.c@example.org', skills: ['Medical', 'Spanish'], status: 'Verified', hours: '142h', image: 'S' },
   { id: 2, name: 'Marcus Wright', email: 'm.wright@domain.com', skills: ['Logistics', 'Driver'], status: 'On Duty', hours: '86h', image: 'M' },
   { id: 3, name: 'Elena Rodriguez', email: 'elena.r@charity.org', skills: ['Education'], status: 'Pending', hours: '0h', image: 'E' },
-  { id: 4, name: 'Zohaib Khan', email: 'zohaib.k@baitussalam.org', skills: ['IT Support', 'Urdu'], status: 'Verified', hours: '210h', image: 'Z' },
+  { id: 4, name: 'Zohaib Khan', email: 'zohaib.k@jpsd.org.pk', skills: ['IT Support', 'Urdu'], status: 'Verified', hours: '210h', image: 'Z' },
 ];
 
-export default function AdminVolunteersPage() {
+function AdminVolunteersPage() {
   const [selectedVolunteer, setSelectedVolunteer] = useState<any>(null);
 
   return (
@@ -181,3 +183,7 @@ export default function AdminVolunteersPage() {
     </div>
   );
 }
+
+export default withAuth(AdminVolunteersPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

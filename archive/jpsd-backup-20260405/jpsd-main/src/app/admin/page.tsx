@@ -1,0 +1,288 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { FiHome, FiDollarSign, FiUsers, FiUser, FiBarChart2, FiSettings, FiPlus, FiActivity, FiShield, FiDatabase, FiCheck, FiX } from 'react-icons/fi';
+import { getSystemStats, getRecentActivity } from '@/lib/firebaseUtils';
+import GlobalSearch from '@/components/admin/GlobalSearch';
+
+export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<any>(null);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsData, activityData] = await Promise.all([
+          getSystemStats(),
+          getRecentActivity()
+        ]);
+        setStats(statsData || { todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
+        setActivities(activityData && activityData.length > 0 ? activityData : [
+          { id: '1', message: 'New Volunteer Deployment Request: Korangi District', time: 'Just Now', icon: '🚨' },
+          { id: '2', message: 'Major Donation Deployment: Syrian Emergency Relief', time: '12 mins ago', icon: '💰' }
+        ]);
+      } catch (err) {
+        console.warn('[HQ Intel] Data Fetch Calibration failed, using tactical defaults.');
+        setStats({ todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
+        setActivities([
+          { id: '1', message: 'System Override: Manual Data Calibration Active', time: 'Now', icon: '⚙️' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return (
+     <div className="min-h-screen flex items-center justify-center bg-[#f9f9fb]">
+        <div className="w-16 h-16 border-4 border-[#1ea05f] border-t-transparent rounded-full animate-spin shadow-xl shadow-[#1ea05f]/20"></div>
+     </div>
+  );
+
+  return (
+    <>
+      {/* Header Section */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+        <div>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">HQ Command Center</h2>
+          <p className="text-slate-500 font-medium">JPSD Global Management & Tactical Operations.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button 
+            className="flex items-center gap-2 px-6 py-3 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl border border-slate-200 hover:text-[#1ea05f] shadow-sm transition-all"
+          >
+            <FiPlus /> Add Cause
+          </button>
+          <button 
+            className="flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-[#1ea05f] to-[#15804a] text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:opacity-90 transition-all shadow-xl shadow-[#1ea05f]/20"
+          >
+            <FiActivity /> Deploy Mission
+          </button>
+        </div>
+      </header>
+
+      {/* Quick Stats Bento Grid */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#1ea05f]/10 flex items-center justify-center text-[#1ea05f]">
+              <FiDollarSign size={24} />
+            </div>
+            <span className="text-[10px] font-black text-[#1ea05f] bg-[#1ea05f]/10 px-3 py-1 rounded-full uppercase tracking-widest">Today</span>
+          </div>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Today's Donations</p>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">${stats?.todayDonations.toLocaleString()}</h3>
+        </div>
+
+        <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+              <FiUsers size={24} />
+            </div>
+            <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-3 py-1 rounded-full uppercase tracking-widest">Total</span>
+          </div>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Total Donors</p>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.totalDonors.toLocaleString()}</h3>
+        </div>
+
+        <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+              <FiActivity size={24} />
+            </div>
+            <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1 rounded-full uppercase tracking-widest">Deployments</span>
+          </div>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Active Missions</p>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.upcomingMissions}</h3>
+        </div>
+        
+        {/* System Health Status (Requirement B - 8) */}
+        <div className="bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group md:col-span-3">
+           <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Database: Live</span>
+              </div>
+              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Assets Store: Healthy</span>
+              </div>
+              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Auth Service: Operational</span>
+              </div>
+              <span className="ml-auto text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health: 100% Operational</span>
+           </div>
+        </div>
+      </section>
+
+      {/* Main Dashboard Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Revenue Chart & Trends */}
+        <div className="xl:col-span-2 space-y-8">
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h4 className="text-xl font-bold">Revenue Insights</h4>
+                <p className="text-sm text-slate-500">Weekly donation performance</p>
+              </div>
+              <div className="flex gap-2">
+                <button className="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-800">Week</button>
+                <button className="px-3 py-1 text-xs font-semibold rounded-lg hover:bg-slate-100 text-slate-500">Month</button>
+              </div>
+            </div>
+            {/* Mock Graph Area */}
+            <div className="h-64 flex items-end justify-between gap-4 px-2">
+              <div className="w-full bg-[#1ea05f]/20 rounded-t-lg h-[40%] hover:bg-[#1ea05f]/40 transition-colors"></div>
+              <div className="w-full bg-[#1ea05f]/20 rounded-t-lg h-[65%] hover:bg-[#1ea05f]/40 transition-colors"></div>
+              <div className="w-full bg-[#1ea05f]/40 rounded-t-lg h-[55%] hover:bg-[#1ea05f]/60 transition-colors"></div>
+              <div className="w-full bg-[#1ea05f]/20 rounded-t-lg h-[85%] hover:bg-[#1ea05f]/40 transition-colors"></div>
+              <div className="w-full bg-[#1ea05f]/80 rounded-t-lg h-[95%] shadow-lg shadow-[#1ea05f]/20"></div>
+              <div className="w-full bg-[#1ea05f]/20 rounded-t-lg h-[45%] hover:bg-[#1ea05f]/40 transition-colors"></div>
+              <div className="w-full bg-[#1ea05f]/20 rounded-t-lg h-[60%] hover:bg-[#1ea05f]/40 transition-colors"></div>
+            </div>
+            <div className="flex justify-between mt-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
+
+          {/* Recent Donations Table */}
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-xl font-bold">Recent Donations</h4>
+              <Link className="text-sm font-semibold text-[#1ea05f] hover:underline" href="/admin/donations">View All</Link>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="border-b border-slate-100">
+                  <tr className="text-xs text-slate-400 uppercase tracking-wider">
+                    <th className="pb-4 font-semibold">Donor</th>
+                    <th className="pb-4 font-semibold">Cause</th>
+                    <th className="pb-4 font-semibold">Amount</th>
+                    <th className="pb-4 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  <tr className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">SM</div>
+                        <span className="text-sm font-semibold text-slate-700">Sarah Mitchell</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-sm text-slate-600">Clean Water Initiative</td>
+                    <td className="py-4 text-sm font-bold text-slate-800">$250.00</td>
+                    <td className="py-4">
+                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
+                    </td>
+                  </tr>
+                  <tr className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#1ea05f]/20 flex items-center justify-center text-[#1ea05f] font-bold text-xs">JH</div>
+                        <span className="text-sm font-semibold text-slate-700">James Hensen</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-sm text-slate-600">Mosque Construction</td>
+                    <td className="py-4 text-sm font-bold text-slate-800">$1,200.00</td>
+                    <td className="py-4">
+                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
+                    </td>
+                  </tr>
+                  <tr className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-xs">LB</div>
+                        <span className="text-sm font-semibold text-slate-700">Lena Bourne</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-sm text-slate-600">Rural Education Fund</td>
+                    <td className="py-4 text-sm font-bold text-slate-800">$50.00</td>
+                    <td className="py-4">
+                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-amber-100 text-amber-700 uppercase tracking-tighter">Pending</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Content */}
+        <div className="space-y-8">
+          {/* Upcoming Events Countdown */}
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+            <h4 className="text-lg font-bold mb-6">Upcoming Main Event</h4>
+            <div className="flex flex-col gap-4">
+              <p className="text-slate-300 text-sm font-medium">Annual Zakat Distribution</p>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+                  <span className="block text-2xl font-black">04</span>
+                  <span className="text-[10px] uppercase font-bold opacity-70">Days</span>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+                  <span className="block text-2xl font-black">12</span>
+                  <span className="text-[10px] uppercase font-bold opacity-70">Hours</span>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center">
+                  <span className="block text-2xl font-black">45</span>
+                  <span className="text-[10px] uppercase font-bold opacity-70">Mins</span>
+                </div>
+              </div>
+              <button onClick={() => alert('یہ فیچر ابھی شامل کیا جا رہا ہے')} className="mt-4 w-full py-3 bg-[#1ea05f] text-white font-bold rounded-xl hover:bg-[#15804a] transition-colors">Manage Event</button>
+            </div>
+          </div>
+
+          {/* Field Agent Calibration (Approvals) */}
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-[3rem] border border-white shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h4 className="text-lg font-black italic uppercase italic tracking-widest text-slate-800">Agent Calibration</h4>
+                <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest">Pending Verification</p>
+              </div>
+              <FiShield className="text-amber-500" />
+            </div>
+            <div className="space-y-6">
+              {[
+                { name: 'Arsalan Khan', skills: 'Medical, Logistics', phone: '0300-1234567' },
+                { name: 'Mariam Ali', skills: 'Translation, Education', phone: '0321-9876543' }
+              ].map((v, i) => (
+                <div key={i} className="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] space-y-4 hover:shadow-lg transition-all group">
+                   <div className="flex justify-between items-start">
+                      <div>
+                         <p className="text-sm font-black text-slate-800 italic uppercase">{v.name}</p>
+                         <p className="text-[9px] text-[#1ea05f] font-black uppercase tracking-widest mt-1">Field Unit: {v.skills}</p>
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-400">{v.phone}</p>
+                   </div>
+                   <div className="flex gap-2 pt-2">
+                      <button 
+                         onClick={() => alert('Mission Authorization Confirmed. SMS Alerting Agent...')}
+                         className="flex-1 py-3 bg-[#1ea05f] text-white rounded-2xl flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-[#1ea05f]/20"
+                      >
+                         <FiCheck /> Approve
+                      </button>
+                      <button 
+                         onClick={() => alert('Agent Calibration Rejected. Identity Verification Failed.')}
+                         className="w-12 h-12 bg-white text-red-500 border border-slate-200 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                      >
+                         <FiX />
+                      </button>
+                   </div>
+                </div>
+              ))}
+            </div>
+            <button className="w-full mt-8 py-3 text-slate-400 font-black text-[10px] uppercase tracking-widest border border-dashed border-slate-200 rounded-2xl hover:bg-white hover:text-slate-800 transition-all">
+              View All Field Applications
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+

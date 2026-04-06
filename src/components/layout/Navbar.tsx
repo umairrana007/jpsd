@@ -1,386 +1,323 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/Button';
-import { FiMenu, FiX, FiChevronDown, FiPhone, FiGlobe, FiBook, FiExternalLink } from 'react-icons/fi';
-import { FaFacebook, FaInstagram, FaTiktok, FaYoutube, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-const navItems = [
-  { label: 'nav.home', href: '/' },
-  { label: 'nav.causes', href: '/causes' },
-  { label: 'nav.events', href: '/events' },
-  { label: 'nav.blog', href: '/blog' },
-  { 
-    label: 'nav.welfare', 
-    href: '/welfare', 
-    subItems: [
-      { label: 'nav.welfare.projects', href: '/welfare/projects' },
-      { label: 'nav.welfare.causes', href: '/welfare/causes' },
-      { label: 'nav.welfare.news', href: '/welfare/news' },
-    ] 
-  },
-  { 
-    label: 'nav.education', 
-    href: '/education', 
-    subItems: [
-      { label: 'nav.education.projects', href: '/education/projects' },
-      { label: 'nav.education.causes', href: '/education/causes' },
-      { label: 'nav.education.news', href: '/education/news' },
-    ] 
-  },
-  { 
-    label: 'nav.spirituality', 
-    href: '/spirituality', 
-    subItems: [
-      { label: 'nav.spirituality.duas', href: '/spirituality/duas' },
-      { label: 'nav.spirituality.bayanat', href: '/spirituality/bayanat' },
-    ] 
-  },
-  { 
-    label: 'nav.more', 
-    href: '#', 
-    subItems: [
-      { label: 'nav.about', href: '/about-us' },
-      { label: 'nav.contact', href: '/contact-us' },
-      { label: 'nav.volunteer', href: '/volunteer' },
-      { label: 'nav.timeline', href: '/timeline' },
-      { label: 'nav.zakatCalculator', href: '/zakat-calculator' },
-      { label: 'nav.askShariah', href: '/ask-shariah' },
-    ] 
-  }
-];
+import { 
+  FiMenu, FiX, FiChevronDown, FiGlobe, FiUser, 
+  FiHeart, FiLogOut, FiLayout, FiMaximize2,
+  FiBell, FiCalendar, FiBook, FiImage, FiUserPlus, FiMail,
+  FiMoreHorizontal
+} from 'react-icons/fi';
 
 export const Navbar: React.FC = () => {
-  const { language, setLanguage, t } = useLanguage();
-  const { user, currentUserData, logout, isAdmin, isVolunteer } = useAuth();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [showMoreDesktop, setShowMoreDesktop] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  
+  const { language, setLanguage, t } = useLanguage();
+  const { user, currentUserData, logout, loading: authLoading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 20);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleDropdown = (label: string) => {
-    setActiveDropdown(activeDropdown === label ? null : label);
+  // Close menus on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setShowMoreDesktop(false);
+    setUserMenuOpen(false);
+  }, [pathname]);
+
+  const navItems = [
+    { name: t('nav.home'), href: '/' },
+    { name: t('nav.welfare'), href: '/welfare' },
+    { name: t('nav.education'), href: '/education' },
+    { name: t('nav.spirituality'), href: '/spirituality' },
+    { name: t('nav.causes'), href: '/causes' },
+  ];
+
+  const moreItems = [
+    { name: t('nav.events'), href: '/events', icon: <FiCalendar /> },
+    { name: t('nav.blog'), href: '/blog', icon: <FiBook /> },
+    { name: t('nav.gallery'), href: '/gallery', icon: <FiImage /> },
+    { name: t('nav.volunteer'), href: '/volunteer', icon: <FiUserPlus /> },
+    { name: t('nav.contact'), href: '/contact-us', icon: <FiMail /> },
+  ];
+
+  const isUrdu = language === 'ur';
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
   };
 
-  // Bypass Navbar for tactical portals to avoid UI overlap
-  if (pathname?.startsWith('/admin') || 
-      pathname?.startsWith('/volunteer') || 
-      pathname?.startsWith('/donor') ||
-      pathname?.startsWith('/dashboard')) {
-    return null;
-  }
-
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 inset-x-0 z-50 pointer-events-auto"
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+        scrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-xl' : 'bg-transparent py-6'
+      }`}
     >
-      <style>{`
-        @keyframes slide-infinite {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-slide-infinite {
-          display: flex;
-          width: max-content;
-          animation: slide-infinite 45s linear infinite;
-        }
-        .marquee-container:hover .animate-slide-infinite {
-          animation-play-state: paused;
-        }
-      `}</style>
-
-      {/* 1) Black Marquee Bar */}
-      <div className={`w-full bg-black text-white py-1 md:py-1.5 overflow-hidden marquee-container transition-all duration-300 pointer-events-auto flex items-center ${isScrolled ? 'opacity-0 h-0 !py-0' : 'opacity-100'}`}>
-        <div className="animate-slide-infinite gap-8 md:gap-14 text-[10px] md:text-xs tracking-wider font-semibold whitespace-nowrap pl-4 w-full">
-          <div className="flex gap-8 md:gap-14">
-            <span className="text-gray-300">Baitussalam Masjid Namaz Time, DHA Phase 4</span>
-            <span>Fajar: 5:40 am</span>
-            <span>Zuhar: 1:30 pm</span>
-            <span>Asar: 5:30 pm</span>
-            <span>Magrib: Sunset</span>
-            <span>Isha: 8:30 pm</span>
-          </div>
-          <div className="flex gap-8 md:gap-14 pr-8 md:pr-14">
-            <span className="text-gray-300">Baitussalam Masjid Namaz Time, DHA Phase 4</span>
-            <span>Fajar: 5:40 am</span>
-            <span>Zuhar: 1:30 pm</span>
-            <span>Asar: 5:30 pm</span>
-            <span>Magrib: Sunset</span>
-            <span>Isha: 8:30 pm</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2) Social Media Bar */}
-      <div className={`w-full bg-[#1ea05f] text-white py-1.5 md:py-2 transition-all duration-300 pointer-events-auto border-b border-[#15804a] ${isScrolled ? 'opacity-0 h-0 !py-0 !border-transparent' : 'opacity-100'}`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex justify-end items-center gap-3 md:gap-5 text-[15px] md:text-lg">
-          <a href="https://www.facebook.com/jpsd.official" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 hover:scale-110 transition-all"><FaFacebook /></a>
-          <a href="https://www.instagram.com/jpsd.media/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 hover:scale-110 transition-all"><FaInstagram /></a>
-          <a href="#" className="hover:text-gray-300 hover:scale-110 transition-all"><FaTiktok /></a>
-          <a href="https://www.youtube.com/channel/UC93l50wypcsmOG-wn_BHPIg" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 hover:scale-110 transition-all"><FaYoutube /></a>
-          <a href="#" className="hover:text-gray-300 hover:scale-110 transition-all"><FaXTwitter /></a>
-          <a href="https://wa.me/923212898200" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 hover:scale-110 transition-all"><FaWhatsapp /></a>
-        </div>
-      </div>
-
-      {/* 3) Global Info Bar */}
-      <div className={`w-full py-1.5 px-4 md:px-8 bg-white/40 backdrop-blur-sm transition-all duration-300 pointer-events-auto shadow-sm ${isScrolled ? 'opacity-0 h-0 !py-0 !overflow-hidden' : 'opacity-100 h-auto'}`}>
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center text-[10px] md:text-[11px] font-bold text-gray-600 tracking-tight">
-          <div className="flex items-center space-x-6 rtl:space-x-reverse">
-            <a href="tel:+922134135826" className="flex items-center hover:text-[#1ea05f] transition-colors">
-              <FiPhone className="mr-1.5 text-[#1ea05f]" /> (+92) 21 34135826
-            </a>
-            <div className="flex items-center font-bold">
-              <FiGlobe className="mr-1.5 text-[#1ea05f]" /> {t('nav.globalOutreach')}
-            </div>
-          </div>
+      <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+        <div className={`flex items-center justify-between ${isUrdu ? 'flex-row-reverse' : ''}`}>
           
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            <div className="flex bg-gray-100/80 rounded-lg p-0.5 border border-gray-200">
-              <button 
-                onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-md transition-all ${language === 'en' ? 'bg-white shadow-sm text-[#1ea05f]' : 'hover:bg-white/50'}`}
-              >
-                EN
-              </button>
-              <button 
-                onClick={() => setLanguage('ur')}
-                className={`px-3 py-1 rounded-md transition-all urdu-font ${language === 'ur' ? 'bg-white shadow-sm text-[#1ea05f]' : 'hover:bg-white/50'}`}
-              >
-                UR
-              </button>
+          {/* Logo */}
+          <Link href="/" className="relative z-10 flex items-center gap-3 group">
+            <div className="relative w-12 h-12 md:w-14 md:h-14 overflow-hidden rounded-2xl bg-white shadow-lg p-1.5 transition-transform group-hover:scale-105 active:scale-95 duration-500">
+               <Image 
+                src="/logo.png" 
+                alt="JPSD Logo" 
+                width={200} 
+                height={200} 
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
-            
-            <Link href="/shariah-advisory" className="flex items-center bg-orange-50 text-orange-600 px-3 py-1.5 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors">
-              <FiBook className="mr-1.5" /> <span className="uppercase tracking-wider">{t('nav.shariahAdvisory')}</span>
-            </Link>
-          </div>
-        </div>
-      </div>
+            <div className={`flex flex-col ${isUrdu ? 'items-end text-right' : 'items-start'}`}>
+              <span className={`text-xl md:text-2xl font-black tracking-tighter leading-none ${scrolled ? 'text-slate-900' : 'text-slate-800'} ${isUrdu ? 'font-urdu' : ''}`}>
+                JPSD
+              </span>
+              <span className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1 text-[#1ea05f]`}>
+                Heritage of Service
+              </span>
+            </div>
+          </Link>
 
-      {/* Main Navbar */}
-      <div className="w-full px-4 pt-2 md:pt-4 pointer-events-auto">
-        <div className={`mx-auto max-w-7xl transition-all duration-300 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-white/40 relative z-50 ${
-          isScrolled ? 'bg-white/95 backdrop-blur-xl py-1 shadow-green-600/5' : 'bg-white py-2'
-        }`}>
-          <div className="flex items-center gap-2 px-4 md:px-6 h-14 md:h-16 overflow-hidden" dir={language === 'ur' ? 'rtl' : 'ltr'}>
-            <Link href="/" className="flex items-center group flex-shrink-0">
-              <div className={`relative transition-all duration-500 group-hover:scale-105 active:scale-95 ${
-                isScrolled ? 'w-48 h-12 md:w-60 md:h-14' : 'w-52 h-14 md:w-72 md:h-18'
-              }`}>
-                <Image 
-                  src="/logo.png" 
-                  alt="JPSD Logo" 
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </Link>
-
-            <nav className="hidden lg:flex items-center gap-1 flex-1 min-w-0 overflow-hidden justify-center">
-              {navItems.map((item) => (
-                <div key={item.label} 
-                     className="relative group h-full flex items-center"
-                     onMouseEnter={() => item.subItems && setActiveDropdown(item.label)}
-                     onMouseLeave={() => setActiveDropdown(null)}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center gap-1 px-2 py-2 text-[#334155] hover:text-[#1ea05f] font-bold text-[12px] transition-all rounded-full hover:bg-gray-50 whitespace-nowrap ${activeDropdown === item.label ? 'text-[#1ea05f]' : ''} ${language === 'ur' ? 'urdu-text' : ''}`}
-                  >
-                    <span>{t(item.label)}</span>
-                    {item.subItems && <FiChevronDown className={`transform transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`} />}
-                  </Link>
-
-                  <AnimatePresence>
-                    {activeDropdown === item.label && item.subItems && (
-                      <motion.div
-                        dir={language === 'ur' ? 'rtl' : 'ltr'}
-                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                        className="absolute top-[80%] left-1/2 -translate-x-1/2 mt-4 w-56 bg-white rounded-3xl shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden z-[60] p-2"
-                      >
-                        {item.subItems.map((subItem) => (
-                          <Link
-                            key={subItem.label}
-                            href={subItem.href}
-                            className="flex items-center justify-between px-4 py-3 text-[13px] text-gray-600 hover:bg-[#1ea05f]/5 hover:text-[#1ea05f] transition-all font-bold rounded-2xl"
-                          >
-                            <span>{t(subItem.label)}</span>
-                            <FiExternalLink className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px]" />
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-1 xl:gap-2 flex-shrink-0" dir="ltr">
-              {user ? (
-                <div className="relative group" onMouseEnter={() => setUserMenuOpen(true)} onMouseLeave={() => setUserMenuOpen(false)}>
-                  <button className="flex items-center gap-2 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200 hover:bg-gray-200 transition-all">
-                    <div className="w-8 h-8 rounded-full bg-[#1ea05f] flex items-center justify-center text-white font-black text-xs">
-                      {currentUserData?.name?.charAt(0) || user.email?.charAt(0)}
-                    </div>
-                    <span className="hidden md:block text-xs font-black text-slate-700 tracking-tight">{currentUserData?.name?.split(' ')[0] || 'User'}</span>
-                    <FiChevronDown className="text-gray-500" />
-                  </button>
-
-                  <AnimatePresence>
-                    {userMenuOpen && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 z-[100]"
-                      >
-                        {isAdmin && (
-                          <Link href="/admin" className={`block px-4 py-3 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-xl ${language === 'ur' ? 'urdu-text text-right' : ''}`}>
-                            {t('nav.adminPortal')}
-                          </Link>
-                        )}
-                        <Link href="/dashboard" className={`block px-4 py-3 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-xl ${language === 'ur' ? 'urdu-text text-right' : ''}`}>
-                          {t('nav.dashboard')}
-                        </Link>
-                        {isVolunteer && (
-                          <Link href="/dashboard/volunteer" className={`block px-4 py-3 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-xl ${language === 'ur' ? 'urdu-text text-right' : ''}`}>
-                            {t('nav.volunteerPortal')}
-                          </Link>
-                        )}
-                        <div className="h-px bg-gray-100 my-1"></div>
-                        <button 
-                          onClick={() => { logout(); setUserMenuOpen(false); }}
-                          className={`w-full text-left px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-50 rounded-xl ${language === 'ur' ? 'urdu-text text-right shadow-none' : ''}`}
-                        >
-                          {t('nav.logout')}
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                <div className="hidden xl:flex gap-1">
-                  <Link href="/login">
-                    <Button variant="outline" size="sm" className={`font-black text-[10px] text-[#1ea05f] hover:bg-[#1ea05f]/5 rounded-xl px-2 border-none shadow-none uppercase tracking-widest ${language === 'ur' ? 'urdu-text' : ''}`}>
-                      {t('nav.login')}
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button variant="outline" size="sm" className={`font-black text-[10px] border-2 border-[#1ea05f] text-[#1ea05f] rounded-xl px-3 hover:bg-[#1ea05f] hover:text-white transition-all uppercase tracking-widest ${language === 'ur' ? 'urdu-text' : ''}`}>
-                      {t('nav.signup')}
-                    </Button>
-                  </Link>
-                </div>
-              )}
-
-              <Link href="/donate" className="flex-shrink-0">
-                <Button 
-                   variant="gold" 
-                   size="sm" 
-                   className={`flex !bg-orange-500 hover:!bg-orange-600 !text-white !rounded-xl !py-1.5 !px-3 xl:!px-5 shadow-lg shadow-orange-500/20 text-[10px] xl:text-xs border-none font-black whitespace-nowrap ${language === 'ur' ? 'urdu-text' : ''}`}
+          {/* Desktop Navigation */}
+          <div className={`hidden lg:flex items-center gap-2 ${isUrdu ? 'flex-row-reverse' : ''}`}>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link 
+                  key={item.href}
+                  href={item.href}
+                  className={`px-5 py-2.5 rounded-2xl text-[13px] font-extrabold transition-all duration-300 relative group overflow-hidden ${
+                    scrolled 
+                      ? isActive ? 'text-[#1ea05f] bg-[#1ea05f]/5 shadow-sm' : 'text-slate-600 hover:text-[#1ea05f]' 
+                      : isActive ? 'text-[#1ea05f] bg-[#1ea05f]/5' : 'text-slate-600 hover:text-[#1ea05f]'
+                  }`}
                 >
-                   {t('nav.donate')}
-                </Button>
-              </Link>
+                  <span className={`relative z-10 ${isUrdu ? 'urdu-text text-[15px]' : ''}`}>{item.name}</span>
+                  {isActive && (
+                    <motion.div layoutId="nav-pill" className="absolute inset-0 bg-[#1ea05f]/10 dark:bg-white/10 -z-0" />
+                  )}
+                </Link>
+              );
+            })}
 
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2.5 text-[#334155] bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+            {/* Desktop More Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowMoreDesktop(!showMoreDesktop)}
+                onMouseEnter={() => setShowMoreDesktop(true)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[13px] font-black transition-all ${
+                  scrolled 
+                    ? 'text-slate-900 hover:text-[#1ea05f]' 
+                    : 'text-slate-700 hover:text-[#1ea05f]'
+                }`}
               >
-                {mobileMenuOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+                <FiMoreHorizontal className="text-lg" />
+                <span className={isUrdu ? 'urdu-text text-[15px]' : ''}>{t('nav.more')}</span>
+                <FiChevronDown className={`transition-transform duration-300 ${showMoreDesktop ? 'rotate-180' : ''}`} />
               </button>
+
+              <AnimatePresence>
+                {showMoreDesktop && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    onMouseLeave={() => setShowMoreDesktop(false)}
+                    className={`absolute ${isUrdu ? 'right-0' : 'left-0'} mt-3 w-64 bg-white rounded-[2rem] shadow-2xl p-4 border border-slate-50 overflow-hidden z-50`}
+                  >
+                    <div className="grid grid-cols-1 gap-2">
+                       {moreItems.map((item) => (
+                         <Link 
+                          key={item.href} 
+                          href={item.href}
+                          className={`flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors group ${isUrdu ? 'flex-row-reverse text-right' : ''}`}
+                         >
+                           <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#1ea05f]/10 group-hover:text-[#1ea05f] transition-colors">{item.icon}</div>
+                           <span className={`text-[12px] font-black text-slate-600 group-hover:text-slate-900 ${isUrdu ? 'urdu-text' : ''}`}>{item.name}</span>
+                         </Link>
+                       ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
+
+          {/* Action Area */}
+          <div className={`hidden lg:flex items-center gap-6 ${isUrdu ? 'flex-row-reverse' : ''}`}>
+            
+            {/* Language Switcher */}
+            <button 
+              onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
+              className={`flex items-center gap-2.5 px-4 py-2.0 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all ${
+                scrolled ? 'bg-slate-50 text-slate-600 hover:bg-slate-100' : 'bg-slate-50/50 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <FiGlobe className="text-[14px]" />
+              {language === 'en' ? 'اردو' : 'English'}
+            </button>
+
+            {/* Auth Area */}
+            {authLoading ? (
+              <div className="w-10 h-10 rounded-full border-2 border-[#1ea05f] border-t-transparent animate-spin" />
+            ) : user ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className={`flex items-center gap-3 p-1 rounded-full transition-all border-2 ${scrolled ? 'border-slate-100' : 'border-white/20'}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#1ea05f] flex items-center justify-center text-white text-lg font-black uppercase">
+                    {user.email?.[0] || 'U'}
+                  </div>
+                </button>
+                
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 15 }}
+                      className={`absolute top-full mt-4 w-60 bg-white rounded-[2rem] shadow-3xl p-4 border border-slate-100 z-50 ${isUrdu ? 'left-0' : 'right-0'}`}
+                    >
+                      <div className={`px-4 py-3 mb-2 border-b border-slate-50 ${isUrdu ? 'text-right' : ''}`}>
+                        <p className={`text-[10px] font-black text-slate-400 uppercase tracking-widest ${isUrdu ? 'urdu-text' : ''}`}>{t('nav.welcome')}</p>
+                        <p className="text-[12px] font-black text-slate-800 truncate">{(currentUserData?.name || user?.displayName) || user?.email}</p>
+                      </div>
+                      <div className="grid gap-1">
+                        <Link href="/dashboard" className={`flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-slate-600 text-[12px] font-bold ${isUrdu ? 'flex-row-reverse' : ''}`}>
+                          <FiLayout className="text-[#1ea05f]" />
+                          <span className={isUrdu ? 'urdu-text' : ''}>{t('nav.dashboard')}</span>
+                        </Link>
+                        <button 
+                          onClick={handleLogout}
+                          className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-[#f43f5e] text-[12px] font-bold ${isUrdu ? 'flex-row-reverse' : ''}`}
+                        >
+                          <FiLogOut />
+                          <span className={isUrdu ? 'urdu-text' : ''}>{t('nav.logout')}</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className={`flex items-center gap-3 ${isUrdu ? 'flex-row-reverse' : ''}`}>
+                <Link href="/login">
+                  <Button variant="outline" className={`!px-6 !py-2.5 !rounded-2xl !text-[12px] !font-black !tracking-widest ${scrolled ? '!border-slate-200 !text-slate-600' : '!border-slate-200 !text-slate-600 hover:!bg-slate-50'}`}>
+                    {t('nav.login')}
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="primary" className="!px-7 !py-3 !rounded-[1.3rem] !text-[11px] !font-black !tracking-widest !bg-[#1ea05f] hover:!bg-[#198a51] hover:-translate-y-1 shadow-lg shadow-[#1ea05f]/20">
+                    {t('nav.signup')}
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className={`lg:hidden p-3 rounded-2xl transition-all shadow-md active:scale-90 ${
+              scrolled ? 'bg-[#1ea05f] text-white' : 'bg-white/10 text-white backdrop-blur-md'
+            }`}
+          >
+            {isOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}
+          </button>
         </div>
       </div>
 
+      {/* Mobile Navigation Sidebar */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1] pointer-events-auto"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden w-[calc(100%-2rem)] mx-auto mt-2 bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 pointer-events-auto"
-            >
-              <div className="p-4 space-y-1">
-                {navItems.map((item) => (
-                  <div key={item.label}>
-                    <div className="flex items-center justify-between">
-                      <Link href={item.href} className="flex-1 px-4 py-3 text-[#334155] font-bold text-sm tracking-wide" onClick={() => !item.subItems && setMobileMenuOpen(false)}>
-                        {t(item.label)}
-                      </Link>
-                      {item.subItems && (
-                        <button onClick={() => toggleDropdown(item.label)} className="p-3 text-gray-400">
-                          <FiChevronDown className={`transform transition-transform ${activeDropdown === item.label ? 'rotate-180' : ''}`} />
-                        </button>
-                      )}
-                    </div>
-                    {activeDropdown === item.label && item.subItems && (
-                      <div className="bg-gray-50 rounded-2xl mx-2 mb-2 overflow-hidden">
-                        {item.subItems.map((subItem) => (
-                          <Link key={subItem.label} href={subItem.href} className="block px-6 py-3 text-xs text-gray-500 font-bold hover:text-[#1ea05f]" onClick={() => setMobileMenuOpen(false)}>
-                            {t(subItem.label)}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isAdmin && (
-                  <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block w-full">
-                    <Button variant="outline" className={`w-full !rounded-2xl border-red-500 text-red-500 hover:bg-red-50 mb-2 ${language === 'ur' ? 'urdu-text' : ''}`}>
-                       {t('nav.adminPortal')}
-                    </Button>
+        {isOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={`fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-3xl z-[150] overflow-y-auto ${isUrdu ? 'left-0 right-auto' : 'right-0'}`}
+          >
+            <div className="p-8 space-y-10">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center p-2">
+                   <Image src="/logo.png" alt="Logo" width={100} height={100} />
+                </div>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400"
+                >
+                  <FiX className="text-2xl" />
+                </button>
+              </div>
+
+              <div className="grid gap-2">
+                {[...navItems, ...moreItems].map((item) => (
+                  <Link 
+                    key={item.href}
+                    href={item.href}
+                    className={`p-5 rounded-2xl flex items-center justify-between group transition-all hover:bg-[#1ea05f]/5 ${isUrdu ? 'flex-row-reverse' : ''}`}
+                  >
+                    <span className={`text-lg font-black text-slate-800 tracking-tight group-hover:text-[#1ea05f] ${isUrdu ? 'urdu-text' : ''}`}>
+                      {item.name}
+                    </span>
+                    <FiChevronDown className={`text-slate-300 group-hover:text-[#1ea05f] ${isUrdu ? 'rotate-90' : '-rotate-90'}`} />
                   </Link>
-                )}
-                {!user && (
-                  <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                      <Button variant="outline" className={`w-full !rounded-2xl border-[#1ea05f] text-[#1ea05f] ${language === 'ur' ? 'urdu-text' : ''}`}>
-                        {t('nav.login')}
-                      </Button>
-                    </Link>
-                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                      <Button variant="outline" className={`w-full !rounded-2xl border-[#1ea05f] text-[#1ea05f] ${language === 'ur' ? 'urdu-text' : ''}`}>
-                        {t('nav.signup')}
-                      </Button>
-                    </Link>
+                ))}
+              </div>
+
+              <div className="pt-8 border-t border-slate-50 grid gap-4">
+                 <button 
+                  onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
+                  className={`w-full p-5 rounded-2xl bg-slate-50 flex items-center justify-between text-slate-600 font-bold ${isUrdu ? 'flex-row-reverse' : ''}`}
+                >
+                  <div className={`flex items-center gap-4 ${isUrdu ? 'flex-row-reverse' : ''}`}>
+                     <FiGlobe className="text-xl text-[#1ea05f]" />
+                     <span className={isUrdu ? 'urdu-text' : ''}>{language === 'en' ? 'اردو' : 'English'}</span>
+                  </div>
+                  <FiMaximize2 className="text-slate-300" />
+                </button>
+
+                {user ? (
+                   <button 
+                    onClick={handleLogout}
+                    className="w-full p-5 rounded-2xl bg-rose-50 text-rose-500 flex items-center gap-4 font-black"
+                   >
+                     <FiLogOut />
+                     <span>Logout</span>
+                   </button>
+                ) : (
+                  <div className="grid gap-3">
+                    <Link href="/login" className="block"><Button variant="outline" className="w-full !rounded-2xl !py-4">Login</Button></Link>
+                    <Link href="/signup" className="block"><Button variant="primary" className="w-full !rounded-2xl !py-4 shadow-lg shadow-[#1ea05f]/20">Join the Mission</Button></Link>
                   </div>
                 )}
               </div>
-            </motion.div>
-          </>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </nav>
   );
 };

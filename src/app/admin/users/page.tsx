@@ -7,10 +7,11 @@ import {
   FiMail, FiActivity, FiKey, FiCheck, FiX, FiRefreshCw
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getUsers, updateUserStatus } from '@/lib/firebaseUtils';
+import { getUsers, updateUserStatus, updateUserRole } from '@/lib/firebaseUtils';
+import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
 
-export default function AdminUsersPage() {
+function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
@@ -40,11 +41,24 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    setActionLoading(userId);
+    try {
+      await updateUserRole(userId, newRole);
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error updating role:', error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesFilter = 
       filter === 'all' ? true : 
       filter === 'pending' ? user.status === 'pending' : 
-      filter === 'approved' ? user.status === 'approved' : true;
+      filter === 'approved' ? user.status === 'approved' : 
+      filter === 'deletion' ? user.status === 'pending_deletion' : true;
     
     const matchesSearch = 
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -56,6 +70,7 @@ export default function AdminUsersPage() {
   const stats = {
     total: users.length,
     pending: users.filter(u => u.status === 'pending').length,
+    deletion: users.filter(u => u.status === 'pending_deletion').length,
     volunteers: users.filter(u => u.role === UserRole.VOLUNTEER).length,
     active: users.filter(u => u.isActive).length
   };
@@ -107,14 +122,19 @@ export default function AdminUsersPage() {
       <div className="bg-white/70 backdrop-blur-md rounded-[3rem] border border-white shadow-sm overflow-hidden">
          {/* Filter Tabs */}
          <div className="flex border-b border-slate-50 px-8 pt-6">
-            {['all', 'pending', 'approved'].map((t) => (
+            {[
+              { id: 'all', label: 'All Records' },
+              { id: 'pending', label: 'Account Approvals' },
+              { id: 'approved', label: 'Approved Access' },
+              { id: 'deletion', label: 'Deletion Requests' }
+            ].map((t) => (
               <button 
-                key={t}
-                onClick={() => setFilter(t)}
-                className={`px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${filter === t ? 'text-[#1ea05f]' : 'text-slate-400 hover:text-slate-600'}`}
+                key={t.id}
+                onClick={() => setFilter(t.id)}
+                className={`px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${filter === t.id ? 'text-[#1ea05f]' : 'text-slate-400 hover:text-slate-600'}`}
               >
-                {t} Records
-                {filter === t && (
+                {t.label}
+                {filter === t.id && (
                   <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#1ea05f] rounded-full" />
                 )}
               </button>
@@ -168,13 +188,24 @@ export default function AdminUsersPage() {
                             </div>
                          </td>
                          <td className="px-10 py-8">
-                            <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border ${
-                              user.role === UserRole.ADMIN ? 'bg-red-50 text-red-600 border-red-100' : 
-                              user.role === UserRole.VOLUNTEER ? 'bg-blue-50 text-blue-600 border-blue-100' : 
-                              'bg-emerald-50 text-emerald-600 border-emerald-100'
-                            }`}>
-                               {user.role}
-                            </span>
+                            <div className="relative inline-block">
+                               <select
+                                  value={user.role}
+                                  onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                                  disabled={actionLoading === user.id}
+                                  className={`appearance-none px-4 py-2 pr-8 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border outline-none bg-transparent cursor-pointer transition-all ${
+                                    user.role === UserRole.ADMIN ? 'bg-red-50 text-red-600 border-red-100' : 
+                                    user.role === UserRole.VOLUNTEER ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                                    user.role === UserRole.CONTENT_MANAGER ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                    'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                  }`}
+                               >
+                                  {Object.values(UserRole).map(role => (
+                                     <option key={role} value={role} className="bg-white text-slate-800">{role.replace('_', ' ')}</option>
+                                  ))}
+                               </select>
+                               <FiShield className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 text-[10px]" />
+                            </div>
                          </td>
                          <td className="px-10 py-8">
                             <div className="flex items-center gap-3">
@@ -186,7 +217,15 @@ export default function AdminUsersPage() {
                          </td>
                          <td className="px-10 py-8 text-right">
                             <div className="flex justify-end gap-2">
-                               {user.status === 'pending' ? (
+                               {user.status === 'pending_deletion' ? (
+                                 <button 
+                                   disabled={actionLoading === user.id}
+                                   onClick={() => handleAction(user.id, 'inactive', false)}
+                                   className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                                 >
+                                   <FiX strokeWidth={3} /> SAFE PURGE (DEACTIVATE)
+                                 </button>
+                               ) : user.status === 'pending' ? (
                                  <>
                                    <button 
                                      disabled={actionLoading === user.id}
@@ -235,3 +274,7 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
+export default withAuth(AdminUsersPage, { 
+  allowedRoles: [UserRole.ADMIN] 
+});

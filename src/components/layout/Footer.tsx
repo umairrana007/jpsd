@@ -45,6 +45,7 @@ export const Footer: React.FC = () => {
                   src="/logo.png" 
                   alt="JPSD Logo" 
                   fill
+                  sizes="(max-width: 768px) 100vw, 320px"
                   className="object-contain object-left" 
                   priority
                 />
@@ -56,7 +57,7 @@ export const Footer: React.FC = () => {
             <div className={`flex space-x-5 ${language === 'ur' ? 'flex-row-reverse space-x-reverse' : ''}`}>
               {[
                 { Icon: FiFacebook, href: 'https://www.facebook.com/jpsd.official' },
-                { Icon: FiTwitter, href: '#' },
+                { Icon: FiTwitter, href: 'https://twitter.com/jpsdofficial' },
                 { Icon: FiInstagram, href: 'https://www.instagram.com/jpsd.media/' },
                 { Icon: FiYoutube, href: 'https://www.youtube.com/channel/UC93l50wypcsmOG-wn_BHPIg' }
               ].map(({ Icon, href }, i) => (

@@ -1,0 +1,228 @@
+# Baitussalam Welfare Trust Website
+
+A modern, responsive welfare trust website built with Next.js 14+, Tailwind CSS, and Firebase. This platform enables users to donate to various welfare causes, view programs, and learn about the organization's impact.
+
+## 🚀 Features
+
+### Core Features
+- **Multi-language Support**: English and Urdu (RTL) with language toggle
+- **Responsive Design**: Mobile-first approach for all devices
+- **Multi-step Donation Flow**: Intuitive 4-step donation process
+- **Real-time Statistics**: Live counters for lives served, donations, and programs
+- **Program Cards**: Interactive cards showing funding progress
+- **SEO Optimized**: Server-side rendering for better search rankings
+- **Firebase Integration**: Real-time database for donations and programs
+
+### UI/UX Features
+- Smooth animations with Framer Motion
+- Custom color scheme matching Baitussalam branding
+- Loading skeletons for better perceived performance
+- Progress bars with animated counters
+- Sticky navigation with dropdown menus
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Backend**: Firebase (Firestore, Auth, Storage)
+- **Icons**: React Icons
+- **PDF Generation**: pdfmake
+- **Language**: TypeScript
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm or yarn
+- A Firebase account and project
+
+## 🔧 Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone <repository-url>
+cd baitussalam
+```
+
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Firebase Setup
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project named "Baitussalam"
+3. Enable Firestore Database
+4. Enable Firebase Authentication
+5. Enable Firebase Storage
+6. Get your Firebase config from Project Settings
+
+### 4. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+# Payment Gateway Keys
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_key
+STRIPE_SECRET_KEY=your_stripe_secret
+
+# Other Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_DEFAULT_LANGUAGE=en
+```
+
+### 5. Firestore Collections Setup
+
+Create the following collections in Firebase Firestore:
+
+#### `programs` Collection
+```typescript
+{
+  title: string;
+  titleUrdu: string;
+  description: string;
+  descriptionUrdu: string;
+  image: string;
+  category: 'education' | 'health' | 'food' | 'water' | 'emergency' | 'other';
+  goalAmount: number;
+  raisedAmount: number;
+  percentage: number;
+  active: boolean;
+  featured: boolean;
+}
+```
+
+#### `donations` Collection
+```typescript
+{
+  donorName: string;
+  donorEmail: string;
+  donorPhone: string;
+  amount: number;
+  programId: string;
+  programName: string;
+  paymentMethod: 'stripe' | 'payfast' | 'jazzcash' | 'easypaisa';
+  frequency: 'one-time' | 'monthly';
+  status: 'pending' | 'completed' | 'failed';
+  transactionId?: string;
+  createdAt: Timestamp;
+  anonymous: boolean;
+  location?: string;
+}
+```
+
+#### `live_stats` Collection
+```typescript
+{
+  totalLivesServed: number;
+  totalDonationsReceived: number;
+  activePrograms: number;
+  volunteersCount: number;
+}
+```
+
+### 6. Run the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 📁 Project Structure
+
+```
+baitussalam/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── donation/          # Donation page
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Homepage
+│   │   └── globals.css        # Global styles
+│   ├── components/
+│   │   ├── ui/                # Reusable UI components
+│   │   ├── layout/            # Layout components (Header, Footer)
+│   │   ├── sections/          # Page sections
+│   │   └── donation/          # Donation flow components
+│   ├── contexts/              # React contexts (Language)
+│   ├── lib/                   # Utility libraries
+│   │   ├── firebase.ts        # Firebase config
+│   │   └── firebaseUtils.ts   # Firebase operations
+│   ├── types/                 # TypeScript types
+│   └── utils/                 # Helper functions
+├── public/                     # Static assets
+├── .env.local                 # Environment variables
+└── package.json
+```
+
+## 🎨 Color Palette
+
+- **Primary Green**: `#27ae60` - Main brand color
+- **Primary Blue**: `#2980b9` - Secondary brand color
+- **Accent Gold**: `#f39c12` - Call-to-action buttons
+- **Urgent Red**: `#c0392b` - Emergency alerts
+- **Background Light**: `#f8f9fa` - Page backgrounds
+- **Text Dark**: `#2c3e50` - Headlines and text
+
+## 🌐 Pages Implemented
+
+- ✅ Homepage (Hero, Stats, Programs, About sections)
+- ✅ Multi-step Donation Page
+- ✅ Responsive Navigation with Dropdowns
+- ✅ Top Bar with Language Toggle
+- ✅ Footer with Newsletter
+
+## 🔄 Next Steps (To Be Implemented)
+
+1. Additional Pages:
+   - About Us page
+   - Media/Gallery page
+   - Contact page
+   - Volunteer registration
+   - Zakat Calculator
+   - Program detail pages
+
+2. Advanced Features:
+   - Real-time donation ticker
+   - Impact map visualization
+   - WhatsApp integration for receipts
+   - Admin dashboard
+   - Payment gateway integration
+   - Email notifications
+
+3. Performance:
+   - Image optimization
+   - Lazy loading
+   - Service worker for offline support
+   - Lighthouse score optimization
+
+## 🚀 Deployment
+
+The easiest way to deploy is using [Vercel](https://vercel.com):
+
+1. Push your code to GitHub
+2. Import your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+## 📝 License
+
+This project is proprietary software created for Baitussalam Welfare Trust.
+
+## 👥 Support
+
+For questions or issues, please contact the development team.
+
+---
+
+**Built with ❤️ for Baitussalam Welfare Trust**

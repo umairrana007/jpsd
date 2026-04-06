@@ -22,7 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (!loading) {
       if (!user) {
         // Redirect to login if not authenticated
-        router.push('/admin/login');
+        router.push('/login?redirect=' + window.location.pathname);
         return;
       }
 
@@ -30,8 +30,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       if (allowedRoles && allowedRoles.length > 0) {
         const userRole = currentUserData?.role as UserRole;
         if (!allowedRoles.includes(userRole)) {
-          // Redirect to dashboard if user doesn't have required role
-          router.push('/admin/dashboard');
+          // Redirect to unauthorized page if user doesn't have required role
+          router.push('/unauthorized');
           return;
         }
       }
@@ -41,17 +41,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#f9f9fb]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#27ae60] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="w-16 h-16 border-4 border-[#1ea05f] border-t-transparent rounded-full animate-spin shadow-xl shadow-[#1ea05f]/20 mx-auto mb-6"></div>
+          <p className="text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] animate-pulse">Synchronizing Security Protocol...</p>
         </div>
       </div>
     );
   }
 
   // Don't render anything if not authenticated or doesn't have required role
-  if (!user || (allowedRoles && !allowedRoles.includes(currentUserData?.role))) {
+  const userRole = currentUserData?.role as UserRole;
+  if (!user || (allowedRoles && !allowedRoles.includes(userRole))) {
     return null;
   }
 

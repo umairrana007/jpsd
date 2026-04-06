@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Noto+Nastaliq+Urdu&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f9f9fb",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-tertiary-container": "#632200",
+              "on-primary-fixed": "#00201e",
+              "surface": "#f9f9fb",
+              "primary-fixed": "#79f6ed",
+              "tertiary-fixed-dim": "#ffb597",
+              "on-secondary-fixed-variant": "#004883",
+              "on-primary-fixed-variant": "#00504c",
+              "secondary-container": "#68abff",
+              "primary": "#006a65",
+              "outline-variant": "#bbc9c7",
+              "on-surface-variant": "#3c4948",
+              "primary-fixed-dim": "#59dad1",
+              "tertiary-container": "#e9865b",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#59dad1",
+              "on-surface": "#1a1c1d",
+              "surface-container": "#eeeef0",
+              "on-primary": "#ffffff",
+              "primary-container": "#20b2aa",
+              "error-container": "#ffdad6",
+              "secondary": "#0060ac",
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "on-secondary-fixed": "#001c39",
+              "inverse-surface": "#2f3132",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "error": "#ba1a1a",
+              "surface-dim": "#d9dadc",
+              "surface-container-low": "#f3f3f5",
+              "on-tertiary-fixed": "#360f00",
+              "on-background": "#1a1c1d",
+              "surface-container-high": "#e8e8ea",
+              "on-secondary-container": "#003e73",
+              "tertiary": "#984721",
+              "outline": "#6c7a78",
+              "background": "#f9f9fb",
+              "surface-variant": "#e2e2e4",
+              "surface-tint": "#006a65",
+              "inverse-on-surface": "#f0f0f2",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary-container": "#003e3b"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #006a65 0%, #20b2aa 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-teal-800">Ethereal Guardian</div>
+<div class="hidden md:flex items-center gap-8 font-sans tracking-tight font-medium text-sm">
+<a class="text-teal-600 border-b-2 border-teal-500 pb-1" href="#">Our Mission</a>
+<a class="text-slate-600 hover:text-teal-600 transition-colors" href="#">Impact</a>
+<a class="text-slate-600 hover:text-teal-600 transition-colors" href="#">Reports</a>
+<a class="text-slate-600 hover:text-teal-600 transition-colors" href="#">Transparency</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/10 transition-all rounded-full">
+<span class="material-symbols-outlined text-teal-700">search</span>
+</button>
+<button class="p-2 hover:bg-white/10 transition-all rounded-full">
+<span class="material-symbols-outlined text-teal-700">language</span>
+</button>
+<button class="signature-gradient text-white px-6 py-2 rounded-full font-bold text-sm tracking-wide shadow-md active:scale-95 duration-200 transition-all">
+                    Donate
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Ethereal Guardian Hero" class="w-full h-full object-cover" data-alt="Heartwarming wide shot of humanitarian volunteers interacting with children in a sunlit outdoor community center, soft focus background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-mTuA6E2ScxXu8rNbQwsJr1YHCSkYF3ZTHzv-OR5oiUfiwYMrGkgZ4iY2lGaGzlGOTRtuDzJF7gydWFjPyN9r_UU8dk5tPBGBkbyoph9Sg3TaRj3lZv2EYF1cg3g9HLwQ__mYyP6OzsFZvhlXW5S4iMxHohwO3PumyU1FkjwrEv0ESY0qfljsw55Nzo84KknYXUTYyttnJO0-cbDGyksGdy1K6fHPwhzrkbA38lkOBMb-C-pp7-sXrt9hQs6w9y8fjtWX0WrLIRw"/>
+<div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-8 w-full">
+<div class="max-w-2xl">
+<span class="inline-block text-primary-fixed font-bold tracking-widest uppercase text-xs mb-4">Foundation of Hope</span>
+<h1 class="text-6xl md:text-8xl font-black text-white leading-tight tracking-tighter mb-6">Lumina Benevolence</h1>
+<p class="text-xl text-white/90 mb-10 font-light leading-relaxed">We believe in the quiet power of collective action. Providing light, sustenance, and dignity to the world's most vulnerable communities through transparent, high-impact stewardship.</p>
+<div class="flex gap-4">
+<button class="signature-gradient text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-primary/20 transition-all active:scale-95">Donate Now</button>
+<button class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all">View Our Impact</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Section -->
+<section class="py-24 bg-surface-container-low relative">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+<div class="p-8 group">
+<div class="text-6xl font-black text-primary tracking-tighter mb-2">12K+</div>
+<div class="text-sm uppercase tracking-widest font-bold text-on-surface-variant">Global Donors</div>
+<div class="mt-4 h-1 w-12 bg-primary-container mx-auto opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-8 group">
+<div class="text-6xl font-black text-secondary tracking-tighter mb-2">500K+</div>
+<div class="text-sm uppercase tracking-widest font-bold text-on-surface-variant">Lives Changed</div>
+<div class="mt-4 h-1 w-12 bg-secondary-container mx-auto opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-8 group">
+<div class="text-6xl font-black text-tertiary tracking-tighter mb-2">45</div>
+<div class="text-sm uppercase tracking-widest font-bold text-on-surface-variant">Active Projects</div>
+<div class="mt-4 h-1 w-12 bg-tertiary-container mx-auto opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Causes (Bento Grid) -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="text-4xl font-black tracking-tight text-on-surface mb-2">Featured Causes</h2>
+<p class="text-on-surface-variant max-w-lg">Direct your generosity towards specific initiatives that resonate with your personal mission.</p>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:underline">
+                        Explore All Causes <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Clean Water -->
+<div class="md:col-span-2 group relative h-[500px] rounded-3xl overflow-hidden shadow-lg bg-surface-container-high">
+<img alt="Clean Water Initiative" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Clear water being poured into a local village container, bright sunny day, crystal clear droplets in focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdEY5eMDhec5LGTQu9y_OgH1GYfqRBG5qjs575icNmsWP2Dgbim4pDtE8sODC7e69hIFWSu3S3gxDAklpl0lbbxrJawRQfELsNIL1q-AAgPDi32DJHx1cjCWmW7Q3Ok-1CLDTUdPPpPdXOQ1Gkk2qOwKWucWN8NfCmVpU7HzNHNpZBYXtIKQrySXJqSLAM_LnFtKlyh0dSa8zrKxxxJB7pQICplRhxjUquMcQg0n6MZ7_BnqG4ywCuRf399DRrb_ZRcZjp7IBiTDM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-10 w-full">
+<span class="bg-primary-container text-on-primary-container text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block">Urgent</span>
+<h3 class="text-4xl font-black text-white mb-4">Pure Flow: Clean Water Access</h3>
+<p class="text-white/80 mb-8 max-w-md">Installing solar-powered filtration systems in remote arid regions.</p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-primary-container h-full w-[72%]"></div>
+</div>
+<div class="flex justify-between text-xs font-bold text-white uppercase tracking-tighter">
+<span>$72,400 Raised</span>
+<span>Goal: $100,000</span>
+</div>
+</div>
+</div>
+<!-- Education -->
+<div class="group relative h-[500px] rounded-3xl overflow-hidden shadow-lg bg-surface-container-high">
+<img alt="Education Project" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Classroom of young students engaged in learning, colorful educational posters on the walls, warm natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAosw44MvXnpPWVBtafwGTCjXRAxBIGtYQRdrR4p2Xhk-ubb99zBp59x8AkgLc5gTYUcXsWWvQbA5VEuMmHB6tthtCl6twYOywGWqfrfOq4GmEID0WouK6WLWUQgnvbdB0MPow2GM_MxEdHzmLo3qOCZU3Pe8Tp1ehrz0mTQYMbhBzUxQTpzHOmDvJkJGgEFhPSdvgGQg2t6YIHSVgGUHFXJiut7IGn2OTd4lFI67WA6CAhHVGFWyNqD3rwdhBv1RDfl-bt74bqLx0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<h3 class="text-2xl font-black text-white mb-2">Global Scholars</h3>
+<p class="text-white/80 text-sm mb-6">Building schools and providing digital tools for 5,000 children.</p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-secondary-container h-full w-[45%]"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-white uppercase tracking-tighter">
+<span>$45,000 Raised</span>
+<span>45% Funded</span>
+</div>
+</div>
+</div>
+<!-- Food -->
+<div class="md:col-span-3 group relative h-[400px] rounded-3xl overflow-hidden shadow-lg bg-surface-container-high">
+<img alt="Food Security" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Aerial view of a community kitchen serving fresh meals, vibrant vegetables and large pots, organized and clean environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb9MarMOUWV9Nt6KWviBADmJtI6s4KPY9REcut06rpryD7ckmTH47YPVZHsfFH4eDz9dRuri-tfoArjETIrBYHcHxSmMSypLE5zzUi4FVRJnM0C_McPUHWvvFNFCeWu_IKa5MlUeJPFlvGsTFRoca8GRm1EjZzSZQasG5Y4R1yE5Ii72LcLIzTZYqHjzo3PXLRMc8dvpnpdIfosZ0WHdBpuhJmggbsCOWrXBFIP7obiUEKy6fK1dThE_5ThRFxHcVcd_fjVFmgpno"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-10 flex flex-col md:flex-row md:items-end justify-between w-full gap-8">
+<div class="max-w-xl">
+<h3 class="text-3xl font-black text-white mb-2">End Hunger Initiative</h3>
+<p class="text-white/80">Sustainable farming training and immediate food relief for displaced families.</p>
+</div>
+<div class="min-w-[300px]">
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-tertiary-container h-full w-[88%]"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-white uppercase tracking-tighter">
+<span>$176,000 Raised</span>
+<span>Almost Funded</span>
+</div>
+<button class="mt-4 w-full py-3 bg-white text-on-surface font-bold rounded-lg hover:bg-white/90 transition-all">Support Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Events Carousel -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-8">
+<div class="mb-12">
+<h2 class="text-4xl font-black tracking-tight text-on-surface">Upcoming Impact Events</h2>
+</div>
+<div class="flex gap-8 overflow-x-auto pb-8 snap-x no-scrollbar">
+<div class="min-w-[350px] snap-center bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<div>
+<div class="text-xs font-bold text-primary uppercase">Sept 12, 2024</div>
+<div class="font-bold">Medical Camp: Sindh</div>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Providing free vaccinations and check-ups for 1,200 children in the Sindh province.</p>
+<button class="text-sm font-bold text-primary hover:underline flex items-center gap-1">Participate <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+<div class="min-w-[350px] snap-center bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-xl bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<div class="text-xs font-bold text-secondary uppercase">Oct 05, 2024</div>
+<div class="font-bold">Literacy Workshop</div>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Training local teachers in digital curriculum delivery for rural primary schools.</p>
+<button class="text-sm font-bold text-secondary hover:underline flex items-center gap-1">Participate <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+<div class="min-w-[350px] snap-center bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">psychiatry</span>
+</div>
+<div>
+<div class="text-xs font-bold text-tertiary uppercase">Oct 20, 2024</div>
+<div class="font-bold">Seed Distribution</div>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Distributing climate-resilient seeds to 300 farming households before planting season.</p>
+<button class="text-sm font-bold text-tertiary hover:underline flex items-center gap-1">Participate <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Section -->
+<section class="py-24 bg-surface-container-high overflow-hidden">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+<div>
+<h2 class="text-4xl font-black tracking-tight mb-8">Trusted by Global Partners</h2>
+<div class="grid grid-cols-3 gap-8 grayscale opacity-60">
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">United Care</div>
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">Eco Trust</div>
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">Heal Global</div>
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">Pathways</div>
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">Civic Reach</div>
+<div class="h-12 bg-on-surface/10 rounded flex items-center justify-center font-bold text-xs uppercase tracking-widest text-on-surface/40">Sky Blue</div>
+</div>
+</div>
+<div class="relative">
+<div class="bg-surface p-12 rounded-3xl shadow-xl relative z-10">
+<span class="material-symbols-outlined text-primary-container text-6xl mb-6">format_quote</span>
+<p class="text-xl font-medium text-on-surface leading-relaxed mb-8 italic">"The Ethereal Guardian Foundation doesn't just provide relief; they restore dignity. Their transparency in how every dollar is spent sets a new standard for charitable work."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-slate-300 overflow-hidden">
+<img alt="Testimonial Author" data-alt="Professional headshot of a mature woman with a confident smile, wearing a professional blazer, neutral office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGLo1qiFGUUo8-V2qN7y952di3Uf3p4K844Ym5mlB0TCQ2zFnkoAtkjIttAj7qy341R8fZ-Vw6RDOMkeA9nSq7Xyqe3kMCtT7vCmJCcMTSC6fTVB9AVQ--ZuYOl013-HD5oFZ5oNzIJzh2GMLlPyK9Qg70Nx-0mwrtlsZTqMKieYiB14LjSa-tW6c86SRfcWPTolRGGCBFsnbWsXluMIsijYWd8ZG0WBcpw40w6Jd6VlydaajizDgb-Xk_Pjv6T_wI-1Hjt3k96nY"/>
+</div>
+<div>
+<div class="font-bold text-on-surface">Dr. Sarah Jenkins</div>
+<div class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Director, Global Relief Council</div>
+</div>
+</div>
+</div>
+<div class="absolute -top-10 -right-10 w-40 h-40 signature-gradient rounded-full opacity-20 blur-3xl"></div>
+<div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary-container rounded-full opacity-20 blur-3xl"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter Signup -->
+<section class="py-24 px-8">
+<div class="max-w-7xl mx-auto rounded-[3rem] overflow-hidden relative min-h-[400px] flex items-center">
+<img alt="Newsletter Background" class="absolute inset-0 w-full h-full object-cover" data-alt="Modern high-end architectural office interior with large glass windows and soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzKu8BSUhvxgP43ssJb8uYMB-rwMX7SM7DmcMWybHOuJZ7QijepqpFYUjl-dm0oZOrYlNoNu25n8hD8MFSgR51txX1bvXnJCQ_kNXyUp3-Mw9BbAzeUWHUlclBFWL8t2JW31uvPg2nvhovabFoa5aTKIoPx3abbKaEi-SPwpITQUYCfD7uStegc0tTjsqNBLjcK1q1XURLccQfWmAcIhlgZQ60j7prvlaC1REvgyCaLUyTW7CrlVD45V1lKF1UI7HDDDbT8D-V3dE"/>
+<div class="absolute inset-0 bg-primary/40 backdrop-blur-sm"></div>
+<div class="relative z-10 w-full px-12 md:px-24">
+<div class="max-w-2xl text-white">
+<h2 class="text-4xl font-black mb-6">Stay Connected to the Cause</h2>
+<p class="text-lg text-white/90 mb-10">Get monthly updates on our projects, financial reports, and stories from the field. No spam, just impact.</p>
+<form class="flex flex-col md:flex-row gap-4">
+<input class="flex-1 bg-white/20 border border-white/30 rounded-xl px-6 py-4 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-md" placeholder="Enter your email address" type="email"/>
+<button class="bg-white text-primary font-bold px-10 py-4 rounded-xl hover:bg-white/90 transition-all" type="submit">Subscribe Now</button>
+</form>
+<p class="mt-6 text-xs text-white/60 uppercase tracking-widest">By subscribing, you agree to our Privacy Policy.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 border-t border-slate-200">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-12 py-16 gap-8">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="text-xl font-black text-slate-900">ETHEREAL GUARDIAN</div>
+<div class="font-sans text-xs uppercase tracking-widest text-slate-500">© 2024 Ethereal Guardian Foundation. Registered Charity.</div>
+</div>
+<div class="flex flex-wrap justify-center gap-x-8 gap-y-4 font-sans text-xs uppercase tracking-widest">
+<a class="text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Impact Report 2023</a>
+<a class="text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Financial Transparency</a>
+<a class="text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-teal-500 transition-colors hover:underline decoration-teal-500 underline-offset-4" href="#">Contact Us</a>
+</div>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 transition-colors" href="#">
+<span class="material-symbols-outlined">public</span>
+</a>
+<a class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+</footer>
+</body></html>

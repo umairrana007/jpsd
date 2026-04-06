@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transaction Detail - Ethereal Charity Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#ffdbcd",
+              "surface-container-highest": "#e2e2e4",
+              "primary-fixed": "#79f6ed",
+              "secondary": "#0060ac",
+              "on-secondary-fixed-variant": "#004883",
+              "on-surface": "#1a1c1d",
+              "surface-container-high": "#e8e8ea",
+              "inverse-primary": "#59dad1",
+              "secondary-fixed-dim": "#a4c9ff",
+              "on-primary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e2e2e4",
+              "on-primary-fixed-variant": "#00504c",
+              "error-container": "#ffdad6",
+              "error": "#ba1a1a",
+              "primary-container": "#20b2aa",
+              "on-surface-variant": "#3c4948",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface": "#f9f9fb",
+              "secondary-container": "#68abff",
+              "outline-variant": "#bbc9c7",
+              "primary": "#006a65",
+              "outline": "#6c7a78",
+              "on-tertiary-container": "#632200",
+              "on-secondary-container": "#003e73",
+              "surface-container": "#eeeef0",
+              "surface-bright": "#f9f9fb",
+              "inverse-on-surface": "#f0f0f2",
+              "on-error": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#360f00",
+              "on-secondary-fixed": "#001c39",
+              "background": "#f9f9fb",
+              "inverse-surface": "#2f3132",
+              "primary-fixed-dim": "#59dad1",
+              "on-primary-container": "#003e3b",
+              "on-primary-fixed": "#00201e",
+              "surface-container-low": "#f3f3f5",
+              "on-error-container": "#93000a",
+              "secondary-fixed": "#d4e3ff",
+              "on-tertiary-fixed-variant": "#79300b",
+              "on-secondary": "#ffffff",
+              "tertiary": "#984721",
+              "on-background": "#1a1c1d",
+              "tertiary-container": "#e9865b",
+              "surface-tint": "#006a65",
+              "surface-dim": "#d9dadc"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .editorial-shadow {
+        box-shadow: 0 10px 30px -10px rgba(0, 106, 101, 0.1);
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface overflow-x-hidden">
+<!-- SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-4 z-50">
+<div class="mb-10 px-3">
+<span class="text-xl font-bold text-teal-700 dark:text-teal-300">Admin Portal</span>
+<p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-semibold">Global Overview</p>
+</div>
+<div class="flex-grow space-y-1">
+<a class="text-slate-500 dark:text-slate-400 flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-sans text-sm">Dashboard</span>
+</a>
+<a class="bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 font-semibold rounded-lg flex items-center gap-3 p-3 active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-sans text-sm">Transactions</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-sans text-sm">Events Manager</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-sans text-sm">Volunteers</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-sans text-sm">Settings</span>
+</a>
+</div>
+<div class="mt-auto border-t border-slate-200 pt-4 px-2">
+<button class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">
+                Export Reports
+            </button>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex justify-between items-center h-16 px-6">
+<div class="flex items-center bg-surface-container-low px-4 py-1.5 rounded-full w-96 border border-outline-variant/30">
+<span class="material-symbols-outlined text-slate-400 text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400" placeholder="Search transactions..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-full transition-opacity duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-full transition-opacity duration-200">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden ml-2">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Close-up professional headshot of a smiling man with a beard and light skin against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGVXifxgvlXqpX9oCOuMtsb2hh2tNKcEVv2nQdLtku2KeaaCa8y_M3PyTsZyscvJhimp5NE50q75WvVb12RfYHlp-M1ougpUeExz0LEdq5AcRsJvqngD_scVOGOWSt_mP4EiWTK6ULNHFESitcKhdGlLiavZ4zuOcoTZdJ3aLGa4D8amNsCsW1ddJNnyWcF6cjvQbpVWHk1dXCPvi0rEF5nQr_YS1si3ddIccjMYtF-Tytu1bAV5-YqGBLSLP5N7la1EejO7tStKU"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 pb-12 px-8 min-h-screen relative overflow-hidden">
+<!-- Background Gradient Glows -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute top-1/2 -left-24 w-64 h-64 bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 mb-6 text-sm font-medium text-outline">
+<span>Transactions</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-semibold">TXN-9842</span>
+</div>
+<!-- Bento Grid Layout for Details -->
+<div class="grid grid-cols-12 gap-6 items-start">
+<!-- Left Column: Core Info -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Main Header Card -->
+<section class="glass-panel p-8 rounded-2xl editorial-shadow border border-white/40">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+<div>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-bold tracking-wider uppercase mb-3">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                                Verified
+                            </span>
+<h1 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-1">TXN-9842</h1>
+<p class="text-slate-500 font-medium">Recorded on Oct 24, 2024 at 02:45 PM</p>
+</div>
+<div class="text-right">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
+<h2 class="text-5xl font-black text-primary tracking-tighter">$1,250.00</h2>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-slate-100">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Donor Name</p>
+<p class="font-bold text-lg text-on-surface">Sarah Jenkins</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cause</p>
+<p class="font-bold text-lg text-teal-700">Clean Water</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Method</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600" data-icon="credit_card">credit_card</span>
+<p class="font-bold text-lg text-on-surface">Visa •• 4242</p>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Type</p>
+<p class="font-bold text-lg text-on-surface">One-time</p>
+</div>
+</div>
+</section>
+<!-- Impact Timeline -->
+<section class="glass-panel p-8 rounded-2xl editorial-shadow border border-white/40">
+<h3 class="text-xl font-bold tracking-tight mb-8">Impact Timeline</h3>
+<div class="relative space-y-12">
+<!-- Timeline Line -->
+<div class="absolute left-[15px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
+<!-- Step 1 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-8 h-8 rounded-full bg-primary-container flex items-center justify-center z-10 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-white text-sm" data-icon="check" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary uppercase tracking-widest">Oct 24, 2024</p>
+<h4 class="font-bold text-lg mt-1">Donation Received</h4>
+<p class="text-slate-500 mt-2 max-w-xl leading-relaxed">The funds were successfully captured and allocated to the <span class="font-semibold text-slate-700">Clean Water Initiative - Central African Project</span>.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center z-10 shadow-sm shadow-secondary/20">
+<span class="material-symbols-outlined text-white text-sm" data-icon="water_drop" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<p class="text-xs font-bold text-secondary uppercase tracking-widest">Oct 26, 2024</p>
+<h4 class="font-bold text-lg mt-1">Resource Allocation</h4>
+<p class="text-slate-500 mt-2 max-w-xl leading-relaxed">Procured high-efficiency solar water pumps for the community center. Your donation contributed to 40% of the unit cost.</p>
+<div class="mt-4 flex gap-4">
+<img alt="Solar Water Pump" class="w-24 h-16 object-cover rounded-lg border border-slate-200" data-alt="Modern solar-powered water pump installation in a rural sunny village setting with clean water flowing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3FmAIpDnp25jVA5ClAIAvMNx5-MwvZDHnia5akS-MpHTKBNE8MbXWA710IIdJV-fEvCfSa_f-31o80xXHz5eFxzRCIC4VMq-l9YkBDzjEboP9ARI9D4co1Rh3V7oLHBfEaJRnuuZBuVvLRk4FJ63znXCaWrAC3v10QNlcxfW-yZU0Xh5RiyCdl1AqCG9zA4zRlBpHQ7zu33GWB_hfevCFiKXDh2cj3JKWZNPmg9d8G_-fwMtRjuG_XxwFQq0GZ-DtQD3kfdlU3bU"/>
+<img alt="Community Gathering" class="w-24 h-16 object-cover rounded-lg border border-slate-200" data-alt="Community members gathered around a new well site, showing joy and collaboration in a desert landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhNTdyg3kiFs-xCEd3PnyzgqURhMq2-BqcC6w7r20A885Rt-mbj15zA9bTd15lhCV1ug1tRGQsN7RdJZOW9BN_mYyERW-K3X53g5m0N1E4hdpNNxNoKhAKqIgv5HiF17Q5KROxJhSnlLxmcOJDnwu0wUjkBmtKi-3J61JRXLTqb9nlooruLnQMuycMfjHHeuHTN6CrCBTzB_9v_kwYcd6F6mYH4E7aYzvu9kvw7Xf1EBfkjJlYrUAgx-ZBv38hdEBjTx9-mOGhkps"/>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-8 h-8 rounded-full bg-surface-container-high border-2 border-primary flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Estimated Nov 12, 2024</p>
+<h4 class="font-bold text-lg mt-1">Installation Completion</h4>
+<p class="text-slate-500 mt-2 max-w-xl leading-relaxed">Deployment of the water filtration systems. This phase will provide clean drinking water to approximately 250 residents.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar Actions/Meta -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Donor Insights Card -->
+<section class="glass-panel p-6 rounded-2xl editorial-shadow border border-white/40">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Donor Profile</h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-primary/20 p-0.5">
+<img alt="Sarah Jenkins" class="w-full h-full object-cover rounded-full" data-alt="Professional portrait of a middle-aged woman with kind eyes and a warm smile, wearing a cream sweater" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnAXT-lRTu6E3dMdHiD8GUVHRQj2effaF7LOfwA1M-tJrwLpzoEuW4tIdGkKJIiDSOgcmy_fliSGgGvy8F5jMxAYV23fvlZtyz1JG0CjBY0qaJhTLUFm5XpWhl9lx9WrwhQX2x2MGgzGLj6pZwekvgnsiQ9FwhHy0II6S6GHkoEBANQlqe_Or9CMPyfGFMEkSUCzG5bQQSqFtZRfAmjGaxKTfV2MLmUwJtLxwlMxX67qO6eI2Q9SJ1mcEqVnJ90_HYs4iwOQG_o9Y"/>
+</div>
+<div>
+<p class="font-bold text-lg text-on-surface">Sarah Jenkins</p>
+<p class="text-xs text-slate-500 font-medium">jenkins.s@email.com</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-3 border-b border-slate-50">
+<span class="text-sm text-slate-500">Total Donated</span>
+<span class="text-sm font-bold text-primary">$14,200.00</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-slate-50">
+<span class="text-sm text-slate-500">Impact Score</span>
+<span class="text-sm font-bold text-secondary">Elite Supporter</span>
+</div>
+<div class="flex justify-between items-center py-3">
+<span class="text-sm text-slate-500">Member Since</span>
+<span class="text-sm font-bold text-slate-700">June 2021</span>
+</div>
+</div>
+<button class="w-full mt-6 py-3 px-4 border border-teal-600/30 text-teal-700 rounded-xl text-sm font-bold hover:bg-teal-50 transition-colors">
+                        View Full History
+                    </button>
+</section>
+<!-- Support & Resolution Card -->
+<section class="glass-panel p-6 rounded-2xl editorial-shadow border border-white/40 bg-teal-900/5">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Internal Actions</h3>
+<div class="space-y-3">
+<button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="receipt">receipt</span>
+                            Resend Tax Receipt
+                        </button>
+<button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="mail">mail</span>
+                            Contact Donor
+                        </button>
+<button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-error-container text-on-error-container rounded-xl text-sm font-bold hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="undo">undo</span>
+                            Initiate Refund
+                        </button>
+</div>
+</section>
+<!-- Map Component (Simulated Context) -->
+<section class="glass-panel overflow-hidden rounded-2xl editorial-shadow border border-white/40">
+<div class="h-40 relative">
+<img alt="Map location" class="w-full h-full object-cover opacity-80" data-alt="Stylized map overlay of a central african region with a highlighted teal circular zone indicating impact area" data-location="Central Africa" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxrEG8d8pzIQ8gT1Cv2d4769GoOrI5ov38S27MczJW97giDXefXVGoMGz4-npuDdT216OCfrTyGwAnX-W9T26QYQQVsu7_SgEr3BTtk6ld0loCMfZL0d2AH8gSiW4-X3OgwiXloBX5kXxKkHL9Z4XMSiYjHg8uE9DRjkFsFtH_Zj2zAXeNR6GVY7gdGQinOv0mQOXdv8QkJWImfAuggzzRj1nTefBko6N-ba0RIo7RJKWVMqsB7ypvK5mK5XJ6d4DJaQL1tku-VJc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<p class="text-white text-xs font-bold uppercase tracking-widest">Impact Location</p>
+<p class="text-white text-lg font-black tracking-tight">Kibera Region Hub</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="ml-64 w-auto py-12 px-8 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex flex-col gap-2">
+<span class="text-lg font-black text-teal-900 dark:text-teal-100">Ethereal Guardian</span>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">© 2024 Ethereal Guardian. All rights reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:underline hover:text-teal-600 transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:underline hover:text-teal-600 transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:underline hover:text-teal-600 transition-colors opacity-80 hover:opacity-100" href="#">Contact Us</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:underline hover:text-teal-600 transition-colors opacity-80 hover:opacity-100" href="#">Careers</a>
+</div>
+</footer>
+</body></html>

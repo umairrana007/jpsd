@@ -81,16 +81,11 @@ export const ProgramsSection: React.FC = () => {
     const fetchPrograms = async () => {
       try {
         const fetchedPrograms = await getPrograms();
-        if (fetchedPrograms && fetchedPrograms.length > 0) {
+        if (fetchedPrograms) {
           setPrograms(fetchedPrograms as ProgramType[]);
-        } else {
-          // Use sample data if Firebase is not configured
-          setPrograms(samplePrograms);
         }
       } catch (error) {
         console.error('Error fetching programs:', error);
-        // Fallback to sample data
-        setPrograms(samplePrograms);
       } finally {
         setLoading(false);
       }
@@ -148,7 +143,7 @@ export const ProgramsSection: React.FC = () => {
                     : 'bg-white text-[#64748b] hover:bg-gray-50 border border-gray-100 hover:border-primary-green/30'
                 } ${language === 'ur' ? 'urdu-text text-sm' : 'text-xs uppercase tracking-widest'}`}
               >
-                {language === 'ur' ? (t(`category.${cat}`) || cat) : cat}
+                {language === 'ur' ? (t(`category.${cat}`) || cat) : cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
             ))}
           </motion.div>

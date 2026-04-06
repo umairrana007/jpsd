@@ -10,8 +10,16 @@ export async function updateSiteSettings(formData: {
   heroTitleUr: string;
   primaryColor: string;
   secondaryColor: string;
+  livesServed?: number;
+  donationsReceived?: number;
+  volunteersCount?: number;
+  programsCount?: number;
 }) {
   try {
+    if (!db) {
+      throw new Error('Firebase not configured');
+    }
+    
     const settingsRef = doc(db, 'global_config', 'site-settings');
     
     await setDoc(settingsRef, {
@@ -20,6 +28,10 @@ export async function updateSiteSettings(formData: {
       heroTitleUr: formData.heroTitleUr,
       primaryColor: formData.primaryColor,
       secondaryColor: formData.secondaryColor,
+      livesServed: formData.livesServed || 0,
+      donationsReceived: formData.donationsReceived || 0,
+      volunteersCount: formData.volunteersCount || 0,
+      programsCount: formData.programsCount || 0,
       lastUpdated: serverTimestamp(),
     }, { merge: true });
 

@@ -6,16 +6,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const BOT_KNOWLEDGE: any = {
   en: [
-    { keywords: ['register', 'join'], response: "To join as a volunteer, complete the 3-step registration. Admin approval takes 24-48 hours." },
-    { keywords: ['event', 'mission'], response: "Check the 'Operational Feed' in your dashboard to browse active missions." },
+    { keywords: ['register', 'join', 'volunteer'], response: "To join as a volunteer, complete the 3-step registration. Admin approval takes 24-48 hours." },
+    { keywords: ['event', 'mission'], response: "Check the 'Operational Feed' in your dashboard or browse 'Events' in the main menu to see active missions." },
     { keywords: ['certificate', 'hours'], response: "Certificates are automatically generated once you log 40+ operational hours." },
-    { keywords: ['zakat', 'calc'], response: "You can use our Zakat Calculator in the donation portal to determine your humanitarian magnitude." },
+    { keywords: ['zakat', 'calc'], response: "Our Zakat Calculator is available publicly. You don't need to register to use it or to make a donation." },
+    { keywords: ['donor', 'doner', 'donate', 'contribution'], response: "Registration is NOT mandatory for donors. You can donate as a guest via Bank Transfer or online payment by selecting any campaign in the 'Causes' section." },
+    { keywords: ['contact', 'email', 'offices'], response: "You can reach JPSD HQ at info@jpsd.org or visit our regional hub at Baitussalam Complex for field coordination." },
+    { keywords: ['jpsd', 'who', 'jamiyat'], response: "Jamiyat Punjabi Saudagran-e-Delhi (JPSD) is a premier humanitarian organization dedicated to education, welfare, and spiritual empowerment since 1947." },
   ],
   ur: [
-    { keywords: ['رجسٹریشن', 'شامل'], response: "بطور رضا کار شامل ہونے کے لیے 3 مراحل کی رجسٹریشن مکمل کریں۔ ایڈمن کی منظوری میں 24 سے 48 گھنٹے لگتے ہیں۔" },
-    { keywords: ['ایونٹ', 'مشن'], response: "فعال مشنز دیکھنے کے لیے اپنے ڈیش بورڈ میں 'آپریشنل فیڈ' چیک کریں۔" },
+    { keywords: ['رجسٹریشن', 'شامل', 'رضا کار'], response: "بطور رضا کار شامل ہونے کے لیے 3 مراحل کی رجسٹریشن مکمل کریں۔ ایڈمن کی منظوری میں 24 سے 48 گھنٹے لگتے ہیں۔" },
+    { keywords: ['ایونٹ', 'مشن'], response: "فعال مشنز دیکھنے کے لیے اپنے ڈیش بورڈ میں 'آپریشنل فیڈ' یا مین مینو میں 'Events' چیک کریں۔" },
     { keywords: ['سرٹیفکیٹ', 'گھنٹے'], response: "سرٹیفکیٹ 40+ گھنٹے مکمل ہونے کے بعد خود بخود تیار ہو جاتے ہیں۔" },
-    { keywords: ['زکوٰۃ'], response: "آپ عطیہ پورٹل میں ہمارا زکوٰۃ کیلکولیٹر استعمال کر سکتے ہیں۔" },
+    { keywords: ['زکوٰۃ'], response: "ہمارا زکوٰۃ کیلکولیٹر سب کے لیے ہے، اسے استعمال کرنے یا عطیہ دینے کے لیے رجسٹریشن کی ضرورت نہیں ہے۔" },
+    { keywords: ['عطیہ', 'ڈونر', 'مدد'], response: "چیریٹی کے لیے رجسٹریشن لازمی نہیں ہے۔ آپ بطور 'Guest' بینک ٹرانسفر یا آن لائن پیمنٹ کے ذریعے کسی بھی مہم میں حصہ لے سکتے ہیں۔" },
+    { keywords: ['رابطہ', 'ای میل', 'دفتر'], response: "آپ ہمیں info@jpsd.org پر ای میل کر سکتے ہیں یا بیت السلام کمپلیکس میں ہمارے علاقائی مرکز کا دورہ کر سکتے ہیں۔" },
+    { keywords: ['جے پی ایس ڈی', 'جمیعت'], response: "جمیعت پنجابی سوداگرانِ دہلی (JPSD) ایک انسانی فلاحی تنظیم ہے جو 1947 سے تعلیم، فلاح و بہبود اور روحانی بااختیار بنانے کے لیے وقف ہے۔" },
   ]
 };
 
@@ -24,7 +30,7 @@ export default function BilingualChatbot() {
   const [minimized, setMinimized] = useState(false);
   const [lang, setLang] = useState<'en' | 'ur'>('en');
   const [messages, setMessages] = useState<any[]>([
-    { text: "Assalam-o-Alaikum! I am Baitussalam HQ AI. How can I assist your mission today?", sender: 'bot' }
+    { text: "Assalam-o-Alaikum! I am JPSD HQ Intelligence. How can I assist your mission today?", sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -61,7 +67,7 @@ export default function BilingualChatbot() {
   };
 
   return (
-    <div className="fixed bottom-32 right-8 z-[200]">
+    <div className="fixed bottom-32 right-12 z-[200]">
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -75,13 +81,13 @@ export default function BilingualChatbot() {
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse" />
           </motion.button>
         )}
-
+ 
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className={`bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-all ${minimized ? 'h-20 w-80' : 'h-[600px] w-96'}`}
+            className={`bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-all ${minimized ? 'h-20 w-80' : 'h-[550px] w-[360px] max-w-[calc(100vw-4rem)] max-h-[70vh]'}`}
           >
             {/* Header */}
             <div className={`p-6 bg-slate-900 text-white flex items-center justify-between transition-all ${minimized ? 'bg-[#1ea05f]' : ''}`}>

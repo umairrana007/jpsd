@@ -1,0 +1,447 @@
+harity/Non-Profit Organization - Complete Design & Development Prompt
+Project: Modern Glassmorphic Charity Platform (Website + Admin Dashboard + Mobile App)
+References: Alkhidmat Foundation, Baitussalam, Saylani Welfare Trust
+
+1. PROJECT OVERVIEW
+Ek modern, clean aur professional charity/non-profit organization ka complete digital platform design aur develop karna hai jisme 3 main components honge:
+Component
+Description
+Public Website
+Donors aur visitors ke liye (Home, About, Causes, Donation, Events, Blog, Contact)
+Admin Dashboard
+Internal team ke liye management panel (Donations, Events, Volunteers, Users, Reports, Settings)
+Mobile App
+On-the-go access ke liye (Donate, News, Causes, Events, Volunteer Registration, Profile)
+
+2. DESIGN SYSTEM & STYLE GUIDE
+
+2.1 Visual Style
+✓ Glassmorphism Design (Frosted Glass Effect)
+✓ Transparency & Layered Panels
+✓ Soft Shadows & Smooth Gradients
+✓ Minimalist & Smart Iconography
+✓ Professional yet Warm Atmosphere
+
+2.2 Glassmorphism CSS Specifications
+.glass-panel {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+}
+
+.glass-card-hover {
+    transition: all 0.3s ease-in-out;
+}
+
+.glass-card-hover:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+2.3 Color Palette
+Primary Colors:
+├── Teal: #20B2AA (Main Brand Color)
+├── Blue: #4A90E2 (Accent/CTA)
+├── White: #FFFFFF (Base)
+└── Warm Gray: #F5F5F7 (Background)
+
+Secondary Colors:
+├── Success Green: #34C759 (Donation Complete)
+├── Warning Orange: #FF9500 (Alerts)
+├── Error Red: #FF3B30 (Errors)
+└── Text Dark: #1C1C1E (Primary Text)
+
+Gradient Examples:
+├── Primary Gradient: linear-gradient(135deg, #20B2AA 0%, #4A90E2 100%)
+└── Glass Overlay: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)
+
+2.4 Typography
+English Fonts:
+├── Headings: 'Inter' or 'Poppins' (SemiBold/Bold)
+└── Body: 'Inter' or 'Noto Sans' (Regular)
+
+Urdu Fonts (Bilingual Support):
+├── Headings: 'Noto Nastaliq Urdu'
+└── Body: 'Jameel Noori Nastaleeq'
+
+Font Sizes:
+├── H1: 48px (Desktop) / 32px (Mobile)
+├── H2: 36px (Desktop) / 28px (Mobile)
+├── H3: 24px (Desktop) / 20px (Mobile)
+├── Body: 16px (Desktop) / 14px (Mobile)
+└── Small: 12px (Captions/Meta)
+
+ 3. PUBLIC WEBSITE - PAGE REQUIREMENTS
+3.1 Home Page
+Sections:
+├── Hero Section (Full-width banner with CTA: "Donate Now")
+├── Stats Counter (Animated: Donors, Lives Changed, Projects)
+├── Featured Causes (Card Grid with Progress Bars)
+├── Recent Events (Carousel/Slider)
+├── Testimonials/Success Stories
+├── Partner Logos (Trust Badges)
+└── Newsletter Signup + Footer
+
+3.2 Causes Page
+Features:
+├── Filter System (Category, Location, Urgency)
+├── Search Bar
+├── Cause Cards (Image, Title, Description, Progress Bar, Donate Button)
+├── Sorting Options (Newest, Most Funded, Ending Soon)
+└── Pagination/Infinite Scroll
+
+3.3 Donation Page
+Flow (Max 3 Steps):
+├── Step 1: Select Cause + Amount (Preset + Custom)
+├── Step 2: Donor Information (Name, Email, Phone - Guest Option Available)
+└── Step 3: Payment Method (Card, JazzCash, EasyPaisa, Bank Transfer)
+
+Features:
+├── Recurring Donation Toggle (Monthly/Yearly)
+├── Zakat/Sehmi Option Checkbox
+├── Anonymous Donation Option
+├── Auto-Receipt Generation (Email + SMS)
+└── SSL/Payment Security Badges Display
+
+3.4 Events Page
+Features:
+├── Event Calendar View + List View Toggle
+├── Event Cards (Date, Location, Image, Registration CTA)
+├── Filter by Event Type (Medical Camp, Food Drive, Education, Emergency)
+├── Registration Form Modal
+├── Google Maps Integration for Location
+└── Share Buttons (WhatsApp, Facebook, Twitter)
+
+3.5 About Page
+Sections:
+├── Organization History & Mission
+├── Leadership Team (Photos + Bios)
+├── Transparency Report Download
+├── Certifications & Registrations
+├── Annual Reports (PDF Downloads)
+└── Contact Information
+
+3.6 Blog/News Page
+Features:
+├── Card Layout with Featured Image
+├── Category Filters
+├── Read Time Display
+├── Social Share Buttons
+├── Related Posts Section
+└── Comments Section (Optional/Moderated)
+
+3.7 Contact Page
+Elements:
+├── Contact Form (Name, Email, Subject, Message)
+├── Office Locations with Maps
+├── Phone Numbers (Click-to-Call)
+├── Email Addresses (Click-to-Mail)
+├── Social Media Links
+└── Working Hours Display
+
+4. ADMIN DASHBOARD - PANEL REQUIREMENTS
+4.1 Dashboard Home (Main)
+Widgets:
+├── Quick Stats (Today's Donations, Total Donors, Active Campaigns)
+├── Revenue Chart (Daily/Weekly/Monthly - Line/Bar Graph)
+├── Recent Donations Table (Last 10 Transactions)
+├── Upcoming Events Countdown
+├── Volunteer Activity Feed
+└── Quick Actions (Add Cause, Create Event, Send Notification)
+
+4.2 Donations Management
+Features:
+├── Data Table with: Search, Sort, Filter (Date, Amount, Status, Payment Method)
+├── Bulk Actions (Export CSV/PDF, Mark as Verified, Send Receipt)
+├── Transaction Details Modal
+├── Refund Processing Option
+├── Recurring Donation Management
+└── Payment Gateway Status Monitor
+
+4.3 Events Management
+Features:
+├── Create/Edit/Delete Events
+├── Registration List & Attendance Tracking
+├── Event Analytics (Registrations, Check-ins, Feedback)
+├── Bulk Email/SMS to Registrants
+├── QR Code Generation for Check-in
+└── Post-Event Report Generation
+
+4.4 Volunteers Management
+Features:
+├── Volunteer Registration Approvals
+├── Profile Database with Skills/Availability
+├── Assignment Tracking (Which Event/Cause)
+├── Hours Logged & Certificates
+├── Communication Tools (Email/WhatsApp Integration)
+└── Performance Ratings
+
+4.5 Users Management
+Features:
+├── Donor Database with Donation History
+├── User Roles (Admin, Content Manager, Volunteer, Viewer)
+├── Role-Based Access Control (RBAC)
+├── Account Status (Active, Suspended, Deleted)
+├── Login Activity Log
+└── GDPR Data Export/Delete Options
+
+4.6 Reports & Analytics
+Reports:
+├── Financial Reports (Income, Expenses, Net)
+├── Campaign Performance (Funds Raised vs Target)
+├── Donor Retention Rate
+├── Geographic Distribution Map
+├── Event ROI Analysis
+└── Custom Date Range Selection + Export
+
+4.7 Site Settings
+Configurations:
+├── General Settings (Site Name, Logo, Contact Info)
+├── Payment Gateway Settings (API Keys, Webhooks)
+├── Email/SMS Template Editor
+├── Social Media Links
+├── SEO Settings (Meta Tags, Sitemap)
+├── Backup & Restore Options
+└── Maintenance Mode Toggle
+
+4.8 Login/Register (Admin)
+Security Features:
+├── Two-Factor Authentication (2FA) Option
+├── Password Strength Indicator
+├── Forgot Password with Email Reset
+├── Session Timeout Warning
+├── Login Activity Log (IP, Device, Time)
+└── Biometric Login Support (Mobile App)
+
+5. MOBILE APP - SCREEN REQUIREMENTS
+5.1 App Home Screen
+Elements:
+├── Bottom Navigation (5 Items Max: Home, Causes, Events, Donate, Profile)
+├── Floating Action Button (FAB) for Quick Donate
+├── Push Notification Bell Icon
+├── Search Bar (Causes/Events)
+├── Featured Cause Carousel
+├── Quick Stats Widget
+└── Recent News Feed
+
+5.2 Donation Screen (Mobile)
+Optimized Flow:
+├── One-Tap Preset Amounts
+├── Apple Pay / Google Pay Integration
+├── Biometric Authentication for Payment
+├── Donation History Quick Access
+├── Saved Payment Methods
+└── Instant Receipt in App
+5.3 Events Screen (Mobile)
+Features:
+├── Calendar View + List View Toggle
+├── Add to Phone Calendar Option
+├── Location with Navigation (Google Maps/Apple Maps)
+├── One-Tap Registration
+├── Event Reminders (Push Notifications)
+└── QR Code Ticket in App
+5.4 Login/Profile Screen (Mobile)
+Features:
+├── Biometric Login (Fingerprint/Face ID)
+├── Social Login (Google, Apple, Facebook)
+├── Profile Edit (Name, Email, Phone, Preferences)
+├── Donation History with Filters
+├── Saved Causes/Favorites
+├── Notification Preferences
+├── Language Toggle (Urdu/English)
+└── Logout + Delete Account Option
+
+5.5 Mobile App Technical Requirements
+✓ Offline Mode (Cached Causes, Donation History, Event Details)
+✓ Push Notifications (Campaign Alerts, Event Reminders, Receipts)
+✓ Deep Linking (Share Specific Causes/Events)
+✓ App Rating Prompt (After Successful Donation)
+✓ Crash Reporting & Analytics Integration
+✓ Minimum Support: iOS 14+, Android 10+
+
+6. TECHNICAL SPECIFICATIONS
+
+6.1 Responsive Breakpoints
+Mobile:    360px - 767px
+Tablet:    768px - 1023px
+Desktop:   1024px - 1439px
+Large:     1440px+
+
+6.2 Accessibility (WCAG 2.1 AA Compliance)
+✓ Color Contrast Ratio: Minimum 4.5:1 for text
+✓ Keyboard Navigation Support (Tab Index, Focus States)
+✓ ARIA Labels for All Interactive Elements
+✓ Screen Reader Compatibility
+✓ Alt Text for All Images
+✓ Form Labels & Error Messages (Accessible)
+✓ Skip to Content Link
+✓ Reduced Motion Option for Animations
+
+6.3 Performance Requirements
+✓ Core Web Vitals Optimized:
+  ├── LCP (Largest Contentful Paint): < 2.5s
+  ├── FID (First Input Delay): < 100ms
+  └── CLS (Cumulative Layout Shift): < 0.1
+
+✓ Image Optimization:
+  ├── WebP Format with Fallback
+  ├── Lazy Loading with Blur-Up Placeholders
+  └── Responsive Images (srcset)
+
+✓ Code Optimization:
+  ├── Minified CSS/JS
+  ├── Tree Shaking for Unused Code
+  └── CDN for Static Assets
+
+6.4 Security Requirements
+✓ SSL/TLS Encryption (HTTPS Only)
+✓ PCI-DSS Compliance for Payments
+✓ GDPR/Privacy Policy Compliance
+✓ CSRF Protection on All Forms
+✓ XSS Prevention (Input Sanitization)
+✓ Rate Limiting on API Endpoints
+✓ Regular Security Audits
+✓ Data Backup (Daily Automated)
+7. MICRO-INTERACTIONS & ANIMATIONS
+Hover Effects:
+├── Buttons: Soft Glow + Scale 1.02
+├── Cards: Shadow Lift + Border Highlight
+└── Links: Underline Animation (Left to Right)
+
+Loading States:
+├── Skeleton Screens for Content
+├── Shimmer Effect on Glass Panels
+├── Progress Bars for Donations/Uploads
+└── Spinner for Async Actions
+
+Transitions:
+├── Page Transitions: 300ms Fade + Slide
+├── Modal Open/Close: 200ms Ease-in-out
+├── Scroll Animations: Fade-in on Viewport Entry
+└── Button Press: 100ms Scale Down + Glow
+
+Success States:
+├── Checkmark Animation (Donation Complete)
+├── Confetti Effect (Major Milestone)
+├── Toast Notifications (Auto-dismiss 3s)
+└── Haptic Feedback (Mobile App)
+
+8. DELIVERABLES CHECKLIST
+Design Files
+□ Figma/Adobe XD Complete Design File
+□ All Pages Mockups (Desktop + Mobile)
+□ UI Component Library (Buttons, Cards, Forms, Modals)
+□ Design System Document (Colors, Typography, Spacing)
+□ Glassmorphism Style Guide with CSS Snippets
+□ Icon Set (SVG Format - Custom or Library)
+□ Interactive Prototype (User Flow Demonstration)
+
+Development Files
+□ Responsive HTML/CSS/JS Codebase
+□ React/Vue/Angular Components (As Per Stack)
+□ Admin Panel Backend Integration Ready
+□ API Documentation (Endpoints, Auth, Data Models)
+□ Database Schema Design
+□ Environment Configuration Files
+□ Deployment Instructions (Docker/CI-CD)
+
+Documentation
+□ User Manual (Admin Panel)
+□ API Documentation (Swagger/Postman)
+□ Style Guide (Brand Usage)
+□ Accessibility Audit Report
+□ Performance Test Results
+□ Security Compliance Checklist
+□ Maintenance & Update Guide
+
+ 9. CONTENT & LOCALIZATION
+Languages:
+├── Primary: Urdu (RTL Support)
+├── Secondary: English (LTR)
+└── Language Toggle in Header/Footer
+
+Tone of Voice:
+├── Warm & Trustworthy
+├── Action-Oriented (Clear CTAs)
+├── Transparent (Financial/Impact Data)
+└── Inclusive (Diverse Community Representation)
+
+Imagery Guidelines:
+├── Authentic Humanitarian Moments
+├── Diverse Communities (Age, Gender, Ethnicity)
+├── High-Quality Professional Photos
+├── Consent & Privacy Compliant
+└── Alt Text for All Images (Accessibility)
+
+10. TESTING & QA REQUIREMENTS
+Browser Testing:
+├── Chrome (Latest 2 Versions)
+├── Firefox (Latest 2 Versions)
+├── Safari (Latest 2 Versions)
+├── Edge (Latest 2 Versions)
+└── Mobile Browsers (Chrome, Safari)
+
+Device Testing:
+├── iOS Devices (iPhone 12+, iPad)
+├── Android Devices (Samsung, Pixel, OnePlus)
+├── Various Screen Sizes (360px to 1920px+)
+└── Touch & Mouse Interaction
+
+Functional Testing:
+├── All Forms Validation
+├── Payment Gateway Integration
+├── Email/SMS Notifications
+├── Admin Panel CRUD Operations
+├── User Authentication & Authorization
+└── Error Handling & Edge Cases
+
+11. CONTACT & SUPPORT
+Post-Launch Support:
+├── 30 Days Bug Fix Warranty
+├── Documentation Handover Session
+├── Admin Training (2 Sessions)
+├── Source Code & Asset Delivery
+└── Future Maintenance Contract Option
+
+12. SUCCESS METRICS
+Website:
+├── Page Load Time: < 3 seconds
+├── Donation Conversion Rate: > 5%
+├── Bounce Rate: < 40%
+└── Mobile Traffic: > 60%
+
+Admin Panel:
+├── Task Completion Time: < 2 minutes (Common Actions)
+├── Error Rate: < 1%
+└── User Satisfaction: > 4.5/5
+
+Mobile App:
+├── App Store Rating: > 4.5 Stars
+├── Crash-Free Sessions: > 99%
+├── Daily Active Users Growth: > 10% Monthly
+└── Donation via App: > 30% of Total
+
+--------------------------------------------------------
+
+Design Approved – Project Development Start Instruction
+
+Maine aapke banaye gaye designs (Public Website, Admin Dashboard, aur Mobile App) carefully review kar liye hain.
+
+Approval Status: ✅ Approved
+
+Yeh designs meri di gayi requirements (Glassmorphism style, Charity theme, Responsiveness, aur Accessibility) ke mutabiq hain.
+Ab aap Development/Build Phase start kar sakte hain.
+
+Development ke doran in baaton ka khas khayal rakhein:
+
+Design Fidelity: Coding mein wahi Glassmorphism effect, colors aur typography maintain rahe jo designs mein hain.
+
+Responsiveness: Mobile-first approach follow karein (Mobile, Tablet, Desktop).
+
+Performance: Website ki loading speed aur Core Web Vitals optimized hon.
+
+Security: Payment gateway aur user data ki security priority ho.
+

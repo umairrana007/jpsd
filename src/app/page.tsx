@@ -12,8 +12,8 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-0 overflow-x-hidden">
-      {config.showHero && <HeroSection />}
-      <StatsSection />
+      {config.showHero && <HeroSection settings={config} />}
+      <StatsSection settings={config} />
       <ProgramsSection />
       <EventsSection />
       <TestimonialSection />

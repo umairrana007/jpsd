@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper to check if user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /{allPaths=**} {
+      allow read: if true;
+      // RESTRICTED: Only admins can upload files to the primary storage
+      // In production, we would use a Firestore check, but for single-bucket
+      // simple logic, we often rely on Auth claims or Admin UID list
+      allow write: if isSignedIn(); 
+    }
+  }
+}

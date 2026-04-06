@@ -8,6 +8,11 @@ import {
   FiFileText, FiVideo, FiMaximize2, FiEdit3, FiSave
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { storage, db } from '@/lib/firebase';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { collection, addDoc, getDocs, query, orderBy, Timestamp, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 
 interface MediaItem {
   id: string;
@@ -21,78 +26,163 @@ interface MediaItem {
   folder?: string;
 }
 
-export default function MediaLibraryPage() {
+function MediaLibraryPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([
-    { 
-      id: '1', 
-      name: 'Hero_Humanity_01.webp', 
-      url: '/images/jpsd_main.jpg', 
-      type: 'image', 
-      size: '1.2 MB', 
-      dimensions: '1920x1080', 
-      alt: 'Children receiving education in rural areas',
-      createdAt: '2 hours ago',
-      folder: 'Website Assets'
-    },
-    { 
-      id: '2', 
-      name: 'Annual_Report_2025.pdf', 
-      url: '#', 
-      type: 'pdf', 
-      size: '4.5 MB', 
-      createdAt: '1 day ago',
-      folder: 'Documents'
-    },
-    { 
-      id: '3', 
-      name: 'Zakat_Campaign_Video.mp4', 
-      url: '#', 
-      type: 'video', 
-      size: '24 MB', 
-      createdAt: '3 days ago',
-      folder: 'Campaigns'
-    },
-    { 
-      id: '4', 
-      name: 'Volunteer_Manual.docx', 
-      url: '#', 
-      type: 'doc', 
-      size: '800 KB', 
-      createdAt: '1 week ago',
-      folder: 'Internal'
-    },
-    { 
-      id: '5', 
-      name: 'Cataract_Camp_Photo_09.jpg', 
-      url: '/images/jpsd_food.jpg', 
-      type: 'image', 
-      size: '2.1 MB', 
-      dimensions: '2400x1600', 
-      alt: 'Medical camp in Korangi',
-      createdAt: '2 weeks ago',
-      folder: 'Health'
-    },
-  ]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleUpload = () => {
+  React.useEffect(() => {
+    async function fetchMedia() {
+      if (!db) return;
+      try {
+        const q = query(collection(db as any, 'media'), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: (doc.data().createdAt as Timestamp)?.toDate().toLocaleString() || 'Ancient'
+        })) as MediaItem[];
+        
+        if (items.length > 0) {
+          setMediaItems(items);
+        } else {
+          // Fallback to defaults if empty
+          setMediaItems([
+            { 
+              id: '1', 
+              name: 'Hero_Humanity_01.webp', 
+              url: '/images/jpsd_main.jpg', 
+              type: 'image', 
+              size: '1.2 MB', 
+              dimensions: '1920x1080', 
+              alt: 'Children receiving education in rural areas',
+              createdAt: '2 hours ago',
+              folder: 'Website Assets'
+            },
+            { 
+              id: '2', 
+              name: 'Annual_Report_2025.pdf', 
+              url: '#', 
+              type: 'pdf', 
+              size: '4.5 MB', 
+              createdAt: '1 day ago',
+              folder: 'Documents'
+            },
+          ]);
+        }
+      } catch (err) {
+        console.error("Fetch media error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchMedia();
+  }, []);
+
+  const [loading, setLoading] = useState(true);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !storage || !db) return;
+
     setIsUploading(true);
     setUploadProgress(0);
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsUploading(false), 500);
-          return 100;
-        }
-        return prev + 10;
+
+    const fileName = `${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, `media/${fileName}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(Math.round(progress));
+      }, 
+      (error) => {
+        console.error("Upload error:", error);
+        setIsUploading(false);
+      }, 
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        
+        // Save metadata to Firestore
+        const mediaDoc = await addDoc(collection(db as any, 'media'), {
+          name: file.name,
+          url: downloadURL,
+          type: file.type.startsWith('image/') ? 'image' : (file.type === 'application/pdf' ? 'pdf' : 'doc'),
+          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          createdAt: serverTimestamp(),
+          folder: 'Recent Uploads'
+        });
+
+        const newItem: MediaItem = {
+          id: mediaDoc.id,
+          name: file.name,
+          url: downloadURL,
+          type: file.type.startsWith('image/') ? 'image' : (file.type === 'application/pdf' ? 'pdf' : 'doc'),
+          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          createdAt: 'Just now',
+          folder: 'Recent Uploads'
+        };
+
+        setMediaItems(prev => [newItem, ...prev]);
+        setIsUploading(false);
+      }
+    );
+  };
+
+  const handleDelete = async (item: MediaItem) => {
+    if (!db || !storage || !window.confirm(`Delete ${item.name}? This cannot be undone.`)) return;
+    
+    try {
+      // 1. Delete from Firestore
+      await deleteDoc(doc(db as any, 'media', item.id));
+      
+      // 2. Delete from Storage (Optional but recommended)
+      // Note: We need the full storage path or ref. 
+      // If the URL is external or not formatted for easy ref extraction, we might skip this or handle carefully.
+      try {
+        const storageRef = ref(storage, item.url); 
+        await deleteObject(storageRef);
+      } catch (err) {
+        console.warn("Storage deletion skipped or failed:", err);
+      }
+
+      setMediaItems(prev => prev.filter(i => i.id !== item.id));
+      setSelectedItem(null);
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!db || !selectedItem) return;
+    setSaving(true);
+    try {
+      const mediaRef = doc(db as any, 'media', selectedItem.id);
+      await updateDoc(mediaRef, {
+        alt: selectedItem.alt || '',
+        updatedAt: serverTimestamp()
       });
-    }, 200);
+      
+      setMediaItems(prev => prev.map(item => 
+        item.id === selectedItem.id ? { ...item, alt: selectedItem.alt } : item
+      ));
+      setSelectedItem(null);
+    } catch (err) {
+      console.error("Update error:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const triggerUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -113,8 +203,14 @@ export default function MediaLibraryPage() {
               className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#1ea05f]/20 outline-none transition-all"
             />
           </div>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            className="hidden" 
+          />
           <button 
-            onClick={handleUpload}
+            onClick={triggerUpload}
             className="px-8 py-4 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all flex items-center gap-2"
           >
             <FiUploadCloud />
@@ -242,7 +338,12 @@ export default function MediaLibraryPage() {
                      <td className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.size}</td>
                      <td className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.createdAt}</td>
                      <td className="px-8 py-4 text-right">
-                        <button className="p-2 text-slate-400 hover:text-red-500 transition-colors"><FiTrash2 /></button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
+                          className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                        >
+                          <FiTrash2 />
+                        </button>
                      </td>
                   </tr>
                 ))}
@@ -319,7 +420,8 @@ export default function MediaLibraryPage() {
                             <FiEdit3 className="absolute left-5 top-5 text-slate-400 group-focus-within:text-[#1ea05f] transition-colors" />
                             <textarea 
                               rows={3} 
-                              defaultValue={selectedItem.alt}
+                              value={selectedItem.alt || ''}
+                              onChange={(e) => setSelectedItem({...selectedItem, alt: e.target.value})}
                               className="w-full bg-slate-50 border-none rounded-3xl p-5 pl-14 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none"
                               placeholder="Describe this asset for accessibility engines..."
                             />
@@ -336,10 +438,17 @@ export default function MediaLibraryPage() {
                    </div>
 
                    <div className="pt-6 border-t border-slate-100 flex gap-4">
-                      <button className="flex-1 py-4 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                         <FiSave /> Verify Changes
+                      <button 
+                        onClick={handleUpdate}
+                        disabled={saving}
+                        className="flex-1 py-4 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                         <FiSave /> {saving ? 'Updating...' : 'Verify Changes'}
                       </button>
-                      <button className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5">
+                      <button 
+                        onClick={() => handleDelete(selectedItem)}
+                        className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5"
+                      >
                          <FiTrash2 size={24} />
                       </button>
                    </div>
@@ -351,3 +460,6 @@ export default function MediaLibraryPage() {
     </div>
   );
 }
+export default withAuth(MediaLibraryPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+});

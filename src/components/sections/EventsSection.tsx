@@ -1,60 +1,57 @@
 'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getEvents } from '@/lib/firebaseUtils';
+import { Event as EventType } from '@/types';
 
-const events = [
+// Sample fallback data
+const sampleEvents = [
   {
-    id: 1,
+    id: '1',
     title: 'Ramadan Food Drive 2024',
     titleUrdu: 'رمضان فوڈ ڈرائیو ۲۰۲۴',
-    date: 'March 15, 2024',
+    startDate: new Date('2024-03-15'),
     location: 'Karachi',
-    locationUrdu: 'کراچی',
     image: '/images/jpsd_main.jpg',
     description: 'Distributed 10,000+ food packages to families in need during Ramadan.',
     descriptionUrdu: 'رمضان کے دوران ضرورت مند خاندانوں میں ۱۰،۰۰۰ سے زائد راشن پیکٹ تقسیم کیے گئے۔',
   },
   {
-    id: 2,
+    id: '2',
     title: 'Free Medical Camp',
     titleUrdu: 'مفت میڈیکل کیمپ',
-    date: 'February 20, 2024',
+    startDate: new Date('2024-02-20'),
     location: 'Lahore',
-    locationUrdu: 'لاہور',
     image: '/images/jpsd_education.jpg',
     description: 'Provided free healthcare to 5,000+ patients with specialist consultations.',
     descriptionUrdu: 'ماہر ڈاکٹروں کی زیر نگرانی ۵۰۰۰ سے زائد مریضوں کا مفت طبی معائنہ کیا گیا۔',
   },
-  {
-    id: 3,
-    title: 'Winter Clothing Distribution',
-    titleUrdu: 'کپڑوں کی تقسیم',
-    date: 'January 10, 2024',
-    location: 'Islamabad',
-    locationUrdu: 'اسلام آباد',
-    image: '/images/jpsd_health.jpg',
-    description: 'Distributed warm clothing to homeless individuals during winter.',
-    descriptionUrdu: 'سردیوں کے موسم میں بے گھر افراد میں گرم کپڑے اور کمبل تقسیم کیے گئے۔',
-  },
-  {
-    id: 4,
-    title: 'School Supplies Drive',
-    titleUrdu: 'اسکول سپلائیز مہم',
-    date: 'December 5, 2023',
-    location: 'Peshawar',
-    locationUrdu: 'پشاور',
-    image: '/images/jpsd_ambulance.jpg',
-    description: 'Equipped 500+ students with books, bags, and stationery for new academic year.',
-    descriptionUrdu: 'نئے تعلیمی سال کے لیے ۵۰۰ سے زائد طلباء کو کتابیں، بیگز اور اسٹیشنری فراہم کی گئی۔',
-  },
 ];
 
 export const EventsSection: React.FC = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const fetched = await getEvents();
+        if (fetched) {
+          setEvents(fetched);
+        }
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
   return (
     <section className="py-20 bg-white overflow-hidden">
       <div className="container mx-auto px-4" dir={language === 'ur' ? 'rtl' : 'ltr'}>
@@ -75,29 +72,37 @@ export const EventsSection: React.FC = () => {
         </motion.div>
 
         {/* Events Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {events.map((event, index) => (
-            <div
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {loading ? (
+             <div className="col-span-full text-center py-10 font-bold text-gray-400">Loading Events...</div>
+          ) : events.map((event, index) => (
+            <motion.div
               key={event.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
               className="group flex flex-col h-full"
             >
               <div className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden flex-shrink-0">
                   <Image
-                    src={event.image}
+                    src={event.image || '/images/jpsd_main.jpg'}
                     alt={language === 'ur' ? (event.titleUrdu || event.title) : event.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                   <div className={`absolute top-4 ${language === 'ur' ? 'left-4' : 'right-4'} bg-[#f39c12] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider z-10 English-text`}>
-                    {event.date}
+                    {event.startDate instanceof Date 
+                      ? event.startDate.toLocaleDateString() 
+                      : (event.startDate?.toDate ? event.startDate.toDate().toLocaleDateString() : 'Upcoming')}
                   </div>
                 </div>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <h3 className={`text-xl font-bold text-[#2c3e50] mb-4 line-clamp-2 min-h-[4.5rem] flex items-center ${language === 'ur' ? 'urdu-text !leading-[1.8] py-2' : ''}`}>
+                  <h3 className={`text-xl font-bold text-[#2c3e50] mb-4 line-clamp-2 min-h-[3rem] flex items-center ${language === 'ur' ? 'urdu-text !leading-[1.8] py-2' : ''}`}>
                     {language === 'ur' ? (event.titleUrdu || event.title) : event.title}
                   </h3>
                   
@@ -125,7 +130,7 @@ export const EventsSection: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 

@@ -11,7 +11,6 @@ import {
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import BilingualChatbot from '@/components/BilingualChatbot';
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -38,8 +37,9 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
           <div className="relative w-64 h-24 mb-6 brightness-0 invert opacity-95 transition-transform hover:scale-105 active:scale-95">
              <Image 
                src="/logo.png" 
-               alt="Baitussalam Logo" 
-               fill 
+               alt="JPSD Logo" 
+               fill
+               sizes="280px"
                className="object-contain" 
                priority
              />
@@ -123,7 +123,6 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
         <main className="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
           {children}
         </main>
-        <BilingualChatbot />
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -177,3 +176,4 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
