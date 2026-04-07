@@ -5,7 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiHome, FiDollarSign, FiUsers, FiUser, FiBarChart2, FiSettings, FiMenu, FiLayout, FiImage, FiFileText, FiPieChart, FiBriefcase } from 'react-icons/fi';
 import Image from 'next/image';
-import GlobalSearch from '@/components/admin/GlobalSearch';
+import dynamic from 'next/dynamic';
+
+const GlobalSearch = dynamic(() => import('@/components/admin/GlobalSearch'), {
+  loading: () => <div className="h-12 w-full bg-slate-100 animate-pulse rounded-2xl mb-4" />,
+  ssr: false
+});
 
 import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
 import { UserRole } from '@/types';
