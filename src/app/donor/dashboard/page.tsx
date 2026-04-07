@@ -7,7 +7,7 @@ import { FiClock, FiHeart, FiFileText, FiArrowRight,
   FiMinus, FiPlus, FiGrid, FiActivity, FiSearch, FiRefreshCw
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateTaxReceipt } from '@/lib/pdfUtils';
+import { generateTaxReceipt, generateBulkReceipts } from '@/lib/pdfUtils';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserDonations } from '@/lib/firebaseUtils';
 import { useEffect } from 'react';
@@ -33,7 +33,11 @@ export default function DonorDashboardPage() {
   };
 
   const totals = donations.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-  const livesSustained = Math.ceil(totals / 2000); // Metric: ~2000 PKR sustains a life/ration pack
+  const successfulDonations = donations.filter(d => ['verified', 'completed', 'success'].includes(d.status?.toLowerCase()));
+  const causesSupported = new Set(successfulDonations.map(d => d.causeId || d.causeTitle)).size;
+  const receiptsGenerated = successfulDonations.filter(d => d.receiptUrl).length;
+  const livesSustained = Math.ceil(totals / 2000); 
+  const [recurringActive, setRecurringActive] = useState(true);
 
   const handleDownloadReceipt = (txn: any) => {
     generateTaxReceipt({
@@ -71,6 +75,13 @@ export default function DonorDashboardPage() {
     document.body.removeChild(link);
   };
 
+  const handleBulkDownload = () => {
+    generateBulkReceipts(donations, {
+      name: currentUserData?.name || user?.displayName || 'Donor',
+      uid: user?.uid
+    });
+  };
+
   return (
     <div className="space-y-10">
       {/* Hero Welcome Section */}
@@ -84,12 +95,12 @@ export default function DonorDashboardPage() {
          </div>
          <div className="relative z-10 flex gap-6 mt-4 md:mt-0">
              <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#1ea05f] mb-3 border-b border-[#1ea05f]/20 pb-2">Lives Sustained</p>
-                <p className="text-3xl font-black italic leading-none">{livesSustained}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-3 border-b border-blue-400/20 pb-2">Causes Hub</p>
+                <p className="text-3xl font-black italic leading-none">{causesSupported}</p>
              </div>
              <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-3 border-b border-blue-400/20 pb-2">Impact Score</p>
-                <p className="text-3xl font-black italic leading-none">{(donations.length * 0.5).toFixed(1)}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#1ea05f] mb-3 border-b border-[#1ea05f]/20 pb-2">Receipts</p>
+                <p className="text-3xl font-black italic leading-none">{receiptsGenerated}</p>
              </div>
          </div>
       </header>
@@ -101,13 +112,25 @@ export default function DonorDashboardPage() {
            
            {/* Giving Trajectory Grid */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white/70 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-sm space-y-6 group hover:border-[#1ea05f] transition-all">
-                 <div className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
-                    <FiHeart size={24} />
+              <div className="bg-white/70 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-sm space-y-6 group hover:border-[#1ea05f] transition-all relative">
+                 <div className="flex justify-between items-start">
+                   <div className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                      <FiHeart size={24} />
+                   </div>
+                   <div 
+                     onClick={() => setRecurringActive(!recurringActive)}
+                     className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors ${recurringActive ? 'bg-[#1ea05f]' : 'bg-slate-200'}`}
+                   >
+                     <motion.div 
+                       animate={{ x: recurringActive ? 24 : 4 }}
+                       className="absolute top-1.5 w-5 h-5 bg-white rounded-full shadow-lg"
+                     />
+                   </div>
                  </div>
                  <div>
                     <h4 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Recurring Core</h4>
-                    <p className="text-sm font-medium text-slate-500 mt-1">Active monthly commitment to humanitarian causes.</p>
+                    <p className="text-sm font-medium text-slate-500 mt-1">Status: {recurringActive ? 'Active Deployment' : 'Standby Mode'}</p>
+                    {recurringActive && (<p className="text-xs text-blue-500 mt-2">Monthly donations will be enabled soon.</p>)}
                  </div>
                  <p className="text-3xl font-black text-slate-900">PKR 15,000 / mo</p>
                  <button className="flex items-center gap-2 text-[10px] font-black text-[#1ea05f] uppercase tracking-widest hover:translate-x-1 transition-transform">Optimize Subscription <FiArrowRight /></button>
@@ -133,13 +156,22 @@ export default function DonorDashboardPage() {
                     <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Sacred Transactions</h3>
                     <p className="text-sm font-bold text-slate-400 mt-1">Your recent financial contributions to the foundation.</p>
                  </div>
-                  <button 
-                    onClick={handleExportCSV}
-                    disabled={donations.length === 0}
-                    className="px-6 py-3 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all disabled:opacity-30"
-                  >
-                    Consolidated CSV
-                  </button>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={handleBulkDownload}
+                      disabled={donations.length === 0}
+                      className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2"
+                    >
+                      <FiDownload size={14} /> Global PDF
+                    </button>
+                    <button 
+                      onClick={handleExportCSV}
+                      disabled={donations.length === 0}
+                      className="px-6 py-3 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all disabled:opacity-30"
+                    >
+                      Consolidated CSV
+                    </button>
+                  </div>
               </div>
 
                <div className="space-y-4">

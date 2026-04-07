@@ -10,7 +10,8 @@ import { submitVolunteerApplication } from '@/lib/firebaseUtils';
 import { useRouter } from 'next/navigation';
 
 export default function VolunteerPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isUrdu = language === 'ur';
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -74,11 +75,13 @@ export default function VolunteerPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className={`text-center mb-16 ${isUrdu ? 'rtl' : ''}`}
         >
-          <h1 className="text-5xl font-bold text-[#2c3e50] mb-4">Be a Volunteer</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Join our network of dedicated volunteers making a real difference in people's lives
+          <h1 className={`text-5xl font-bold text-[#2c3e50] mb-4 ${isUrdu ? 'urdu-text' : ''}`}>
+            {isUrdu ? 'رضاکار بنیں' : 'Be a Volunteer'}
+          </h1>
+          <p className={`text-xl text-gray-600 max-w-3xl mx-auto ${isUrdu ? 'urdu-text' : ''}`}>
+            {isUrdu ? 'انسانیت کی خدمت کے لیے ہمارے رضاکاروں کے نیٹ ورک کا حصہ بنیں' : 'Join our network of dedicated volunteers making a real difference in people\'s lives'}
           </p>
         </motion.div>
 
@@ -221,56 +224,61 @@ export default function VolunteerPage() {
           transition={{ duration: 0.6, delay: 1.0 }}
           className="mb-16"
         >
-          <div className="bg-white rounded-xl shadow-xl p-8 md:p-12">
-            <h2 className="text-4xl font-bold text-[#2c3e50] text-center mb-8">
-              Volunteer Registration Form
+          <div className={`bg-white rounded-xl shadow-xl p-8 md:p-12 ${isUrdu ? 'rtl' : ''}`}>
+            <h2 className={`text-4xl font-bold text-[#2c3e50] text-center mb-8 ${isUrdu ? 'urdu-text' : ''}`}>
+              {isUrdu ? 'رضاکار رجسٹریشن فارم' : 'Volunteer Registration Form'}
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <Input
-                  label="Full Name"
-                  placeholder="Enter your full name"
+                  label={isUrdu ? 'مکمل نام' : 'Full Name'}
+                  placeholder={isUrdu ? 'اپنا مکمل نام درج کریں' : "Enter your full name"}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   id="volunteer-name"
+                  className={isUrdu ? 'urdu-text text-right' : ''}
                 />
 
                 <Input
-                  label="Email Address"
+                  label={isUrdu ? 'ای میل ایڈریس' : 'Email Address'}
                   type="email"
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   id="volunteer-email"
+                  className={isUrdu ? 'text-right' : ''}
                 />
 
                 <Input
-                  label="Phone Number"
+                  label={isUrdu ? 'فون نمبر' : 'Phone Number'}
                   type="tel"
                   placeholder="+92-XXX-XXXXXXX"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
                   id="volunteer-phone"
+                  className={isUrdu ? 'text-right' : ''}
                 />
 
                 <Input
-                  label="CNIC Number"
+                  label={isUrdu ? 'شناختی کارڈ نمبر' : 'CNIC Number'}
                   placeholder="XXXXX-XXXXXXX-X"
                   value={formData.cnic}
                   onChange={(e) => setFormData({ ...formData, cnic: e.target.value })}
                   id="volunteer-cnic"
+                  className={isUrdu ? 'text-right' : ''}
                 />
 
                 <Input
-                  label="Community-Biradri"
-                  placeholder="Enter your community/biradri"
+                  label={isUrdu ? 'برادری / کمیونٹی' : 'Community-Biradri'}
+                  placeholder={isUrdu ? 'اپنی برادری درج کریں' : "Enter your community/biradri"}
                   value={formData.community}
                   onChange={(e) => setFormData({ ...formData, community: e.target.value })}
                   id="volunteer-community"
+                  className={isUrdu ? 'urdu-text text-right' : ''}
                 />
               </div>
 

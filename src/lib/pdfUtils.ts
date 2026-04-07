@@ -1,5 +1,7 @@
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 const getPdfMake = () => {
   console.log('Resolving pdfMake...');
@@ -271,4 +273,61 @@ export const generateTreasuryReport = (title: string, data: any) => {
     console.error('PDF Generation Error:', err);
     import('./pdfUtils').then(mod => mod.downloadFallback(title, data));
   }
+};
+
+export const generateBulkReceipts = (donations: any[], donorInfo: any) => {
+  const doc = new jsPDF() as any;
+  
+  // Header
+  doc.setFontSize(22);
+  doc.setTextColor(30, 160, 95); // #1ea05f
+  doc.text("JPSD CENTRAL COMMAND", 105, 20, { align: "center" });
+  
+  doc.setFontSize(14);
+  doc.setTextColor(50, 50, 50);
+  doc.text("Consolidated Humanitarian Impact Report", 105, 30, { align: "center" });
+  
+  // Donor Info
+  doc.setFontSize(10);
+  doc.text(`Donor: ${donorInfo.name || 'N/A'}`, 14, 45);
+  doc.text(`ID: ${donorInfo.uid?.substring(0, 10) || 'N/A'}`, 14, 50);
+  doc.text(`Date Generated: ${new Date().toLocaleString()}`, 14, 55);
+  
+  // Summary Stats
+  const total = donations.reduce((acc, d) => acc + (d.amount || 0), 0);
+  doc.setDrawColor(30, 160, 95);
+  doc.setFillColor(245, 252, 248);
+  doc.roundedRect(140, 40, 56, 20, 3, 3, "FD");
+  doc.setTextColor(30, 160, 95);
+  doc.setFontSize(8);
+  doc.text("TOTAL AGGREGATE IMPACT", 145, 47);
+  doc.setFontSize(12);
+  doc.text(`PKR ${total.toLocaleString()}`, 145, 55);
+
+  // Table
+  const tableData = donations.map(d => [
+    d.id?.substring(0, 8).toUpperCase() || 'N/A',
+    d.causeTitle || "General Welfare",
+    `PKR ${d.amount?.toLocaleString()}`,
+    d.status?.toUpperCase() || "PENDING",
+    d.createdAt ? new Date(d.createdAt).toLocaleDateString() : 'N/A'
+  ]);
+
+  doc.autoTable({
+    startY: 70,
+    head: [['TXN ID', 'HUMANITARIAN CAUSE', 'AMOUNT', 'STATUS', 'TIMESTAMP']],
+    body: tableData,
+    headStyles: { fillColor: [30, 160, 95], textColor: [255, 255, 255], fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    margin: { top: 70 },
+  });
+
+  const finalY = doc.lastAutoTable.finalY || 150;
+  
+  doc.setFontSize(9);
+  doc.setTextColor(150, 150, 150);
+  doc.text("This report is a calibrated summary of humanitarian asset deployment cycles.", 105, finalY + 20, { align: "center" });
+  doc.text("Verification Code: JPSD-GENESIS-2.4-ALPHA", 105, finalY + 25, { align: "center" });
+
+  doc.save(`JPSD_Bulk_Report_${new Date().getTime()}.pdf`);
 };

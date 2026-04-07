@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { FontLoader } from "@/components/ui/FontLoader";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import ClientMetadataUpdater from "@/components/ui/ClientMetadataUpdater";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
         <AuthProvider>
           <LanguageProvider>
             <FontLoader />
+            <ClientMetadataUpdater />
             <Navbar />
             <main className="flex-grow pt-24">{children}</main>
             <Footer />

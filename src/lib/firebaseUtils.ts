@@ -73,13 +73,18 @@ export const getDonations = async () => {
   }
 };
 
-export const getUserDonations = async (userId: string) => {
+export const getUserDonations = async (userId: string, status?: string) => {
   try {
-    const donationsQuery = query(
+    let donationsQuery = query(
       collection(getDb(), 'donations'),
       where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
+
+    if (status) {
+      donationsQuery = query(donationsQuery, where('status', '==', status));
+    }
+
     const snapshot = await getDocs(donationsQuery);
     return snapshot.docs.map(doc => ({ 
       id: doc.id, 

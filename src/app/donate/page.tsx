@@ -5,7 +5,7 @@ import {
   FiHeart, FiArrowRight, FiCheckCircle, FiShield, 
   FiUser, FiMessageSquare, FiTrendingUp, FiCheck,
   FiCreditCard, FiSmartphone, FiHome, FiLock,
-  FiZap, FiArrowLeft, FiTag
+  FiZap, FiArrowLeft, FiTag, FiAlertCircle, FiX
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,6 +26,7 @@ export default function DonationPage() {
     dedication: '',
     paymentMethod: ''
   });
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
@@ -313,18 +314,43 @@ export default function DonationPage() {
                        { id: 'jazzcash', label: 'JazzCash Direct', icon: FiSmartphone, color: 'text-red-500 bg-red-50' },
                        { id: 'easypaisa', label: 'EasyPaisa Hub', icon: FiZap, color: 'text-green-500 bg-green-50' },
                        { id: 'bank', label: 'Bank Transfer', icon: FiHome, color: 'text-slate-500 bg-slate-100' },
-                     ].map((method) => (
-                        <div 
-                          key={method.id}
-                          onClick={() => setFormData({...formData, paymentMethod: method.id})}
-                          className={`p-6 rounded-3xl border-2 flex items-center gap-4 cursor-pointer transition-all ${formData.paymentMethod === method.id ? 'border-slate-900 bg-slate-900 text-white shadow-2xl' : 'border-slate-50 bg-white hover:bg-slate-50'}`}
-                        >
-                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.paymentMethod === method.id ? 'bg-white/10 text-white' : method.color}`}>
-                              <method.icon />
-                           </div>
-                           <span className="text-[10px] font-black uppercase tracking-widest">{method.label}</span>
-                        </div>
-                     ))}
+                     ].map((method) => {
+                        const isComingSoon = method.id === 'jazzcash' || method.id === 'easypaisa';
+                        return (
+                          <div 
+                            key={method.id}
+                            onClick={() => {
+                              if (isComingSoon) {
+                                setShowInfoModal(true);
+                              } else {
+                                setFormData({...formData, paymentMethod: method.id});
+                              }
+                            }}
+                            className={`p-6 rounded-3xl border-2 flex items-center gap-4 cursor-pointer transition-all relative overflow-hidden ${
+                              formData.paymentMethod === method.id 
+                                ? 'border-slate-900 bg-slate-900 text-white shadow-2xl' 
+                                : 'border-slate-50 bg-white hover:bg-slate-50'
+                            } ${isComingSoon ? 'opacity-50 grayscale' : ''}`}
+                          >
+                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                               formData.paymentMethod === method.id ? 'bg-white/10 text-white' : method.color
+                             }`}>
+                                <method.icon />
+                             </div>
+                             <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-widest">{method.label}</span>
+                                {isComingSoon && (
+                                  <span className="text-[8px] font-black text-[#1ea05f] uppercase tracking-tighter mt-1 italic">Tactical Integration In Progress</span>
+                                )}
+                             </div>
+                             {isComingSoon && (
+                               <div className="absolute top-2 right-4">
+                                  <FiLock size={12} className="text-slate-400" />
+                               </div>
+                             )}
+                          </div>
+                        );
+                     })}
                   </div>
                </div>
 
@@ -344,6 +370,56 @@ export default function DonationPage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+
+      <AnimatePresence>
+        {showInfoModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xl flex items-center justify-center p-6"
+            onClick={() => setShowInfoModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-[3rem] p-12 max-w-lg w-full shadow-2xl space-y-8 relative overflow-hidden"
+            >
+               <div className="absolute top-0 right-0 w-32 h-32 bg-[#1ea05f]/10 rounded-full blur-3xl -mr-16 -mt-16" />
+               <button 
+                 onClick={() => setShowInfoModal(false)}
+                 className="absolute top-8 right-8 w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-all"
+               >
+                 <FiX />
+               </button>
+
+               <div className="w-16 h-16 bg-[#1ea05f]/10 rounded-2xl flex items-center justify-center text-[#1ea05f]">
+                 <FiAlertCircle size={32} />
+               </div>
+
+               <div className="space-y-4">
+                 <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-tight text-slate-800">Payment Gateway <br /><span className="text-[#1ea05f]">Calibration Active.</span></h3>
+                 <p className="text-sm font-medium text-slate-500 leading-relaxed">
+                   Our localized payment hubs (JazzCash & EasyPaisa) are currently undergoing high-security synchronization. Real-time humanitarian asset deployment will be enabled in this region shortly.
+                 </p>
+                 <p className="text-[10px] font-black text-[#1ea05f] uppercase tracking-widest italic border-l-2 border-[#1ea05f] pl-4">
+                    HQ Directives: Manual Bank Transfer is available for immediate impact.
+                 </p>
+               </div>
+
+               <button 
+                 onClick={() => setShowInfoModal(false)}
+                 className="w-full py-5 bg-slate-900 text-white font-black rounded-3xl shadow-xl hover:bg-slate-800 transition-all uppercase tracking-widest italic"
+               >
+                 Acknowledge Protocol
+               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="mt-12 flex flex-col items-center gap-4 relative z-10">
          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">Humanitarian Tech Stack by JPSD Global</p>
