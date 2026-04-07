@@ -7,16 +7,21 @@ import {
   FiMail, FiActivity, FiKey, FiCheck, FiX, FiRefreshCw
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getUsers, updateUserStatus, updateUserRole } from '@/lib/firebaseUtils';
+import { getUsers, updateUserStatus, updateUserRole, logActivity } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 function AdminUsersPage() {
+  const { user: authUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkRole, setBulkRole] = useState<UserRole | ''>('');
 
   useEffect(() => {
     fetchUsers();
@@ -33,6 +38,16 @@ function AdminUsersPage() {
     setActionLoading(userId);
     try {
       await updateUserStatus(userId, status, isActive);
+      
+      // Log Activity
+      await logActivity('USER_STATUS_UPDATE', {
+        type: 'PRIVILEGE',
+        message: `Admin ${authUser?.email} updated user ${userId} status to ${status}`,
+        adminUid: authUser?.uid,
+        affectedUserId: userId,
+        newStatus: status
+      });
+
       await fetchUsers(); // Refresh list
     } catch (error) {
       console.error('Error updating status:', error);
@@ -45,11 +60,71 @@ function AdminUsersPage() {
     setActionLoading(userId);
     try {
       await updateUserRole(userId, newRole);
+
+      // Log Activity
+      await logActivity('USER_ROLE_UPDATE', {
+        type: 'PRIVILEGE',
+        message: `Admin ${authUser?.email} changed user ${userId} role to ${newRole}`,
+        adminUid: authUser?.uid,
+        affectedUserId: userId,
+        newRole
+      });
+
       await fetchUsers();
     } catch (error) {
       console.error('Error updating role:', error);
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const toggleSelectUser = (userId: string) => {
+    setSelectedUserIds(prev => 
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    const currentIds = filteredUsers.map(u => u.id);
+    if (selectedUserIds.length === currentIds.length) {
+      setSelectedUserIds([]);
+    } else {
+      setSelectedUserIds(currentIds);
+    }
+  };
+
+  const handleBulkAction = async (type: 'role' | 'activate' | 'deactivate') => {
+    setActionLoading('bulk');
+    try {
+       for (const userId of selectedUserIds) {
+          if (type === 'role' && bulkRole) {
+             await updateUserRole(userId, bulkRole as UserRole);
+          } else if (type === 'activate') {
+             await updateUserStatus(userId, 'approved', true);
+          } else if (type === 'deactivate') {
+             await updateUserStatus(userId, 'inactive', false);
+          }
+       }
+       await fetchUsers();
+
+       // Log Bulk Activity
+       await logActivity('BULK_USER_ACTION', {
+          type: 'PRIVILEGE',
+          message: `Admin ${authUser?.email} performed bulk ${type} on ${selectedUserIds.length} users`,
+          adminUid: authUser?.uid,
+          affectedUserIds: selectedUserIds,
+          actionType: type,
+          ...(type === 'role' && { newRole: bulkRole })
+       });
+
+       setSelectedUserIds([]);
+       setShowBulkModal(false);
+       alert(`Bulk ${type} complete for ${selectedUserIds.length} users.`);
+    } catch (error) {
+       console.error('Bulk action failed:', error);
+       alert('Bulk action failed. Check logs.');
+    } finally {
+       setActionLoading(null);
     }
   };
 
@@ -154,10 +229,68 @@ function AdminUsersPage() {
             </div>
          </div>
 
+         {/* Bulk Actions Bar */}
+         <AnimatePresence>
+            {selectedUserIds.length > 0 && (
+               <motion.div 
+                  initial={{ y: 50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 50, opacity: 0 }}
+                  className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-6"
+               >
+                  <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl flex items-center justify-between border border-white/10 backdrop-blur-xl">
+                     <div className="flex items-center gap-6">
+                        <div className="bg-[#1ea05f] text-white w-12 h-12 rounded-2xl flex items-center justify-center font-black">
+                           {selectedUserIds.length}
+                        </div>
+                        <div>
+                           <p className="text-sm font-black uppercase tracking-widest italic">Users Highlighted</p>
+                           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Global Protocol Intervention Active</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-3">
+                        <button 
+                           onClick={() => setShowBulkModal(true)}
+                           className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                        >
+                           Change Privilege
+                        </button>
+                        <button 
+                           onClick={() => handleBulkAction('activate')}
+                           className="px-6 py-3 bg-[#1ea05f] hover:bg-[#15804a] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                        >
+                           Bulk Activate
+                        </button>
+                        <button 
+                           onClick={() => handleBulkAction('deactivate')}
+                           className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                        >
+                           Bulk Deactivate
+                        </button>
+                        <button 
+                           onClick={() => setSelectedUserIds([])}
+                           className="p-3 text-slate-400 hover:text-white transition-all"
+                        >
+                           <FiX size={20} />
+                        </button>
+                     </div>
+                  </div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
          <div className="overflow-x-auto min-h-[400px]">
             <table className="w-full text-left border-collapse">
                <thead>
                   <tr className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                     <th className="px-10 py-6 w-10">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedUserIds.length === filteredUsers.length && filteredUsers.length > 0}
+                          onChange={toggleSelectAll}
+                          className="w-5 h-5 rounded-lg border-slate-300 text-[#1ea05f] focus:ring-[#1ea05f]/20 cursor-pointer"
+                        />
+                     </th>
                      <th className="px-10 py-6">Operator Identity</th>
                      <th className="px-10 py-6">Privilege Rank</th>
                      <th className="px-10 py-6">System Status</th>
@@ -171,8 +304,16 @@ function AdminUsersPage() {
                         key={user.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="group hover:bg-slate-50/30 transition-all"
+                        className={`group hover:bg-slate-50/30 transition-all ${selectedUserIds.includes(user.id) ? 'bg-[#1ea05f]/5' : ''}`}
                       >
+                         <td className="px-10 py-8">
+                            <input 
+                              type="checkbox" 
+                              checked={selectedUserIds.includes(user.id)}
+                              onChange={() => toggleSelectUser(user.id)}
+                              className="w-5 h-5 rounded-lg border-slate-300 text-[#1ea05f] focus:ring-[#1ea05f]/20 cursor-pointer"
+                            />
+                         </td>
                          <td className="px-10 py-8">
                             <div className="flex items-center gap-5">
                                <div className="w-14 h-14 rounded-3xl bg-slate-100 flex items-center justify-center text-[#1ea05f] font-black text-lg border border-slate-200 group-hover:border-[#1ea05f]/30 transition-all shadow-sm">
@@ -270,6 +411,57 @@ function AdminUsersPage() {
                </tbody>
             </table>
          </div>
+
+         {/* Bulk Role Modal */}
+         <AnimatePresence>
+            {showBulkModal && (
+               <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+                  <motion.div 
+                     initial={{ scale: 0.9, opacity: 0 }}
+                     animate={{ scale: 1, opacity: 1 }}
+                     className="bg-white rounded-[3rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden"
+                  >
+                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#1ea05f] to-[#3b82f6]" />
+                     <h3 className="text-2xl font-black text-slate-800 tracking-tight uppercase italic mb-2">Mass Privilege Shift</h3>
+                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-8">Reclassifying {selectedUserIds.length} operators</p>
+                     
+                     <div className="space-y-4">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Select New Rank</label>
+                        <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2">
+                           {Object.values(UserRole).map((role) => (
+                              <button 
+                                 key={role}
+                                 onClick={() => setBulkRole(role)}
+                                 className={`p-4 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-left flex items-center justify-between ${
+                                    bulkRole === role ? 'border-[#1ea05f] bg-[#1ea05f]/5 text-[#1ea05f]' : 'border-slate-100 text-slate-600 hover:border-slate-200'
+                                 }`}
+                              >
+                                 {role.replace('_', ' ')}
+                                 {bulkRole === role && <FiCheck />}
+                              </button>
+                           ))}
+                        </div>
+                     </div>
+
+                     <div className="flex gap-4 mt-10">
+                        <button 
+                           onClick={() => setShowBulkModal(false)}
+                           className="flex-1 py-4 bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-100 transition-all"
+                        >
+                           Cancel
+                        </button>
+                        <button 
+                           onClick={() => handleBulkAction('role')}
+                           disabled={!bulkRole || actionLoading === 'bulk'}
+                           className="flex-1 py-4 bg-[#1ea05f] text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all disabled:opacity-50"
+                        >
+                           {actionLoading === 'bulk' ? <FiRefreshCw className="animate-spin mx-auto" /> : 'Confirm Update'}
+                        </button>
+                     </div>
+                  </motion.div>
+               </div>
+            )}
+         </AnimatePresence>
       </div>
     </div>
   );

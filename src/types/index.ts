@@ -278,3 +278,28 @@ export interface NavItem {
   href: string;
   subItems?: NavItem[];
 }
+
+// Payment Interface Definitions (Phase 4)
+export type PaymentProcessStatus = 'pending' | 'success' | 'failed' | 'refunded';
+
+export interface PaymentRequest {
+  amount: number;
+  currency: string;
+  donorEmail: string;
+  donorPhone: string;
+  causeId?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  transactionId?: string;
+  message: string;
+  errorCode?: string;
+}
+
+export interface PaymentProvider {
+  initiatePayment(request: PaymentRequest): Promise<PaymentResponse>;
+  verifyTransaction(transactionId: string): Promise<PaymentResponse>;
+  getPaymentStatus(transactionId: string): Promise<PaymentProcessStatus>;
+}

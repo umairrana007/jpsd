@@ -567,12 +567,17 @@ export const searchUsers = async (searchTerm: string) => {
   }
 };
 
-export const logActivity = async (activity: { type: string, message: string, userId?: string, icon?: string }) => {
+
+// Activity Logging Enhanced (Phase 4)
+export const logActivity = async (activityOrAction: string | any, metadata: any = {}) => {
+  if (!isDBAvailable()) return null;
+  
   try {
-    await addDoc(collection(getDb(), 'activity_logs'), {
-      ...activity,
-      timestamp: Timestamp.now()
-    });
+    const data = typeof activityOrAction === 'string' 
+      ? { action: activityOrAction, ...metadata, timestamp: Timestamp.now() }
+      : { ...activityOrAction, timestamp: Timestamp.now() };
+
+    await addDoc(collection(getDb(), 'activity_logs'), data);
   } catch (error) {
     console.error('Error logging activity:', error);
   }
@@ -598,6 +603,28 @@ export const getRecentActivity = async () => {
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error('Activity Stream Failed:', error);
+    return [];
+  }
+};
+
+// Activity Logging Enhanced (Phase 4)
+export const getActivityLogs = async (limitCount: number = 100) => {
+  if (!isDBAvailable()) return [];
+  
+  try {
+    const logsQuery = query(
+      collection(getDb(), 'activity_logs'),
+      orderBy('timestamp', 'desc'),
+      limit(limitCount)
+    );
+    const snapshot = await getDocs(logsQuery);
+    return snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data(),
+      timestamp: (doc.data().timestamp as Timestamp)?.toDate() 
+    }));
+  } catch (error) {
+    console.error('Error getting activity logs:', error);
     return [];
   }
 };
