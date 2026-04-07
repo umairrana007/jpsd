@@ -5,10 +5,15 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { FiUsers, FiHeart, FiClock, FiCheck } from 'react-icons/fi';
+import { FiUsers, FiHeart, FiClock, FiCheck, FiLoader } from 'react-icons/fi';
+import { submitVolunteerApplication } from '@/lib/firebaseUtils';
+import { useRouter } from 'next/navigation';
 
 export default function VolunteerPage() {
   const { t } = useLanguage();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,21 +27,43 @@ export default function VolunteerPage() {
     community: '', // Community-Biradri
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for registering as a volunteer! We will contact you soon.');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      cnic: '',
-      address: '',
-      skills: '',
-      availability: 'weekends',
-      experience: '',
-      emergencyContact: '',
-      community: '',
-    });
+    setLoading(true);
+    try {
+      await submitVolunteerApplication({
+        ...formData,
+        address: {
+          city: formData.address, // Simplifying for the form
+          province: 'Sindh' // Default
+        },
+        skills: formData.skills.split(',').map(s => s.trim()),
+        availability: {
+          days: [formData.availability],
+          hours: 'Flexible'
+        },
+        emergencyContact: {
+          name: 'Contact',
+          phone: formData.emergencyContact,
+          relation: 'Specified'
+        },
+        community: formData.community
+      } as any);
+      
+      setSuccess(true);
+      setFormData({
+        name: '', email: '', phone: '', cnic: '',
+        address: '', skills: '', availability: 'weekends',
+        experience: '', emergencyContact: '', community: '',
+      });
+      
+      // Optional: Redirect or scroll to top
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert('Application submission failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -343,9 +370,24 @@ export default function VolunteerPage() {
                 </ul>
               </div>
 
-              <Button type="submit" variant="primary" size="lg" className="w-full">
-                Submit Application
-              </Button>
+              {success ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-emerald-50 border border-emerald-100 p-8 rounded-2xl text-center space-y-4"
+                >
+                  <div className="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-lg shadow-emerald-200">
+                    <FiCheck />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">Mission Accepted</h3>
+                  <p className="text-slate-600 font-medium">Your application is in the satellite link. Our commanders will review your profile and contact you within 48 hours for onboarding.</p>
+                  <Button onClick={() => setSuccess(false)} variant="outline" className="mt-4">Register Another</Button>
+                </motion.div>
+              ) : (
+                <Button type="submit" variant="primary" size="lg" className="w-full h-16 !rounded-2xl !bg-[#1ea05f] hover:!bg-[#198a51] shadow-xl shadow-[#1ea05f]/20 transition-all active:scale-95 disabled:opacity-50" disabled={loading}>
+                  {loading ? <FiLoader className="animate-spin text-2xl" /> : 'DEPLOY AS VOLUNTEER'}
+                </Button>
+              )}
 
               <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                  <p className="text-sm text-[#27ae60] font-bold uppercase tracking-widest flex items-center justify-center gap-2">

@@ -185,6 +185,7 @@ export interface Volunteer {
   rating: number;
   badges: string[];
   status: 'pending' | 'approved' | 'rejected' | 'inactive';
+  community?: string;
   joinedAt: Date;
 }
 
