@@ -10,6 +10,8 @@ import {
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
+import { UserRole } from '@/types';
 
 export default function DonorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,7 +27,8 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#f9f9fb] font-sans text-slate-800" dir="ltr">
+    <ProtectedRoute allowedRoles={[UserRole.DONOR, UserRole.ADMIN]}>
+      <div className="flex min-h-screen bg-[#f9f9fb] font-sans text-slate-800" dir="ltr">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 border-r border-slate-200/50 bg-white/80 backdrop-blur-xl h-screen p-6 sticky top-0 overflow-y-auto">
         <div className="mb-10 px-2 pt-4 flex flex-col items-center text-center">
@@ -161,6 +164,7 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
           </>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

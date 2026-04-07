@@ -68,6 +68,16 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  const getDashboardLink = () => {
+    if (!currentUserData?.role) return '/dashboard';
+    switch (currentUserData.role) {
+      case 'admin': return '/admin/dashboard';
+      case 'volunteer': return '/volunteer/dashboard';
+      case 'donor': return '/donor/dashboard';
+      default: return '/dashboard';
+    }
+  };
+
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
@@ -205,7 +215,7 @@ export const Navbar: React.FC = () => {
                         <p className="text-[12px] font-black text-slate-800 truncate">{(currentUserData?.name || user?.displayName) || user?.email}</p>
                       </div>
                       <div className="grid gap-1">
-                        <Link href="/dashboard" className={`flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-slate-600 text-[12px] font-bold ${isUrdu ? 'flex-row-reverse' : ''}`}>
+                        <Link href={getDashboardLink()} className={`flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-slate-600 text-[12px] font-bold ${isUrdu ? 'flex-row-reverse' : ''}`}>
                           <FiLayout className="text-[#1ea05f]" />
                           <span className={isUrdu ? 'urdu-text' : ''}>{t('nav.dashboard')}</span>
                         </Link>

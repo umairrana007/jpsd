@@ -11,6 +11,8 @@ import {
   updateProfile,
   sendPasswordResetEmail,
   sendEmailVerification,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, Firestore } from 'firebase/firestore';
@@ -22,6 +24,7 @@ interface AuthContextType {
   loading: boolean;
   currentUserData: any | null;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (role?: UserRole) => Promise<void>;
   register: (email: string, password: string, name: string, role: UserRole, extraData?: any) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -144,9 +147,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userRef = doc(db as Firestore, 'users', result.user.uid);
       const userSnap = await getDoc(userRef);
       
+      const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
+      const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email || '');
+
       if (userSnap.exists()) {
         const data = userSnap.data();
-        if (data.isActive === false) {
+        if (data.isActive === false && !isSuperAdminEmail) {
           await signOut(auth as Auth);
           throw new Error('Your account is currently pending approval by an administrator.');
         }
@@ -155,6 +161,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error: any) {
       throw new Error(error.message || 'Failed to login');
+    }
+  };
+
+
+  const loginWithGoogle = async (preferredRole: UserRole = UserRole.DONOR) => {
+    if (!isFirebaseConfigured || !auth || !db) {
+      throw new Error('Authentication system is currently offline. Please check your environment variables.');
+    }
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth as Auth, provider);
+      const userRef = doc(db as Firestore, 'users', result.user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
+      const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(result.user.email || '');
+
+      if (!userSnap.exists()) {
+        // New Google User
+        const role = isSuperAdminEmail ? UserRole.ADMIN : preferredRole;
+        const autoApprove = role === UserRole.DONOR || isSuperAdminEmail;
+
+        await setDoc(userRef, {
+          email: result.user.email,
+          name: result.user.displayName || '',
+          photoURL: result.user.photoURL || '',
+          role: role,
+          isActive: autoApprove,
+          status: autoApprove ? 'approved' : 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastLogin: new Date(),
+          permissions: isSuperAdminEmail ? ['*'] : [],
+        });
+        
+        if (!autoApprove) {
+          await signOut(auth as Auth);
+          throw new Error('Selection committed. Identity verification pending Super Admin review.');
+        }
+      } else {
+        // Existing Google User
+        const data = userSnap.data();
+        if (data.isActive === false && !isSuperAdminEmail) {
+          await signOut(auth as Auth);
+          throw new Error('Your account is currently pending approval by an administrator.');
+        }
+        await updateDoc(userRef, { lastLogin: new Date() });
+      }
+      await logLoginActivity(result.user.uid, result.user.email || 'google-user');
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') return;
+      throw new Error(error.message || 'Failed to login with Google');
     }
   };
 
@@ -245,9 +304,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Super Admin Fallback (Hardcoded UID or Env Var)
-  const SUPER_ADMIN_UIDS = [process.env.NEXT_PUBLIC_SUPER_ADMIN_UID || ''];
-  const isSuperAdmin = user ? (SUPER_ADMIN_UIDS.includes(user.uid) || currentUserData?.role === UserRole.ADMIN) : false;
+  // Super Admin Fallback (Hardcoded Identity)
+  const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
+  const isSuperAdmin = user ? (SUPER_ADMIN_EMAILS.includes(user.email || '') || currentUserData?.role === UserRole.ADMIN) : false;
 
   const isAdmin = currentUserData?.role === UserRole.ADMIN || isSuperAdmin;
   const isContentManager = currentUserData?.role === UserRole.CONTENT_MANAGER;
@@ -259,6 +318,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     currentUserData,
     login,
+    loginWithGoogle,
     register,
     logout,
     resetPassword,

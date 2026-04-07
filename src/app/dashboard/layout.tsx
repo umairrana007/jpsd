@@ -28,13 +28,19 @@ export default function UserDashboardLayout({
     setMounted(true);
   }, []);
 
-  const menuItems = [
+  const baseMenuItems = [
     { label: isUrdu ? 'اوور ویو' : 'Overview', icon: <FiPieChart />, href: '/dashboard' },
     { label: isUrdu ? 'تاریخی عطیات' : 'Mission History', icon: <FiHeart />, href: '/dashboard/donations' },
     { label: isUrdu ? 'محفوظ کردہ مہمات' : 'Mission Archives', icon: <FiActivity />, href: '/dashboard/causes' },
-    { label: isUrdu ? 'رضاکارانہ پورٹل' : 'Volunteer Force', icon: <FiUser />, href: '/dashboard/volunteer' },
     { label: isUrdu ? 'سیٹنگز' : 'Settings', icon: <FiSettings />, href: '/dashboard/settings' },
   ];
+
+  const menuItems = [...baseMenuItems];
+
+  // Specific Role Visibility
+  if (currentUserData?.role === 'volunteer') {
+    menuItems.splice(3, 0, { label: isUrdu ? 'رضاکارانہ پورٹل' : 'Volunteer Force', icon: <FiUser />, href: '/dashboard/volunteer' });
+  }
 
   if (currentUserData?.role === 'admin') {
     menuItems.push({ label: isUrdu ? 'ایڈمن پینل' : 'Admin Panel', icon: <FiShield />, href: '/dashboard/admin' });

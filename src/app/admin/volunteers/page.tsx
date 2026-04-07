@@ -4,11 +4,14 @@ import React, { useState } from 'react';
 import { 
   FiUsers, FiUserCheck, FiClock, FiSearch, 
   FiFilter, FiEye, FiUserPlus, FiMoreHorizontal,
-  FiMapPin, FiActivity, FiAward
+  FiMapPin, FiActivity, FiAward, FiRefreshCw,
+  FiCheck, FiX, FiMoreVertical
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { withAuth } from '@/components/admin/withAuth';
-import { UserRole } from '@/types';
+import { UserRole, Volunteer } from '@/types';
+import { getVolunteers, updateVolunteer } from '@/lib/firebaseUtils';
+import { format } from 'date-fns';
 
 const volunteersData = [
   { id: 1, name: 'Sarah Chen', email: 'sarah.c@example.org', skills: ['Medical', 'Spanish'], status: 'Verified', hours: '142h', image: 'S' },
@@ -18,7 +21,45 @@ const volunteersData = [
 ];
 
 function AdminVolunteersPage() {
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedVolunteer, setSelectedVolunteer] = useState<any>(null);
+
+  React.useEffect(() => {
+    fetchVolunteers();
+  }, []);
+
+  const fetchVolunteers = async () => {
+    setLoading(true);
+    const data = await getVolunteers();
+    setVolunteers(data);
+    setLoading(false);
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    await updateVolunteer(id, { status: newStatus as any });
+    await fetchVolunteers();
+  };
+
+  const filteredVolunteers = volunteers.filter(vol => {
+    const matchesSearch = 
+      (vol.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      vol.email?.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesFilter = 
+      filterStatus === 'all' ? true : 
+      vol.status === filterStatus;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const stats = {
+    total: volunteers.length,
+    pending: volunteers.filter(v => v.status === 'pending').length,
+    active: volunteers.filter(v => v.status === 'approved').length
+  };
 
   return (
     <div className="space-y-8">
@@ -28,18 +69,26 @@ function AdminVolunteersPage() {
           <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Volunteer Force</h2>
           <p className="text-slate-500 font-medium">Coordinate, approve and assign tasks to your humanitarian team.</p>
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all">
-          <FiUserPlus />
-          <span>Onboard Volunteer</span>
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={fetchVolunteers}
+            className="p-3 bg-white text-[#1ea05f] rounded-2xl border border-slate-200 shadow-sm hover:rotate-180 transition-all duration-500"
+          >
+            <FiRefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+          </button>
+          <button className="flex items-center gap-2 px-6 py-3 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all uppercase text-[10px] tracking-widest">
+            <FiUserPlus />
+            <span>Onboard Volunteer</span>
+          </button>
+        </div>
       </header>
 
       {/* KPI Stats */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Total Active Force', val: '12,842', trend: '+14%', icon: <FiUsers size={24} />, color: 'bg-[#1ea05f]', light: 'bg-[#1ea05f]/10', text: 'text-[#1ea05f]' },
-          { label: 'Pending Onboarding', val: '184', sub: 'Immediate Attention Needed', icon: <FiClock size={24} />, color: 'bg-amber-500', light: 'bg-amber-500/10', text: 'text-amber-500' },
-          { label: 'Field Deployments', val: '2,410', sub: 'Active mission in 42 zones', icon: <FiActivity size={24} />, color: 'bg-blue-500', light: 'bg-blue-500/10', text: 'text-blue-500' },
+          { label: 'Total Active Force', val: stats.total.toLocaleString(), trend: '+14%', icon: <FiUsers size={24} />, color: 'bg-[#1ea05f]', light: 'bg-[#1ea05f]/10', text: 'text-[#1ea05f]' },
+          { label: 'Pending Onboarding', val: stats.pending, sub: 'Immediate Attention Needed', icon: <FiClock size={24} />, color: 'bg-amber-500', light: 'bg-amber-500/10', text: 'text-amber-500' },
+          { label: 'Field Deployments', val: stats.active, sub: 'Live Operational Assets', icon: <FiActivity size={24} />, color: 'bg-blue-500', light: 'bg-blue-500/10', text: 'text-blue-500' },
         ].map((stat, i) => (
           <div key={i} className="bg-white/80 backdrop-blur-md p-7 md:p-9 rounded-[2.5rem] border border-white shadow-sm flex flex-col gap-8 group hover:shadow-xl hover:shadow-slate-200/50 transition-all min-h-max h-full">
              <div className="flex justify-between items-start">
@@ -69,17 +118,28 @@ function AdminVolunteersPage() {
         <div className="p-8 border-b border-slate-50 flex flex-wrap items-center justify-between gap-6">
            <div className="flex-1 min-w-[300px] relative">
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="text" placeholder="Search by name, skills or email..." className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20" />
+            <input 
+              type="text" 
+              placeholder="Search by name, capabilities or hash..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 transition-all outline-none" 
+            />
            </div>
            <div className="flex gap-4">
               <button className="px-6 py-3 bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-all flex items-center gap-2">
                  <FiFilter /> Filter
               </button>
-              <select className="bg-transparent border-none text-[10px] font-black text-slate-800 uppercase tracking-widest focus:ring-0 cursor-pointer">
-                 <option>Recently Added</option>
-                 <option>Highest Impact</option>
-                 <option>Skill Match</option>
-              </select>
+               <select 
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="bg-transparent border-none text-[10px] font-black text-slate-800 uppercase tracking-widest focus:ring-0 cursor-pointer"
+               >
+                 <option value="all">All Operators</option>
+                 <option value="approved">Approved Only</option>
+                 <option value="pending">Pending Review</option>
+                 <option value="inactive">Inactive</option>
+               </select>
            </div>
         </div>
 
@@ -94,54 +154,78 @@ function AdminVolunteersPage() {
                     <th className="px-8 py-5 text-right">Administrative</th>
                  </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                 {volunteersData.map((vol) => (
-                   <tr key={vol.id} className="group hover:bg-slate-50/50 transition-all cursor-pointer" onClick={() => setSelectedVolunteer(vol)}>
-                      <td className="px-8 py-6">
-                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1ea05f] to-[#15804a] text-white flex items-center justify-center font-black text-xl shadow-lg shadow-[#1ea05f]/20">
-                               {vol.image}
-                            </div>
-                            <div>
-                               <p className="text-base font-black text-slate-800 tracking-tight">{vol.name}</p>
-                               <p className="text-[10px] text-slate-400 font-bold tracking-widest">{vol.email}</p>
-                            </div>
-                         </div>
+               <tbody className="divide-y divide-slate-50">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={5} className="py-20 text-center animate-pulse">
+                        <FiRefreshCw className="mx-auto mb-4 animate-spin text-[#1ea05f]" size={32} />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Querying Satellite Link...</p>
                       </td>
-                      <td className="px-8 py-6">
-                         <div className="flex flex-wrap gap-1.5">
-                            {vol.skills.map((skill, i) => (
-                              <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 text-[9px] font-black uppercase rounded-lg tracking-tighter">
-                                {skill}
-                              </span>
-                            ))}
-                         </div>
+                    </tr>
+                  ) : filteredVolunteers.length > 0 ? (
+                    filteredVolunteers.map((vol) => (
+                    <tr key={vol.id} className="group hover:bg-slate-50/50 transition-all cursor-pointer" onClick={() => setSelectedVolunteer(vol)}>
+                       <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1ea05f] to-[#15804a] text-white flex items-center justify-center font-black text-xl shadow-lg shadow-[#1ea05f]/20">
+                                {vol.name?.charAt(0) || vol.email?.charAt(0) || 'V'}
+                             </div>
+                             <div>
+                                <p className="text-base font-black text-slate-800 tracking-tight">{vol.name}</p>
+                                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">{vol.email}</p>
+                             </div>
+                          </div>
+                       </td>
+                       <td className="px-8 py-6">
+                          <div className="flex flex-wrap gap-1.5">
+                             {(vol.skills || ['Generalist']).map((skill, i) => (
+                               <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 text-[9px] font-black uppercase rounded-lg tracking-tighter">
+                                 {skill}
+                               </span>
+                             ))}
+                          </div>
+                       </td>
+                       <td className="px-8 py-6">
+                          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            vol.status === 'approved' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 
+                            vol.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${vol.status === 'approved' ? 'bg-[#1ea05f]' : vol.status === 'pending' ? 'bg-amber-500 animate-pulse' : 'bg-red-500'}`}></span>
+                            {vol.status || 'Pending'}
+                          </span>
+                       </td>
+                       <td className="px-8 py-6 font-black text-slate-800 text-sm italic">
+                          {vol.hoursLogged || 0}h
+                       </td>
+                       <td className="px-8 py-6 text-right">
+                          <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                             {vol.status === 'pending' ? (
+                               <>
+                                 <button onClick={() => handleStatusUpdate(vol.id!, 'approved')} className="p-2.5 text-[#1ea05f] hover:bg-[#1ea05f]/10 transition-all rounded-xl border border-slate-100 bg-white">
+                                   <FiCheck size={16} strokeWidth={3} />
+                                 </button>
+                                 <button onClick={() => handleStatusUpdate(vol.id!, 'rejected')} className="p-2.5 text-red-500 hover:bg-red-50 transition-all rounded-xl border border-slate-100 bg-white">
+                                   <FiX size={16} strokeWidth={3} />
+                                 </button>
+                               </>
+                             ) : (
+                               <button className="p-2.5 text-slate-400 hover:text-[#1ea05f] hover:bg-white transition-all rounded-xl border border-slate-100 bg-slate-50/50">
+                                 <FiMoreHorizontal size={18} />
+                               </button>
+                             )}
+                          </div>
+                       </td>
+                    </tr>
+                   ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="py-24 text-center">
+                        <FiUsers className="mx-auto mb-4 text-slate-200" size={56} />
+                        <p className="text-sm font-black text-slate-400 uppercase tracking-widest italic">No personnel found in current mission sector.</p>
                       </td>
-                      <td className="px-8 py-6">
-                         <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                           vol.status === 'Verified' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 
-                           vol.status === 'On Duty' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
-                         }`}>
-                           <span className={`w-1.5 h-1.5 rounded-full ${vol.status === 'Verified' ? 'bg-[#1ea05f]' : vol.status === 'On Duty' ? 'bg-blue-500 animate-pulse' : 'bg-amber-500'}`}></span>
-                           {vol.status}
-                         </span>
-                      </td>
-                      <td className="px-8 py-6 font-black text-slate-800 text-sm">
-                         {vol.hours}
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                         <div className="flex justify-end gap-2">
-                            <button className="p-2 text-slate-400 hover:text-[#1ea05f] transition-all bg-slate-50 rounded-xl border border-slate-100">
-                               <FiEye size={18} />
-                            </button>
-                            <button className="p-2 text-slate-400 hover:text-blue-500 transition-all bg-slate-50 rounded-xl border border-slate-100">
-                               <FiActivity size={18} />
-                            </button>
-                         </div>
-                      </td>
-                   </tr>
-                 ))}
-              </tbody>
+                    </tr>
+                  )}
+               </tbody>
            </table>
         </div>
       </div>

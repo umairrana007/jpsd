@@ -1,27 +1,74 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  FiClock, FiHeart, FiFileText, FiArrowRight, 
+import { FiClock, FiHeart, FiFileText, FiArrowRight, 
   FiDownload, FiShare2, FiStar, FiZap,
   FiUser, FiBell, FiShield, FiGlobe,
-  FiMinus, FiPlus, FiGrid, FiActivity
+  FiMinus, FiPlus, FiGrid, FiActivity, FiSearch, FiRefreshCw
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateTaxReceipt } from '@/lib/pdfUtils';
+import { useAuth } from '@/contexts/AuthContext';
+import { getUserDonations } from '@/lib/firebaseUtils';
+import { useEffect } from 'react';
+import { format } from 'date-fns';
 
 export default function DonorDashboardPage() {
+  const { user, currentUserData } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications'>('profile');
+  const [donations, setDonations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchDonations();
+    }
+  }, [user]);
+
+  const fetchDonations = async () => {
+    setLoading(true);
+    const data = await getUserDonations(user!.uid);
+    setDonations(data);
+    setLoading(false);
+  };
+
+  const totals = donations.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const livesSustained = Math.ceil(totals / 2000); // Metric: ~2000 PKR sustains a life/ration pack
 
   const handleDownloadReceipt = (txn: any) => {
     generateTaxReceipt({
-      id: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      donorName: 'Muhammad Umair',
-      email: 'umair@JPSD.ngo',
-      phone: '+92 300 1234567',
-      amount: parseInt(txn.amount.replace(',', '')),
-      causeName: txn.cause
+      id: txn.id.substring(0, 8).toUpperCase(),
+      donorName: currentUserData?.name || user?.displayName || 'Donor',
+      email: user?.email || '',
+      phone: currentUserData?.phone || '',
+      amount: txn.amount,
+      causeName: txn.causeTitle || 'General Fund'
     });
+  };
+
+  const handleExportCSV = () => {
+    if (donations.length === 0) return;
+    
+    const headers = ['ID', 'Cause', 'Amount', 'Status', 'Date', 'Type'];
+    const rows = donations.map(d => [
+      d.id,
+      d.causeTitle || 'General',
+      d.amount,
+      d.status,
+      d.createdAt ? format(d.createdAt, 'MMM d, yyyy') : 'N/A',
+      d.type || 'Sadaqah'
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers, ...rows].map(e => e.join(",")).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Donations_${user?.uid.substring(0, 5)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -36,14 +83,14 @@ export default function DonorDashboardPage() {
             </p>
          </div>
          <div className="relative z-10 flex gap-6 mt-4 md:mt-0">
-            <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
-               <p className="text-[10px] font-black uppercase tracking-widest text-[#1ea05f] mb-3 border-b border-[#1ea05f]/20 pb-2">Lives Sustained</p>
-               <p className="text-3xl font-black italic leading-none">248</p>
-            </div>
-            <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
-               <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-3 border-b border-blue-400/20 pb-2">Impact Score</p>
-               <p className="text-3xl font-black italic leading-none">9.2</p>
-            </div>
+             <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#1ea05f] mb-3 border-b border-[#1ea05f]/20 pb-2">Lives Sustained</p>
+                <p className="text-3xl font-black italic leading-none">{livesSustained}</p>
+             </div>
+             <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2.5rem] min-w-[120px] shadow-2xl shadow-black/20">
+                <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-3 border-b border-blue-400/20 pb-2">Impact Score</p>
+                <p className="text-3xl font-black italic leading-none">{(donations.length * 0.5).toFixed(1)}</p>
+             </div>
          </div>
       </header>
 
@@ -74,7 +121,7 @@ export default function DonorDashboardPage() {
                     <h4 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Total Legacy</h4>
                     <p className="text-sm font-medium text-slate-500 mt-1">Accumulated life-time contributions.</p>
                  </div>
-                 <p className="text-3xl font-black text-slate-900">PKR 482,450</p>
+                  <p className="text-3xl font-black text-slate-900">PKR {totals.toLocaleString()}</p>
                  <button className="flex items-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-widest hover:translate-x-1 transition-transform">View Full Summary <FiArrowRight /></button>
               </div>
            </div>
@@ -86,37 +133,54 @@ export default function DonorDashboardPage() {
                     <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Sacred Transactions</h3>
                     <p className="text-sm font-bold text-slate-400 mt-1">Your recent financial contributions to the foundation.</p>
                  </div>
-                 <button className="px-6 py-3 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all">Consolidated PDF</button>
+                  <button 
+                    onClick={handleExportCSV}
+                    disabled={donations.length === 0}
+                    className="px-6 py-3 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all disabled:opacity-30"
+                  >
+                    Consolidated CSV
+                  </button>
               </div>
 
-              <div className="space-y-4">
-                {[
-                  { cause: 'Gaza Emergency Relief', date: 'Oct 12, 2025', amount: '25,000', status: 'verified', type: 'Zakat' },
-                  { cause: 'Clean Water Project', date: 'Sep 28, 2025', amount: '5,000', status: 'verified', type: 'Sadaqah' },
-                  { cause: 'Medical Camp - Thar', date: 'Sep 15, 2025', amount: '12,500', status: 'delayed', type: 'Zakat' },
-                ].map((txn, i) => (
-                  <div key={i} className="flex items-center gap-6 p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all group">
-                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs ${txn.type === 'Zakat' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'bg-blue-500/10 text-blue-500'}`}>
-                        {txn.type[0]}
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-sm font-black text-slate-800 italic uppercase truncate max-w-[180px]">{txn.cause}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{txn.date}</p>
-                     </div>
-                     <div className="text-right">
-                        <p className="text-sm font-black text-slate-800 italic italic">PKR {txn.amount}</p>
-                        <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${txn.status === 'verified' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
-                           {txn.status}
-                        </span>
-                     </div>
-                     <button 
-                        onClick={() => handleDownloadReceipt(txn)}
-                        className="w-10 h-10 border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:bg-[#1ea05f] hover:text-white transition-all group-hover:scale-105"
-                      >
-                        <FiDownload />
-                     </button>
+               <div className="space-y-4">
+                {loading ? (
+                  <div className="py-20 text-center animate-pulse">
+                    <FiRefreshCw className="mx-auto mb-4 animate-spin text-[#1ea05f]" size={32} />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Syncing with HQ...</p>
                   </div>
-                ))}
+                ) : donations.length > 0 ? (
+                  donations.map((txn, i) => (
+                    <div key={txn.id || i} className="flex items-center gap-6 p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all group animate-in fade-in slide-in-from-bottom-2">
+                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs ${txn.type === 'Zakat' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'bg-blue-500/10 text-blue-500'}`}>
+                          {(txn.type || 'S')[0]}
+                       </div>
+                       <div className="flex-1">
+                          <p className="text-sm font-black text-slate-800 italic uppercase truncate max-w-[180px]">{txn.causeTitle || 'General Fund'}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                            {txn.createdAt ? format(txn.createdAt, 'MMM d, yyyy') : 'Recently'}
+                          </p>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-sm font-black text-slate-800 italic">PKR {txn.amount?.toLocaleString()}</p>
+                          <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${txn.status === 'verified' || txn.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
+                             {txn.status}
+                          </span>
+                       </div>
+                       <button 
+                          onClick={() => handleDownloadReceipt(txn)}
+                          className="w-10 h-10 border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:bg-[#1ea05f] hover:text-white transition-all group-hover:scale-105"
+                        >
+                          <FiDownload />
+                       </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+                    <FiHeart className="mx-auto mb-4 text-slate-200" size={48} />
+                    <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No transactions recorded yet.</p>
+                    <button className="mt-4 text-[#1ea05f] font-black text-[10px] uppercase tracking-widest hover:underline italic">Initialize first impact</button>
+                  </div>
+                )}
               </div>
            </section>
         </div>

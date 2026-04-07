@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { FaGoogle } from 'react-icons/fa';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Link from 'next/link';
 
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const router = useRouter();
   const { t, language } = useLanguage();
   const isUrdu = language === 'ur';
@@ -23,8 +24,21 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const userCredential = await login(email, password);
+      await login(email, password);
       router.push('/dashboard'); 
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -138,6 +152,25 @@ export default function LoginPage() {
                   <FiArrowRight className={`group-hover:translate-x-1 transition-transform ${isUrdu ? 'rotate-180' : ''}`} />
                 </>
               )}
+            </button>
+
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+              <div className="relative flex justify-center text-[10px] uppercase font-bold"><span className="bg-[#0f172a] px-4 text-slate-500 tracking-[0.2em]">{isUrdu ? 'یا' : 'OR'}</span></div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full py-4.5 bg-white text-slate-900 font-black rounded-2xl hover:bg-slate-100 transition-all flex items-center justify-center gap-4 group shadow-xl shadow-white/5 uppercase italic tracking-widest text-[11px]"
+            >
+              <div className="bg-white p-1 rounded-lg">
+                <FaGoogle className="text-[#4285F4] text-lg" />
+              </div>
+              <span className={isUrdu ? 'urdu-text' : ''}>
+                {isUrdu ? 'گوگل سے لاگ ان کریں' : 'Login with Google'}
+              </span>
             </button>
           </form>
 

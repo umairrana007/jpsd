@@ -67,7 +67,7 @@ export default function BilingualChatbot() {
   };
 
   return (
-    <div className="fixed bottom-32 right-12 z-[200]">
+    <div className="fixed bottom-8 right-8 z-[200]">
       <AnimatePresence>
         {!isOpen && (
           <motion.button

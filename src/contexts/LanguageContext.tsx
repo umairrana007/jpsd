@@ -247,6 +247,7 @@ const translations = {
     // Chatbot
     'chatbot.title': 'JPSD Assistant',
     'signup.title': 'Join the Mission',
+    'signup.joinMission': 'Join the Strategic Mission',
     'signup.subtitle': 'Help us reach those who need it most.',
     'signup.donor': 'Be a Donor',
     'signup.volunteer': 'Be a Volunteer',

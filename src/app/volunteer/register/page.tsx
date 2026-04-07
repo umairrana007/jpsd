@@ -11,7 +11,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-import { createVolunteer } from '@/lib/firebaseUtils';
+import { submitVolunteerApplication } from '@/lib/firebaseUtils';
 
 export default function VolunteerRegisterPage() {
   const [step, setStep] = useState(1);
@@ -36,17 +36,23 @@ export default function VolunteerRegisterPage() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    const volunteerId = await createVolunteer({
-      ...formData,
-      dob: new Date(formData.dob),
-      joinedAt: new Date()
-    });
-    
-    if (volunteerId) {
-      alert('Identity Induction committed. Deployment eligibility review pending HQ approval.');
-      window.location.href = '/volunteer/login';
+    try {
+      const volunteerId = await submitVolunteerApplication({
+        ...formData,
+        dob: new Date(formData.dob),
+        joinedAt: new Date()
+      });
+      
+      if (volunteerId) {
+        alert('Identity Induction committed. Deployment eligibility review pending HQ approval.');
+        window.location.href = '/volunteer/login';
+      }
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert('Application failed. Check frequency transmission.');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   const [newSkill, setNewSkill] = useState('');
