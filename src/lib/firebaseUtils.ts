@@ -252,7 +252,7 @@ export const getBlogPostById = async (id: string): Promise<BlogPost | null> => {
 };
 
 // Volunteer Operations
-export const createVolunteer = async (volunteerData: Partial<Volunteer>) => {
+export const submitVolunteerApplication = async (volunteerData: Partial<Volunteer>) => {
   try {
     const docRef = await addDoc(collection(getDb(), 'volunteers'), {
       ...volunteerData,
@@ -262,6 +262,13 @@ export const createVolunteer = async (volunteerData: Partial<Volunteer>) => {
       badges: [],
       joinedAt: Timestamp.now()
     });
+    
+    await logActivity({ 
+      type: 'VOLUNTEER_REGISTER', 
+      message: 'New volunteer application submitted', 
+      icon: '🙋' 
+    });
+
     return docRef.id;
   } catch (error) {
     console.error('Error creating volunteer:', error);
@@ -282,6 +289,20 @@ export const getVolunteers = async (): Promise<Volunteer[]> => {
   } catch (error) {
     console.error('Error getting volunteers:', error);
     return [];
+  }
+};
+
+export const updateVolunteer = async (volunteerId: string, updates: Partial<Volunteer>) => {
+  try {
+    const docRef = doc(getDb(), 'volunteers', volunteerId);
+    await updateDoc(docRef, {
+      ...updates,
+      updatedAt: Timestamp.now()
+    });
+    return true;
+  } catch (error) {
+    console.error('Error updating volunteer:', error);
+    throw error;
   }
 };
 
