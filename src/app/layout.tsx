@@ -7,6 +7,8 @@ import { FontLoader } from "@/components/ui/FontLoader";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import ClientMetadataUpdater from "@/components/ui/ClientMetadataUpdater";
+import { getGlobalConfig } from "@/lib/settings";
+import React from "react";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -28,15 +30,20 @@ export const metadata: Metadata = {
 
 import BilingualChatbot from "@/components/BilingualChatbot";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config = await getGlobalConfig();
+  const fontFamily = config.fontFamily || 'Inter';
+  const borderRadius = config.borderRadius || 12;
+
   return (
     <html
       lang="en"
       className={`${montserrat.variable} ${inter.variable} h-full antialiased`}
+      style={{ '--font-family': fontFamily, '--border-radius': `${borderRadius}px` } as React.CSSProperties}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-inter">

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   FiLayout, FiEye, FiSave, FiCheck, 
   FiRefreshCw, FiAlertCircle, FiType, 
-  FiMonitor, FiSmartphone, FiTable
+  FiMonitor, FiSmartphone, FiTable, FiChevronDown
 } from 'react-icons/fi';
 import { updateSiteSettings } from './actions';
 import { getGlobalConfig, SiteSettings } from '@/lib/settings';
@@ -27,6 +27,8 @@ function LayoutManagerPage() {
     donationsReceived: 0,
     volunteersCount: 0,
     programsCount: 0,
+    fontFamily: 'Inter',
+    borderRadius: 12,
   });
 
   useEffect(() => {
@@ -55,6 +57,8 @@ function LayoutManagerPage() {
         donationsReceived: Number(settings.donationsReceived) || 0,
         volunteersCount: Number(settings.volunteersCount) || 0,
         programsCount: Number(settings.programsCount) || 0,
+        fontFamily: settings.fontFamily || 'Inter',
+        borderRadius: Number(settings.borderRadius) || 12,
       });
 
       if (result.success) {
@@ -231,8 +235,53 @@ function LayoutManagerPage() {
                     />
                  </div>
               </div>
-           </section>
-        </div>
+            </section>
+
+            {/* Design Strategy Tokens */}
+            <section className="bg-white/70 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-sm space-y-10 mt-10">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
+                   <FiType size={24} />
+                 </div>
+                 <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase">Design Strategy Tokens</h3>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Global Font Family</label>
+                     <div className="relative">
+                        <select 
+                           value={settings.fontFamily || 'Inter'} 
+                           onChange={(e) => setSettings({...settings, fontFamily: e.target.value})}
+                           className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black text-slate-800 focus:ring-2 focus:ring-[#1ea05f]/20 transition-all outline-none appearance-none" 
+                        >
+                           <option value="Inter">Inter (Modern & Clean)</option>
+                           <option value="Montserrat">Montserrat (Premium & Bold)</option>
+                           <option value="Roboto">Roboto (Standard & Clear)</option>
+                           <option value="Noto Nastaliq Urdu">Noto Nastaliq Urdu (Traditional)</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                           <FiChevronDown />
+                        </div>
+                     </div>
+                  </div>
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Corner Roundness: {settings.borderRadius || 12}px</label>
+                     <div className="px-6 py-4 bg-slate-50 border-none rounded-2xl flex items-center gap-4">
+                        <input 
+                           type="range" 
+                           min="0" 
+                           max="40" 
+                           value={settings.borderRadius || 12} 
+                           onChange={(e) => setSettings({...settings, borderRadius: Number(e.target.value)})}
+                           className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1ea05f]" 
+                        />
+                        <span className="font-black text-slate-800 w-12 text-center text-xs">{settings.borderRadius || 12}px</span>
+                     </div>
+                  </div>
+               </div>
+            </section>
+         </div>
 
         {/* Live Status SideCard */}
         <div className="space-y-8">

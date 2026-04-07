@@ -21,6 +21,8 @@ export interface SiteSettings {
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  fontFamily?: string;
+  borderRadius?: number;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -39,6 +41,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
   contactEmail: 'info@jpsd.org.pk',
   contactPhone: '(+92) 21 34135826 - 29',
   address: 'Jamiyat House, 9 Faran Society, Hyder Ali Road, Karachi, Pakistan',
+  fontFamily: 'Inter',
+  borderRadius: 12,
 };
 
 /**
@@ -94,6 +98,8 @@ export const getGlobalConfig = cache(async (): Promise<SiteSettings> => {
       contactEmail: fields.contactEmail?.stringValue || DEFAULT_SETTINGS.contactEmail,
       contactPhone: fields.contactPhone?.stringValue || DEFAULT_SETTINGS.contactPhone,
       address: fields.address?.stringValue || DEFAULT_SETTINGS.address,
+      fontFamily: fields.fontFamily?.stringValue || DEFAULT_SETTINGS.fontFamily,
+      borderRadius: Number(fields.borderRadius?.integerValue || fields.borderRadius?.doubleValue || DEFAULT_SETTINGS.borderRadius),
     };
   } catch (error: any) {
     if (error.name === 'AbortError') {

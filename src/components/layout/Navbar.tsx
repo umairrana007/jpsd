@@ -14,6 +14,8 @@ import {
   FiBell, FiCalendar, FiBook, FiImage, FiUserPlus, FiMail,
   FiMoreHorizontal
 } from 'react-icons/fi';
+import { getNavigationSettings } from '@/lib/firebaseUtils';
+import { NavItem } from '@/types';
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,13 +43,32 @@ export const Navbar: React.FC = () => {
     setUserMenuOpen(false);
   }, [pathname]);
 
-  const navItems = [
+  const [firestoreNavItems, setFirestoreNavItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchNav = async () => {
+      const data = await getNavigationSettings();
+      if (data && data.items) setFirestoreNavItems(data.items);
+    };
+    fetchNav();
+  }, []);
+
+  const DEFAULT_NAV_ITEMS = [
     { name: t('nav.home'), href: '/' },
     { name: t('nav.welfare'), href: '/welfare' },
     { name: t('nav.education'), href: '/education' },
     { name: t('nav.spirituality'), href: '/spirituality' },
     { name: t('nav.causes'), href: '/causes' },
   ];
+
+  const navItems = firestoreNavItems.length > 0
+    ? firestoreNavItems
+        .filter(item => item.location === 'header')
+        .map(item => ({ 
+          name: isUrdu ? item.labelUrdu || item.label : item.label, 
+          href: item.href 
+        }))
+    : DEFAULT_NAV_ITEMS;
 
   const moreItems = [
     { name: t('nav.events'), href: '/events', icon: <FiCalendar /> },

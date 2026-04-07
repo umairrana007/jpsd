@@ -2,12 +2,37 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiSave, FiEye, FiArrowLeft, FiImage, FiType, FiLayout, FiCode } from 'react-icons/fi';
+import { FiSave, FiEye, FiArrowLeft, FiImage, FiType, FiLayout, FiCode, FiRefreshCw } from 'react-icons/fi';
 import Link from 'next/link';
+import { db } from '@/lib/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function PageEditor({ params }: { params: { id: string } }) {
   const [title, setTitle] = useState(params.id === '1' ? 'Home Page' : 'Humanitarian Cause Page');
   const [content, setContent] = useState('Welcome to Baitussalam. We are dedicated to serving humanity.');
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      if (!db) throw new Error('Firebase connection severed.');
+      
+      const docRef = doc(db, 'pages', params.id);
+      await setDoc(docRef, {
+        title,
+        content,
+        updatedAt: serverTimestamp(),
+        status: 'published'
+      }, { merge: true });
+      
+      alert('Propagated changes to edge network!');
+    } catch (error: any) {
+      console.error('Publishing failed:', error);
+      alert(`Critical: ${error.message || 'Transmission failed.'}`);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
 
   return (
     <div className="space-y-8 pb-20">
@@ -26,9 +51,14 @@ export default function PageEditor({ params }: { params: { id: string } }) {
            <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-500 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all">
              <FiEye /> Preview
            </button>
-           <button className="flex items-center gap-2 px-8 py-4 bg-[#1ea05f] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:bg-[#15804a] transition-all">
-             <FiSave /> Publish Changes
-           </button>
+            <button 
+              onClick={handlePublish}
+              disabled={isPublishing}
+              className="flex items-center gap-2 px-8 py-4 bg-[#1ea05f] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:bg-[#15804a] transition-all disabled:opacity-50"
+            >
+              {isPublishing ? <FiRefreshCw className="animate-spin" /> : <FiSave />} 
+              {isPublishing ? 'Synchronizing...' : 'Publish Changes'}
+            </button>
         </div>
       </header>
 

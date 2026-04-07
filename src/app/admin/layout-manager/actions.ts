@@ -10,6 +10,8 @@ export async function updateSiteSettings(formData: {
   heroTitleUr: string;
   primaryColor: string;
   secondaryColor: string;
+  fontFamily?: string;
+  borderRadius?: number;
   livesServed?: number;
   donationsReceived?: number;
   volunteersCount?: number;
@@ -28,6 +30,8 @@ export async function updateSiteSettings(formData: {
       heroTitleUr: formData.heroTitleUr,
       primaryColor: formData.primaryColor,
       secondaryColor: formData.secondaryColor,
+      fontFamily: formData.fontFamily || 'Inter',
+      borderRadius: formData.borderRadius || 12,
       livesServed: formData.livesServed || 0,
       donationsReceived: formData.donationsReceived || 0,
       volunteersCount: formData.volunteersCount || 0,
