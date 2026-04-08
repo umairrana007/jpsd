@@ -13,10 +13,12 @@ import { createDonation } from '@/lib/firebaseUtils';
 import { processPayment } from '@/lib/paymentUtils';
 import { dispatchDonationNotification } from '@/lib/notificationUtils';
 import { trackDonationCompletion } from '@/lib/analyticsUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function DonationPage() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [isSimulated, setIsSimulated] = useState(false);
   const [formData, setFormData] = useState({
     amount: '',
     frequency: 'one-time',
@@ -27,6 +29,17 @@ export default function DonationPage() {
     paymentMethod: ''
   });
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [lastPaymentResult, setLastPaymentResult] = useState<any>(null);
+
+  const { user } = useAuth();
+
+  const toggleSimulation = () => {
+    const newState = !isSimulated;
+    setIsSimulated(newState);
+    (window as any).PAYMENT_SIMULATION = newState;
+  };
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
@@ -34,7 +47,7 @@ export default function DonationPage() {
   const handleSubmit = async () => {
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
-      alert('Operational Error: Invalid Donation Amount. Deployment requires positive impact values.');
+      setShowErrorModal(true);
       return;
     }
 
@@ -60,12 +73,29 @@ export default function DonationPage() {
       });
 
       if (paymentResult.success) {
+        setLastPaymentResult(paymentResult);
+        
+        // 2.5 Webhook Simulation Integration (Phase 6 Fix)
+        if (isSimulated && paymentResult.success) {
+          const donationAmount = amount;
+          const selectedProvider = formData.paymentMethod;
+          import('@/lib/payments/simulateWebhook').then(mod => {
+            mod.simulateWebhookCallback({ 
+              transactionId: paymentResult.transactionId, 
+              amount: donationAmount, 
+              paymentMethod: selectedProvider, 
+              donorEmail: user?.email || '', 
+              status: 'success' 
+            });
+          });
+        }
+
         // 3. Tactical Comms Dispatch (BTCC)
         await dispatchDonationNotification({
           id: paymentResult.transactionId,
           amount: formData.amount,
           cause: formData.cause,
-          email: 'donor@example.com' // Map properly from session
+          email: user?.email || 'donor@example.com' // Map properly from session
         });
 
         // 4. Tactical Analytics Protocol (BTAT)
@@ -79,13 +109,15 @@ export default function DonationPage() {
           window.location.href = paymentResult.redirectUrl;
         } else {
           // Success Path (e.g. for Direct Wallet)
-          alert(`Humanitarian impact confirmed. ID: ${paymentResult.transactionId}`);
-          window.location.href = '/donation/success';
+          setShowSuccessModal(true);
+          setTimeout(() => {
+             window.location.href = '/donation/success';
+          }, 3000);
         }
       }
     } catch (err) {
       console.error('[BHPGP] Operational Error:', err);
-      alert('Mission-critical payment calibration failed. Please contact HQ.');
+      setShowErrorModal(true);
     } finally {
       setSubmitting(false);
     }
@@ -320,7 +352,7 @@ export default function DonationPage() {
                           <div 
                             key={method.id}
                             onClick={() => {
-                              if (isComingSoon) {
+                              if (isComingSoon && !isSimulated) {
                                 setShowInfoModal(true);
                               } else {
                                 setFormData({...formData, paymentMethod: method.id});
@@ -330,7 +362,7 @@ export default function DonationPage() {
                               formData.paymentMethod === method.id 
                                 ? 'border-slate-900 bg-slate-900 text-white shadow-2xl' 
                                 : 'border-slate-50 bg-white hover:bg-slate-50'
-                            } ${isComingSoon ? 'opacity-50 grayscale' : ''}`}
+                            } ${isComingSoon && !isSimulated ? 'opacity-50 grayscale' : ''}`}
                           >
                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                                formData.paymentMethod === method.id ? 'bg-white/10 text-white' : method.color
@@ -421,10 +453,82 @@ export default function DonationPage() {
         )}
       </AnimatePresence>
 
-      <div className="mt-12 flex flex-col items-center gap-4 relative z-10">
-         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">Humanitarian Tech Stack by JPSD Global</p>
-         <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
-      </div>
+       <div className="mt-12 flex flex-col items-center gap-4 relative z-10">
+          <button 
+            onClick={toggleSimulation}
+            className={`px-6 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all border ${
+              isSimulated ? 'bg-[#1ea05f]/10 text-[#1ea05f] border-[#1ea05f]/20' : 'bg-slate-100 text-slate-400 border-slate-200'
+            }`}
+          >
+            {isSimulated ? 'Simulation Protocol: ACTIVE' : 'Simulation Mode: OFF'}
+          </button>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">Humanitarian Tech Stack by JPSD Global</p>
+          <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
+       </div>
+
+       {/* Phase 6 Fix: Custom Modals */}
+       <AnimatePresence>
+         {showSuccessModal && (
+           <motion.div 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-6"
+           >
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               className="bg-white rounded-[3rem] p-12 max-w-md w-full shadow-2xl relative overflow-hidden text-center"
+             >
+               <div className="w-20 h-20 bg-[#1ea05f] text-white rounded-full flex items-center justify-center mx-auto mb-8 text-3xl">
+                  <FiCheck />
+               </div>
+               <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-4 text-[#1ea05f]">Payment Confirmed</h3>
+               <p className="text-slate-500 font-medium mb-8">
+                 Tactical asset allocation successful. Reference: <code className="bg-slate-100 px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-800">{lastPaymentResult?.transactionId}</code>
+               </p>
+               <button 
+                 onClick={() => {
+                   setShowSuccessModal(false);
+                   window.location.href = '/donation/success';
+                 }} 
+                 className="w-full bg-[#1ea05f] text-white py-6 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-[#15803d] transition-all shadow-xl shadow-[#1ea05f]/20"
+               >
+                 Acknowledge Impact
+               </button>
+             </motion.div>
+           </motion.div>
+         )}
+
+         {showErrorModal && (
+           <motion.div 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             className="fixed inset-0 bg-red-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-6"
+           >
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               className="bg-white rounded-[3rem] p-12 max-w-md w-full shadow-2xl relative overflow-hidden text-center"
+             >
+               <div className="w-20 h-20 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-8 text-3xl">
+                  <FiAlertCircle />
+               </div>
+               <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-4 text-red-600">Calibration Error</h3>
+               <p className="text-slate-500 font-medium mb-8">
+                 Mission-critical payment calibration failed. Our tactical teams have been alerted. Please try again or contact HQ.
+               </p>
+               <button 
+                 onClick={() => setShowErrorModal(false)} 
+                 className="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl"
+               >
+                 Close Protocol
+               </button>
+             </motion.div>
+           </motion.div>
+         )}
+       </AnimatePresence>
     </div>
   );
 }
