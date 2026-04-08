@@ -4,13 +4,10 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
 const getPdfMake = () => {
-  console.log('Resolving pdfMake...');
   let p: any = pdfMake;
   if (!p.createPdf && (p as any).default) p = (p as any).default;
   if (!p.createPdf && (p as any).default) p = (p as any).default;
   
-  // Exhaustive VFS search
-  console.log('Looking for VFS in pdfFonts...');
   const f: any = pdfFonts;
   const vfs = f.pdfMake?.vfs || 
               f.default?.pdfMake?.vfs || 
@@ -18,13 +15,10 @@ const getPdfMake = () => {
               f.default?.vfs || 
               (typeof window !== 'undefined' && (window as any).pdfMake?.vfs);
   
-  console.log('vfs found:', !!vfs);
-  
   if (p && vfs) {
     p.vfs = vfs;
   } else if (p && (window as any).pdfMake?.vfs) {
     p.vfs = (window as any).pdfMake.vfs;
-    console.log('vfs found on window.pdfMake');
   }
   
   return p;
@@ -106,71 +100,73 @@ export const generateTaxReceipt = (donation: any) => {
   getPdfMake().createPdf(docDefinition).download(`JPSD_Receipt_${donation.id}.pdf`);
 };
 
-export const generateVolunteerCertificate = (volunteer: any) => {
-  const docDefinition: any = {
-    background: [
-      {
-        canvas: [
-          {
-            type: 'rect',
-            x: 10, y: 10,
-            w: 575, h: 822,
-            lineWidth: 2,
-            lineColor: '#1ea05f'
-          }
-        ]
-      }
-    ],
-    content: [
-      { text: '\nTactical Merit Deployment', alignment: 'center', fontSize: 10, characterSpacing: 5, color: '#999', margin: [0, 50, 0, 0] },
-      { text: 'CERTIFICATE OF EXCELLENCE', alignment: 'center', fontSize: 34, bold: true, color: '#1ea05f', margin: [0, 20, 0, 40] },
-      
-      { text: 'This is to verify that', alignment: 'center', fontSize: 16, italic: true },
-      { text: volunteer.name.toUpperCase(), alignment: 'center', fontSize: 28, bold: true, margin: [0, 20] },
-      
-      { 
-        text: [
-          'has successfully completed ', { text: `${volunteer.hoursLogged} Operational Hours`, bold: true },
-          ' of humanitarian service with the Jamiyat Punjabi Saudagran-e-Delhi (JPSD). Their commitment to field logistics and rapid asset deployment has been exceptional.'
-        ],
-        alignment: 'center',
-        fontSize: 14,
-        margin: [40, 20, 40, 40],
-        lineHeight: 1.5
-      },
-      
-      {
-        columns: [
-          {
-            width: '*',
-            text: [
-              { text: 'Rank: ', bold: true }, 'Specialist IV\n',
-              { text: 'Department: ', bold: true }, 'Field Logistics\n',
-            ],
-            margin: [40, 0]
-          },
-          {
-            width: '*',
-            alignment: 'right',
-            text: [
-              { text: 'Issued on: ', bold: true }, `${new Date().toLocaleDateString()}\n`,
-              { text: 'ID: ', bold: true }, `${volunteer.id}\n`,
-            ],
-            margin: [0, 0, 40, 0]
-          }
-        ]
-      },
-      
-      { text: '\n\n\n\n\n\n(Director, Tactical Operations)', alignment: 'center', fontSize: 12, bold: true }
-    ],
-    defaultStyle: { font: 'Roboto' }
-  };
+interface VolunteerCertificateData {
+  name: string;
+  volunteerId: string;
+  skills: string[];
+  region: string;
+  joinedAt: string;
+  hours?: number;
+}
 
-  getPdfMake().createPdf(docDefinition).download(`JPSD_Certificate_${volunteer.id}.pdf`);
+export const generateVolunteerCertificate = (volunteer: VolunteerCertificateData) => {
+  const doc = new jsPDF();
+  
+  // Tactical Styling
+  doc.setDrawColor(30, 160, 95);
+  doc.setLineWidth(1.5);
+  doc.rect(10, 10, 190, 277);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(150, 150, 150);
+  doc.text('TACTICAL MERIT DEPLOYMENT // JPSD CENTRAL COMMAND', 105, 30, { align: 'center' });
+  
+  doc.setFontSize(30);
+  doc.setTextColor(30, 160, 95);
+  doc.text('CERTIFICATE OF EXCELLENCE', 105, 50, { align: 'center' });
+  
+  doc.setFontSize(14);
+  doc.setTextColor(100, 100, 100);
+  doc.text('This is to verify the humanitarian accreditation of', 105, 70, { align: 'center' });
+  
+  doc.setFontSize(24);
+  doc.setTextColor(33, 33, 33);
+  doc.text(volunteer.name.toUpperCase(), 105, 85, { align: 'center' });
+  
+  // Dynamic Content: Skills & Region
+  doc.setFontSize(12);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Skills & Expertise Alignment:', 20, 110);
+  
+  doc.setFontSize(10);
+  volunteer.skills.forEach((skill, idx) => {
+    doc.text(`• ${skill.toUpperCase()}`, 25, 120 + (idx * 7));
+  });
+  
+  doc.setFontSize(12);
+  doc.text(`Regional Deployment Hub: ${volunteer.region.toUpperCase()}`, 20, 160);
+  doc.text(`Verification ID: ${volunteer.volunteerId}`, 20, 170);
+  doc.text(`Commencement Date: ${new Date(volunteer.joinedAt).toLocaleDateString()}`, 20, 180);
+  
+  if (volunteer.hours) {
+    doc.setFontSize(14);
+    doc.setTextColor(30, 160, 95);
+    doc.text(`OPERATIONAL HOURS LOGGED: ${volunteer.hours}`, 105, 210, { align: 'center' });
+  }
+
+  doc.setFontSize(10);
+  doc.setTextColor(150, 150, 150);
+  doc.text('CERTIFIED FOR FIELD OPERATIONS // DIRECTIVE 09-X', 105, 250, { align: 'center' });
+  
+  // Footer signature line
+  doc.line(130, 260, 180, 260);
+  doc.text('DIRECTOR OF OPERATIONS', 155, 265, { align: 'center' });
+
+  // Return blob as requested for offer download logic
+  return doc.output('blob');
 };
 
 export const generateTreasuryReport = (title: string, data: any) => {
-  console.log('PDF generation starts for:', title);
   try {
     const docDefinition: any = {
       content: [
@@ -261,12 +257,10 @@ export const generateTreasuryReport = (title: string, data: any) => {
 
     const fileName = `${title.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
     const p = getPdfMake();
-    console.log('Final check before PDF:', { hasP: !!p, hasCreatePdf: !!p?.createPdf, hasVfs: !!p?.vfs });
     
     if (p && p.createPdf && p.vfs) {
       p.createPdf(docDefinition).download(fileName);
     } else {
-      console.warn('pdfMake or VFS not ready, using fallback.');
       downloadFallback(title, data);
     }
   } catch (err) {
@@ -278,22 +272,19 @@ export const generateTreasuryReport = (title: string, data: any) => {
 export const generateBulkReceipts = (donations: any[], donorInfo: any) => {
   const doc = new jsPDF() as any;
   
-  // Header
   doc.setFontSize(22);
-  doc.setTextColor(30, 160, 95); // #1ea05f
+  doc.setTextColor(30, 160, 95); 
   doc.text("JPSD CENTRAL COMMAND", 105, 20, { align: "center" });
   
   doc.setFontSize(14);
   doc.setTextColor(50, 50, 50);
   doc.text("Consolidated Humanitarian Impact Report", 105, 30, { align: "center" });
   
-  // Donor Info
   doc.setFontSize(10);
   doc.text(`Donor: ${donorInfo.name || 'N/A'}`, 14, 45);
   doc.text(`ID: ${donorInfo.uid?.substring(0, 10) || 'N/A'}`, 14, 50);
   doc.text(`Date Generated: ${new Date().toLocaleString()}`, 14, 55);
   
-  // Summary Stats
   const total = donations.reduce((acc, d) => acc + (d.amount || 0), 0);
   doc.setDrawColor(30, 160, 95);
   doc.setFillColor(245, 252, 248);
@@ -304,7 +295,6 @@ export const generateBulkReceipts = (donations: any[], donorInfo: any) => {
   doc.setFontSize(12);
   doc.text(`PKR ${total.toLocaleString()}`, 145, 55);
 
-  // Table
   const tableData = donations.map(d => [
     d.id?.substring(0, 8).toUpperCase() || 'N/A',
     d.causeTitle || "General Welfare",

@@ -13,20 +13,22 @@ export interface PaymentIntent {
   isRecurring?: boolean;
 }
 
+import { paymentService } from './payments/paymentService';
+
 export const processPayment = async (intent: PaymentIntent) => {
   console.log(`[BHPGP] Initiating tactical payment for ${intent.amount} ${intent.currency} via ${intent.method}`);
   
-  // Simulation of secure hand-off to gateway
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // In production, this would return a Stripe Checkout URL or JazzCash API response
-      resolve({
-        success: true,
-        transactionId: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        gatewayResponse: 'AUTHORIZED',
-        redirectUrl: intent.method === 'card' ? 'https://checkout.stripe.com/demo' : null
-      });
-    }, 1500);
+  if (intent.method === 'bank') {
+     return { success: true, transactionId: 'MANUAL-BANK-REF', message: 'Manual bank instructions displayed.' };
+  }
+
+  return paymentService.processPayment(intent.method, {
+    amount: intent.amount,
+    currency: intent.currency || 'PKR',
+    donorEmail: intent.email || 'anonymous@jpsd.org',
+    donorPhone: '0000000000', // Placeholder
+    causeId: intent.causeId,
+    metadata: { ...intent }
   });
 };
 

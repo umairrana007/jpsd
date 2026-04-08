@@ -6,8 +6,10 @@ import { FiSave, FiEye, FiArrowLeft, FiImage, FiType, FiLayout, FiCode, FiRefres
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PageEditor({ params }: { params: { id: string } }) {
+  const { setGlobalAlert } = useAuth();
   const [title, setTitle] = useState(params.id === '1' ? 'Home Page' : 'Humanitarian Cause Page');
   const [content, setContent] = useState('Welcome to Baitussalam. We are dedicated to serving humanity.');
   const [isPublishing, setIsPublishing] = useState(false);
@@ -25,10 +27,11 @@ export default function PageEditor({ params }: { params: { id: string } }) {
         status: 'published'
       }, { merge: true });
       
-      alert('Propagated changes to edge network!');
+      
+      setGlobalAlert('Propagated changes to edge network!', 'success');
     } catch (error: any) {
       console.error('Publishing failed:', error);
-      alert(`Critical: ${error.message || 'Transmission failed.'}`);
+      setGlobalAlert(`Critical: ${error.message || 'Transmission failed.'}`, 'error');
     } finally {
       setIsPublishing(false);
     }

@@ -1,240 +1,345 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   FiHome, FiCalendar, FiClock, FiAward, 
   FiMessageSquare, FiTrendingUp, FiActivity,
   FiZap, FiArrowRight, FiCheckCircle, FiInfo,
   FiDownload, FiExternalLink, FiSearch, FiFilter,
-  FiStar, FiTarget, FiBox, FiShield, FiUser, FiBookOpen
+  FiStar, FiTarget, FiBox, FiShield, FiUser, FiBookOpen,
+  FiPercent, FiMenu, FiGrid, FiList, FiAlertTriangle, 
+  FiMapPin
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateVolunteerCertificate } from '@/lib/pdfUtils';
 
+// Mock data for skill matching logic
+const VOLUNTEER_SKILLS = ['medical', 'logistics', 'tech'];
+const MISSIONS = [
+  { id: 1, title: 'Ambulance Support', category: 'medical', difficulty: 'High', match: 95, status: 'Active' },
+  { id: 2, title: 'Inventory Sync', category: 'tech', difficulty: 'Medium', match: 80, status: 'Active' },
+  { id: 3, title: 'Field Teaching', category: 'teaching', difficulty: 'Low', match: 20, status: 'Draft' },
+];
+
 export default function VolunteerDashboardPage() {
   const [activeTab, setActiveTab] = useState<'mission' | 'history'>('mission');
+  const [availability, setAvailability] = useState<string[]>(['Mon-AM', 'Wed-PM', 'Sat-AM']);
+
+  const toggleAvailability = (slot: string) => {
+    setAvailability(prev => 
+      prev.includes(slot) ? prev.filter(s => s !== slot) : [...prev, slot]
+    );
+  };
 
   const handleDownloadCertificate = () => {
     generateVolunteerCertificate({
-      id: 'BGT-VOL-824',
+      volunteerId: 'BGT-VOL-824',
       name: 'Asad Ullah',
-      hoursLogged: 148.5
+      hours: 148.5,
+      skills: ['Logistics'],
+      region: 'Karachi',
+      joinedAt: new Date().toLocaleDateString()
     });
   };
 
+  // Skill Match Score Calculation (Dummy Logic)
+  const averageMatch = useMemo(() => {
+    return Math.round(MISSIONS.reduce((acc, m) => acc + m.match, 0) / MISSIONS.length);
+  }, []);
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-20">
       {/* Tactical Status Hero */}
       <header className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         <div className="md:col-span-2 bg-slate-900 p-12 rounded-[4rem] text-white overflow-hidden relative shadow-2xl flex flex-col justify-center">
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#1ea05f]/20 rounded-full blur-[100px] -mr-32 -mt-32 anim-pulse" />
-            <div className="relative z-10 space-y-4">
+         <div className="md:col-span-2 bg-slate-900 p-10 md:p-12 rounded-[4rem] text-white overflow-hidden relative shadow-2xl flex flex-col justify-center border border-white/5">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#1ea05f]/20 rounded-full blur-[120px] -mr-32 -mt-32 anim-pulse" />
+            <div className="relative z-10 space-y-6">
                <div className="flex items-center gap-3">
-                  <FiTarget className="text-[#1ea05f]" size={24} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1ea05f] italic">Tactical Ready</span>
+                  <div className="flex -space-x-3">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="w-10 h-10 rounded-full border-4 border-slate-900 bg-slate-800 flex items-center justify-center">
+                        <FiUser size={14} className="text-[#1ea05f]" />
+                      </div>
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1ea05f] italic">Active Squadron Alpha</span>
                </div>
-               <h2 className="text-4xl lg:text-5xl font-black italic uppercase leading-none tracking-tighter">Mission Control</h2>
-               <p className="text-slate-400 font-medium max-w-lg leading-relaxed text-sm">
-                 You have **3 mission-critical** events in your region. Your logistics profile is 98% complete for field deployment.
-               </p>
-               <button className="px-10 py-5 bg-[#1ea05f] text-white font-black rounded-3xl shadow-xl shadow-[#1ea05f]/20 hover:scale-105 transition-all text-xs uppercase tracking-widest flex items-center gap-3 w-fit mt-4">
-                  Browse Active Missions <FiArrowRight />
-               </button>
+               <div className="space-y-1">
+                  <h2 className="text-4xl lg:text-5xl font-black italic uppercase leading-none tracking-tighter">Mission Control</h2>
+                  <p className="text-slate-400 font-medium max-w-sm leading-relaxed text-xs">
+                    Real-time synchronization with JPSD field directives.
+                  </p>
+               </div>
+               <div className="flex flex-wrap gap-4 pt-4">
+                  <button className="px-8 py-4 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 hover:scale-105 transition-all text-[10px] uppercase tracking-widest flex items-center gap-3">
+                     Browse Active Missions <FiArrowRight />
+                  </button>
+                  <button className="px-8 py-4 bg-white/5 backdrop-blur-md text-white border border-white/10 font-black rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">
+                     Operational Manuals
+                  </button>
+               </div>
             </div>
          </div>
 
-         <div className="bg-white p-12 rounded-[4rem] border border-slate-200/50 shadow-sm flex flex-col justify-between">
-            <div>
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Operational Rank</p>
-               <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-[#1ea05f] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-[#1ea05f]/20">
-                     <FiStar size={32} />
-                  </div>
-                  <div>
-                     <h4 className="text-xl font-black text-slate-800 italic uppercase">Specialist</h4>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Level 4 Certified</p>
-                  </div>
+         <div className="bg-white p-12 rounded-[4rem] border border-slate-200/50 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+            <div className="relative z-10">
+               <div className="flex justify-between items-start mb-6">
+                 <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Ranking</p>
+                    <h4 className="text-2xl font-black text-slate-800 italic uppercase">Specialist</h4>
+                 </div>
+                 <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 border border-amber-100 italic font-black text-xl">L4</div>
                </div>
-            </div>
-            <div className="space-y-4 pt-8 mt-8 border-t border-slate-100">
-               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-slate-400 italic">Deployment Rating</span>
-                  <span className="text-[#1ea05f]">4.9 / 5.0</span>
-               </div>
-               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="w-[98%] h-full bg-[#1ea05f] rounded-full shadow-[0_0_10px_rgba(30,160,95,0.5)]"></div>
+               
+               <div className="space-y-6">
+                  <div className="space-y-2">
+                     <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
+                        <span className="text-slate-400">Deployment Logic</span>
+                        <span className="text-[#1ea05f]">98% Complete</span>
+                     </div>
+                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: '98%' }}
+                          className="h-full bg-[#1ea05f] rounded-full"
+                        />
+                     </div>
+                  </div>
+                  <div className="flex items-center gap-4 pt-4 mt-4 border-t border-slate-50">
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] font-black text-slate-300">STRIKE</p>
+                      <p className="text-lg font-black text-slate-800">12</p>
+                    </div>
+                    <div className="w-px h-8 bg-slate-100" />
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] font-black text-slate-300">XP</p>
+                      <p className="text-lg font-black text-slate-800">4.2k</p>
+                    </div>
+                  </div>
                </div>
             </div>
          </div>
       </header>
 
-      {/* Main Operational Dashboard */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-         
-         {/* Left: Events & Notifications */}
-         <div className="xl:col-span-8 space-y-10">
-            
-            {/* Mission Critical Feed */}
-            <section className="bg-white/50 backdrop-blur-md p-10 md:p-14 rounded-[3.5rem] border border-white shadow-sm space-y-10">
-               <div className="flex justify-between items-end">
-                  <div>
-                     <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Operational Feed</h3>
-                     <p className="text-sm font-bold text-slate-400 mt-1 uppercase italic tracking-widest">High-priority humanitarian assignments</p>
-                  </div>
-                  <div className="flex bg-slate-100 p-1 rounded-xl">
-                     <button onClick={() => setActiveTab('mission')} className={`px-5 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'mission' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}>Missions</button>
-                     <button onClick={() => setActiveTab('history')} className={`px-5 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}>Timeline</button>
-                  </div>
-               </div>
+      {/* Analytics & Interaction Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        {/* Left Column: Mission Matrix */}
+        <div className="lg:col-span-8 space-y-10">
+          
+          {/* Section: Operational Feed */}
+          <section className="bg-white/50 backdrop-blur-xl p-10 md:p-14 rounded-[3.5rem] border border-white shadow-xl shadow-slate-200/50 space-y-10">
+             <div className="flex justify-between items-end flex-wrap gap-6">
+                <div>
+                   <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Tactical Feed</h3>
+                   <p className="text-[10px] font-black text-slate-400 mt-1 uppercase italic tracking-[0.2em]">Live assignment stream synchronized with skill metadata</p>
+                </div>
+                <div className="flex bg-slate-100 p-1 rounded-2xl">
+                   <button onClick={() => setActiveTab('mission')} className={`px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'mission' ? 'bg-white text-slate-800 shadow-xl' : 'text-slate-400'}`}>Current</button>
+                   <button onClick={() => setActiveTab('history')} className={`px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-white text-slate-800 shadow-xl' : 'text-slate-400'}`}>Archived</button>
+                </div>
+             </div>
 
-               <AnimatePresence mode="wait">
-                  {activeTab === 'mission' ? (
-                     <motion.div 
-                       key="missions"
-                       initial={{ opacity: 0, y: 10 }}
-                       animate={{ opacity: 1, y: 0 }}
-                       exit={{ opacity: 0, y: -10 }}
-                       className="space-y-6"
-                     >
-                        {[
-                           { title: 'Food Drive - Korangi', date: 'Tomorrow, 9:00 AM', loc: 'Plot 14, Sector 7', points: '+150 XP', category: 'Urgent' },
-                           { title: 'Medical Camp Prep', date: 'Sat, 12 Oct', loc: 'HQ Warehouse', points: '+100 XP', category: 'Training' },
-                           { title: 'Water Filter Install', date: 'Sun, 13 Oct', loc: 'Rural Hub', points: '+200 XP', category: 'Operations' },
-                        ].map((mission, i) => (
-                           <div key={i} className="group flex flex-col md:flex-row items-start md:items-center gap-6 p-8 bg-white rounded-[2.5rem] border border-slate-100 hover:border-[#1ea05f] hover:shadow-2xl hover:shadow-[#1ea05f]/5 transition-all cursor-pointer">
-                              <div className="w-16 h-16 bg-slate-50 group-hover:bg-[#1ea05f]/10 rounded-[1.5rem] flex items-center justify-center text-slate-300 group-hover:text-[#1ea05f] transition-all">
-                                 <FiZap size={24} />
-                              </div>
-                              <div className="flex-1 space-y-1">
-                                 <div className="flex items-center gap-2">
-                                    <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full ${mission.category === 'Urgent' ? 'bg-red-500 text-white' : mission.category === 'Training' ? 'bg-blue-500 text-white' : 'bg-[#1ea05f] text-white'}`}>
-                                       {mission.category}
-                                    </span>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{mission.date}</span>
-                                 </div>
-                                 <h4 className="text-xl font-black italic uppercase tracking-tighter text-slate-800">{mission.title}</h4>
-                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2"><FiInfo /> {mission.loc}</p>
-                              </div>
-                              <div className="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
-                                 <div className="text-right px-4">
-                                    <p className="text-sm font-black text-[#1ea05f] italic">{mission.points}</p>
-                                    <p className="text-[8px] text-slate-300 font-bold uppercase tracking-widest">Potential Impact</p>
-                                 </div>
-                                 <button className="flex-1 md:flex-none px-6 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1ea05f] transition-all group-hover:scale-105">Deploy</button>
-                              </div>
-                           </div>
-                        ))}
-                     </motion.div>
-                  ) : (
-                     <motion.div 
-                        key="history"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="space-y-4"
-                     >
-                        {[
-                           { title: 'Flood Relief Ops', date: 'Aug 2025', hours: '48.0', status: 'Verified' },
-                           { title: 'Education Drive', date: 'Jul 2025', hours: '12.5', status: 'Verified' },
-                           { title: 'Blood Donation Camp', date: 'Jun 2025', hours: '8.0', status: 'Flagged' },
-                        ].map((hist, i) => (
-                           <div key={i} className="flex justify-between items-center p-6 border-b border-slate-100/50 hover:bg-slate-50/50 rounded-2xl transition-all">
-                              <div>
-                                 <h5 className="font-black text-sm italic uppercase text-slate-800">{hist.title}</h5>
-                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{hist.date}</p>
-                              </div>
-                              <div className="text-right">
-                                 <p className="text-sm font-black text-slate-900">{hist.hours} HRS</p>
-                                 <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${hist.status === 'Verified' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>{hist.status}</span>
-                              </div>
-                           </div>
-                        ))}
-                     </motion.div>
-                  )}
-               </AnimatePresence>
-            </section>
-         </div>
-
-         {/* Right: Achievements & Stats */}
-         <div className="xl:col-span-4 space-y-10">
-            
-            {/* Achievement Collection */}
-            <section className="bg-white p-12 rounded-[3.5rem] border border-slate-200/50 shadow-sm space-y-10">
-               <div>
-                  <h3 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Operational Badges</h3>
-                  <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-1 uppercase">Showcasing your verified field skillsets</p>
-               </div>
-
-               <div className="grid grid-cols-3 gap-6">
-                  {[
-                    { icon: FiShield, label: 'First Aid', color: 'bg-red-50 text-red-500' },
-                    { icon: FiBox, label: 'Logistics', color: 'bg-blue-50 text-blue-500' },
-                    { icon: FiUser, label: 'Leader', color: 'bg-purple-50 text-purple-500' },
-                    { icon: FiTrendingUp, label: 'Veteran', color: 'bg-amber-50 text-amber-500' },
-                    { icon: FiMessageSquare, label: 'Proxy', color: 'bg-green-50 text-green-500' },
-                    { icon: FiAward, label: 'Hero', color: 'bg-slate-900 text-[#1ea05f]' },
-                  ].map((badge, i) => (
-                    <div key={i} className="flex flex-col items-center gap-3">
-                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all hover:scale-110 shadow-sm opacity-80 hover:opacity-100 cursor-pointer ${badge.color}`}>
-                          <badge.icon size={24} />
-                       </div>
-                       <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{badge.label}</span>
-                    </div>
-                  ))}
-               </div>
-
-               <div className="pt-6 border-t border-slate-100">
-                  <button 
-                    onClick={handleDownloadCertificate}
-                    className="w-full py-4 bg-slate-50 border border-slate-100 text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-slate-800 transition-all flex items-center justify-center gap-2"
+             <div className="space-y-6">
+               {(activeTab === 'mission' ? MISSIONS : []).map((mission, i) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }} 
+                    animate={{ opacity: 1, x: 0 }}
+                    key={i} 
+                    className="group relative flex flex-col md:flex-row items-start md:items-center gap-8 p-10 bg-white rounded-[3rem] border border-slate-100 hover:border-[#1ea05f] hover:shadow-2xl hover:shadow-[#1ea05f]/5 transition-all cursor-pointer overflow-hidden"
                   >
-                     <FiDownload /> Export Portfolio Certificate
-                  </button>
-               </div>
-            </section>
+                     <div className="absolute top-0 right-0 p-4">
+                        <div className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${mission.match > 90 ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                           {mission.match}% Match
+                        </div>
+                     </div>
+                     <div className={`w-20 h-20 rounded-[1.8rem] flex items-center justify-center shadow-inner transition-all group-hover:scale-105 ${mission.difficulty === 'High' ? 'bg-red-50 text-red-500' : 'bg-[#1ea05f]/5 text-[#1ea05f]'}`}>
+                        <FiTarget size={30} />
+                     </div>
+                     <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-3">
+                           <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">{mission.category}</span>
+                           <span className="text-[9px] font-black uppercase tracking-widest text-[#1ea05f]">{mission.difficulty} PRIORITY</span>
+                        </div>
+                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800 group-hover:text-[#1ea05f] transition-colors">{mission.title}</h4>
+                        <div className="flex items-center gap-6 mt-2">
+                          <div className="flex items-center gap-2 text-slate-400">
+                             <FiMapPin size={12} />
+                             <span className="text-[9px] font-bold uppercase tracking-widest">Sector 14-B</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-slate-400">
+                             <FiClock size={12} />
+                             <span className="text-[9px] font-bold uppercase tracking-widest">In 14 Hours</span>
+                          </div>
+                        </div>
+                     </div>
+                     <button className="w-full md:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1ea05f] transition-all group-hover:shadow-xl group-hover:shadow-[#1ea05f]/20">Deploy Component</button>
+                  </motion.div>
+               ))}
+               
+               {activeTab === 'history' && (
+                 <div className="p-20 text-center border-4 border-dashed border-slate-100 rounded-[4rem]">
+                    <FiInbox className="mx-auto text-slate-200 mb-4" size={48} />
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Archives currently empty in this sector</p>
+                 </div>
+               )}
+             </div>
+          </section>
 
-            {/* Tactical Grade Card */}
-            <section className="bg-gradient-to-br from-[#1ea05f] to-slate-900 p-12 rounded-[4rem] text-white space-y-8 relative overflow-hidden group border border-white/5 shadow-2xl">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-               <div className="space-y-4">
-                  <FiActivity size={32} className="text-[#1ea05f]" />
-                  <h3 className="text-2xl font-black italic uppercase tracking-tighter">Tactical Grade A+</h3>
-                  <p className="text-xs font-medium text-slate-400 leading-relaxed italic">
-                    Your contribution velocity is in the top 5% of global field agents. Keep deploying assets to maintain your elite status.
-                  </p>
+          {/* Temporal Matrix: Availability Section */}
+          <section className="bg-slate-900 p-12 rounded-[4rem] text-white space-y-10 relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-[#1ea05f]/10 rounded-full blur-[100px] -mr-32 -mt-32" />
+             <div className="relative z-10 flex justify-between items-start">
+               <div>
+                  <h3 className="text-2xl font-black italic uppercase tracking-tighter">Availability Matrix</h3>
+                  <p className="text-[10px] font-black text-slate-500 mt-1 uppercase tracking-widest">Toggle your active deployment windows</p>
                </div>
-               <div className="flex justify-between border-t border-white/10 pt-6">
-                  <div className="text-center">
-                     <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Missions</p>
-                     <p className="text-xl font-black italic">42</p>
-                  </div>
-                  <div className="text-center border-x border-white/5 px-8">
-                     <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Rating</p>
-                     <p className="text-xl font-black italic text-[#1ea05f]">4.9</p>
-                  </div>
-                  <div className="text-center">
-                     <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Impact</p>
-                     <p className="text-xl font-black italic text-blue-400">High</p>
-                  </div>
-               </div>
-            </section>
+               <FiCalendar className="text-[#1ea05f]" size={24} />
+             </div>
 
-            {/* Training Shortcut */}
-            <button className="w-full p-8 bg-blue-600 rounded-[3rem] text-white shadow-xl shadow-blue-600/20 flex items-center justify-between group overflow-hidden relative">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-8 -mt-8 group-hover:scale-150 transition-transform" />
-               <div className="flex items-center gap-6 relative z-10">
-                  <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                     <FiBookOpen size={24} />
+             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4 relative z-10">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                  <div key={day} className="space-y-3">
+                     <p className="text-center text-[9px] font-black text-slate-600 uppercase mb-4">{day}</p>
+                     {['AM', 'PM'].map(shift => {
+                        const slot = `${day}-${shift}`;
+                        const isActive = availability.includes(slot);
+                        return (
+                          <button 
+                            key={slot}
+                            onClick={() => toggleAvailability(slot)}
+                            className={`w-full py-5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-[#1ea05f] text-white shadow-lg shadow-[#1ea05f]/20' : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'}`}
+                          >
+                            {shift}
+                          </button>
+                        );
+                     })}
                   </div>
-                  <div className="text-left">
-                     <p className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-1">Academy Access</p>
-                     <p className="text-lg font-black italic uppercase italic tracking-widest italic tracking-widest">Training Materials</p>
+                ))}
+             </div>
+             
+             <div className="pt-6 border-t border-white/5 flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-3">
+                   <div className="w-3 h-3 bg-[#1ea05f] rounded-full shadow-[0_0_10px_#1ea05f]" />
+                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Status: On-Call</span>
+                </div>
+                <button className="text-[10px] font-black text-[#1ea05f] uppercase tracking-widest hover:underline">Commit Temporal State</button>
+             </div>
+          </section>
+        </div>
+
+        {/* Right Column: Statistics & Intelligence */}
+        <div className="lg:col-span-4 space-y-10">
+          
+          {/* Skill Intelligence Gauge */}
+          <section className="bg-white p-12 rounded-[4rem] border border-slate-200/50 shadow-sm space-y-10 relative overflow-hidden">
+             <div className="text-center space-y-2">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Intelligence Score</p>
+                <div className="relative inline-flex items-center justify-center">
+                   <svg className="w-32 h-32 transform -rotate-90">
+                      <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-50" />
+                      <motion.circle 
+                        initial={{ strokeDasharray: "0 360" }}
+                        animate={{ strokeDasharray: `${(averageMatch * 3.64).toFixed(0)} 360` }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="12" fill="transparent" strokeLinecap="round" className="text-[#1ea05f]" 
+                      />
+                   </svg>
+                   <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-3xl font-black italic text-slate-800">{averageMatch}</span>
+                      <span className="text-[8px] font-black text-slate-400 uppercase">Match Avg</span>
+                   </div>
+                </div>
+                <h4 className="text-lg font-black italic uppercase tracking-tighter pt-4">Strategic Compatibility</h4>
+             </div>
+
+             <div className="space-y-4">
+                {[
+                  { label: 'Medical Protocol', val: 92 },
+                  { label: 'Logistics Chain', val: 85 },
+                  { label: 'Asset Management', val: 40 },
+                ].map((s, i) => (
+                  <div key={i} className="space-y-2">
+                     <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-slate-500">
+                        <span>{s.label}</span>
+                        <span>{s.val}%</span>
+                     </div>
+                     <div className="w-full h-1 bg-slate-50 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${s.val}%` }}
+                          className={`h-full rounded-full ${s.val > 70 ? 'bg-[#1ea05f]' : 'bg-slate-300'}`} 
+                        />
+                     </div>
                   </div>
+                ))}
+             </div>
+          </section>
+
+          {/* Impact Trend (Mini Chart) */}
+          <section className="bg-white p-12 rounded-[4rem] border border-slate-200/50 shadow-sm space-y-8">
+             <div>
+                <h3 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Impact Velocity</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Monthly contribution metrics</p>
+             </div>
+             
+             <div className="h-24 flex items-end gap-2 pt-4">
+                {[30, 45, 60, 40, 80, 100, 70, 90, 85].map((h, i) => (
+                   <motion.div 
+                     key={i}
+                     initial={{ height: 0 }}
+                     animate={{ height: `${h}%` }}
+                     transition={{ delay: i * 0.1 }}
+                     className={`flex-1 rounded-t-lg transition-all ${i === 5 ? 'bg-[#1ea05f]' : 'bg-slate-100 hover:bg-slate-200'}`}
+                   />
+                ))}
+             </div>
+             <div className="flex justify-between text-[8px] font-black text-slate-300 uppercase">
+                <span>Jan</span>
+                <span>Jun</span>
+                <span>Sep</span>
+             </div>
+          </section>
+
+          {/* Quick Action: Export */}
+          <div className="p-8 bg-[#1ea05f]/5 rounded-[3rem] border border-[#1ea05f]/10 space-y-6">
+             <div className="flex gap-4">
+               <FiAward className="text-[#1ea05f] shrink-0" size={24} />
+               <div>
+                  <h4 className="text-sm font-black italic uppercase tracking-tighter">Verified Credentials</h4>
+                  <p className="text-[9px] font-bold text-slate-500 uppercase leading-relaxed mt-1">Export your tactical performance log for external verification.</p>
                </div>
-               <FiArrowRight className="group-hover:translate-x-2 transition-transform relative z-10" />
-            </button>
-         </div>
+             </div>
+             <button 
+               onClick={handleDownloadCertificate}
+               className="w-full py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:shadow-xl transition-all flex items-center justify-center gap-3 text-slate-800"
+             >
+                <FiDownload /> Deployment Portfolio (PDF)
+             </button>
+          </div>
+
+        </div>
       </div>
     </div>
+  );
+}
+
+function FiInbox(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+      <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+    </svg>
   );
 }

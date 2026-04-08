@@ -26,7 +26,7 @@ const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr
 const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
 
 export default function DonorDashboardPage() {
-  const { user, currentUserData } = useAuth();
+  const { user, currentUserData, setGlobalAlert } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications'>('profile');
   const [donations, setDonations] = useState<any[]>([]);
   const [impactData, setImpactData] = useState<ImpactMetrics | null>(null);
@@ -233,7 +233,7 @@ export default function DonorDashboardPage() {
                         <FiLayers size={24} />
                      </div>
                      <button 
-                       onClick={() => alert('Impact visualization compiled. Ready for sharing!')}
+                       onClick={() => setGlobalAlert('Impact visualization compiled. Ready for sharing!', 'info')}
                        className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-4 py-2 rounded-full backdrop-blur-md flex items-center gap-2 hover:bg-white/40 transition-all"
                      >
                        <FiShare2 /> Share Impact

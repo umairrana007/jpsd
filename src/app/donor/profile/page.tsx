@@ -7,6 +7,7 @@ import {
   FiEdit2, FiCheckCircle, FiArrowRight
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function DonorProfilePage() {
   return (
@@ -29,7 +30,14 @@ export default function DonorProfilePage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#1ea05f]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
               
               <div className="w-40 h-40 rounded-[3rem] bg-slate-100 flex items-center justify-center text-slate-400 font-black text-4xl shadow-2xl overflow-hidden group relative">
-                 <img src="/images/jpsd_education.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100" alt="Identity" />
+                 <Image 
+                   src="/images/jpsd_education.jpg" 
+                   alt="Identity"
+                   fill
+                   loading="lazy"
+                   sizes="160px"
+                   className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100" 
+                 />
                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-all uppercase tracking-widest">Update Photo</div>
               </div>
 

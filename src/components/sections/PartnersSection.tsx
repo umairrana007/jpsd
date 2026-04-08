@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import Image from 'next/image';
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
@@ -81,7 +82,16 @@ export const PartnersSection: React.FC = () => {
                 {partner.logo ? (
                   <div className="text-6xl">{partner.logo}</div>
                 ) : partner.image ? (
-                  <img src={partner.image} alt={partner.name} className="max-h-16 h-auto grayscale hover:grayscale-0 transition-all duration-300" />
+                   <div className="relative w-full h-16">
+                      <Image 
+                        src={partner.image} 
+                        alt={partner.name} 
+                        fill
+                        loading="lazy"
+                        sizes="(max-width: 768px) 100px, 150px"
+                        className="object-contain grayscale hover:grayscale-0 transition-all duration-300" 
+                      />
+                   </div>
                 ) : (
                   <div className="text-xl font-bold text-gray-400">{partner.name}</div>
                 )}

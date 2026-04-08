@@ -13,7 +13,7 @@ import { UserRole } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
 function AdminUsersPage() {
-  const { user: authUser } = useAuth();
+  const { user: authUser, setGlobalAlert } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
@@ -119,10 +119,10 @@ function AdminUsersPage() {
 
        setSelectedUserIds([]);
        setShowBulkModal(false);
-       alert(`Bulk ${type} complete for ${selectedUserIds.length} users.`);
+       setGlobalAlert(`Bulk ${type} complete for ${selectedUserIds.length} users.`, 'success');
     } catch (error) {
        console.error('Bulk action failed:', error);
-       alert('Bulk action failed. Check logs.');
+       setGlobalAlert('Bulk action failed. HQ assets disconnected.', 'error');
     } finally {
        setActionLoading(null);
     }

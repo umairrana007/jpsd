@@ -11,6 +11,18 @@ export class JazzCashProvider implements PaymentProvider {
    * Required Credentials: Merchant ID, Password, Hash Key.
    */
   async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
+    const isSimulation = (window as any).PAYMENT_SIMULATION === true;
+    
+    if (isSimulation) {
+      console.log('[SIMULATION] JazzCash: Initiating mock success flow.');
+      return {
+        success: true,
+        transactionId: `JC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+        message: 'SIMULATED SUCCESS: JazzCash hub responding in test mode.',
+        redirectUrl: '/donation/success'
+      };
+    }
+
     console.log('[DEBUG] JazzCash: Merchant ID needed from env. Placeholder initiate.', request);
     return {
       success: false,

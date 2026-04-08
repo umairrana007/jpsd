@@ -8,6 +8,7 @@ import {
   FiFileText, FiVideo, FiMaximize2, FiEdit3, FiSave
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { storage, db } from '@/lib/firebase';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
@@ -283,7 +284,14 @@ function MediaLibraryPage() {
             >
               <div className="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center">
                 {item.type === 'image' ? (
-                  <img src={item.url} alt={item.alt} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <Image 
+                    src={item.url} 
+                    alt={item.alt || item.name} 
+                    fill
+                    loading="lazy"
+                    sizes="200px"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                  />
                 ) : item.type === 'pdf' ? (
                   <FiFileText size={48} className="text-red-400 opacity-50" />
                 ) : item.type === 'video' ? (
@@ -324,8 +332,17 @@ function MediaLibraryPage() {
                 {mediaItems.map((item) => (
                   <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer" onClick={() => setSelectedItem(item)}>
                      <td className="px-8 py-4">
-                        <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center text-slate-400 font-bold">
-                           {item.type === 'image' ? <img src={item.url} className="w-full h-full object-cover" /> : item.type === 'pdf' ? 'PDF' : 'VID'}
+                        <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center text-slate-400 font-bold relative">
+                           {item.type === 'image' ? (
+                             <Image 
+                               src={item.url} 
+                               alt={item.name} 
+                               fill
+                               loading="lazy"
+                               sizes="48px"
+                               className="object-cover" 
+                             />
+                           ) : item.type === 'pdf' ? 'PDF' : 'VID'}
                         </div>
                      </td>
                      <td className="px-8 py-4">
@@ -372,7 +389,16 @@ function MediaLibraryPage() {
                 {/* Preview Area */}
                 <div className="flex-[1.5] bg-slate-100 relative flex items-center justify-center overflow-hidden p-12">
                    {selectedItem.type === 'image' ? (
-                     <img src={selectedItem.url} className="max-w-full max-h-full object-contain rounded-3xl shadow-3xl" />
+                     <div className="relative w-full h-full max-w-4xl max-h-4xl">
+                        <Image 
+                          src={selectedItem.url} 
+                          alt={selectedItem.alt || selectedItem.name} 
+                          fill
+                          loading="lazy"
+                          sizes="100vw"
+                          className="object-contain rounded-3xl shadow-3xl" 
+                        />
+                     </div>
                    ) : (
                      <div className="text-slate-300 flex flex-col items-center gap-4">
                         <FiFileText size={120} />

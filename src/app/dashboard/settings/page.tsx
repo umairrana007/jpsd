@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function UserSettingsFinal() {
   const { language, setLanguage } = useLanguage();
-  const { currentUserData } = useAuth();
+  const { currentUserData, setGlobalAlert } = useAuth();
   const isUrdu = language === 'ur';
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -191,10 +191,10 @@ export default function UserSettingsFinal() {
                                                   userId: currentUserData.uid,
                                                   icon: '🗑️'
                                                });
-                                               alert(isUrdu ? 'درخواست بھیج دی گئی ہے۔' : 'Deletion request submitted successfully. Our team will review it within 24 hours.');
+                                               setGlobalAlert(isUrdu ? 'درخواست بھیج دی گئی ہے۔' : 'Deletion request submitted successfully. Our team will review it within 24 hours.', 'success');
                                                window.location.reload();
                                             } catch (err) {
-                                               alert('Error submitting request. Please try again later.');
+                                               setGlobalAlert('Error submitting request. Please try again later.', 'error');
                                             }
                                          }
                                       }}

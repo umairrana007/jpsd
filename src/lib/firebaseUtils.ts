@@ -20,6 +20,36 @@ import {
 import { Cause, Event, BlogPost, Volunteer, User, UserRole } from '@/types';
 import { getSafeImageUrl } from './imageUtils';
 
+// --- In-Memory Cache (Phase 5) ---
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+}
+const queryCache: Record<string, CacheEntry> = {};
+
+const getCachedData = (key: string) => {
+  const entry = queryCache[key];
+  if (entry && (Date.now() - entry.timestamp < CACHE_TTL)) {
+    return entry.data;
+  }
+  return null;
+};
+
+const setCachedData = (key: string, data: any) => {
+  queryCache[key] = { data, timestamp: Date.now() };
+};
+
+export const invalidateCache = (prefix?: string) => {
+  if (!prefix) {
+    Object.keys(queryCache).forEach(key => delete queryCache[key]);
+  } else {
+    Object.keys(queryCache).forEach(key => {
+      if (key.startsWith(prefix)) delete queryCache[key];
+    });
+  }
+};
+
 // Helper to get non-null db reference (throws if not configured)
 const getDb = (): Firestore => {
   if (!db) {
@@ -108,6 +138,10 @@ export const getProgramById = async (id: string) => {
 
 // Cause Operations
 export const getCauses = async (): Promise<Cause[]> => {
+  const cacheKey = 'causes_all';
+  const cached = getCachedData(cacheKey);
+  if (cached) return cached;
+
   if (!isDBAvailable()) return [];
 
   try {
@@ -117,7 +151,7 @@ export const getCauses = async (): Promise<Cause[]> => {
     );
     const snapshot = await getDocs(causesQuery);
     
-    return snapshot.docs.map(doc => {
+    const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
       return {
         ...data,
@@ -128,6 +162,8 @@ export const getCauses = async (): Promise<Cause[]> => {
         updatedAt: data.updatedAt?.toDate(),
       } as Cause;
     });
+    setCachedData(cacheKey, data);
+    return data;
   } catch (error: any) {
     console.error('Database Error:', error);
     return [];
@@ -157,6 +193,10 @@ export const getCauseById = async (id: string): Promise<Cause | null> => {
 
 // Event Operations
 export const getEvents = async (): Promise<Event[]> => {
+  const cacheKey = 'events_all';
+  const cached = getCachedData(cacheKey);
+  if (cached) return cached;
+
   if (!isDBAvailable()) return [];
 
   try {
@@ -166,7 +206,7 @@ export const getEvents = async (): Promise<Event[]> => {
     );
     const snapshot = await getDocs(eventsQuery);
 
-    return snapshot.docs.map(doc => {
+    const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
       return {
         ...data,
@@ -178,6 +218,8 @@ export const getEvents = async (): Promise<Event[]> => {
         createdAt: data.createdAt?.toDate(),
       } as Event;
     });
+    setCachedData(cacheKey, data);
+    return data;
   } catch (error: any) {
     console.error('Database Error:', error);
     return [];
@@ -208,6 +250,10 @@ export const getEventById = async (id: string): Promise<Event | null> => {
 
 // Blog Post Operations
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
+  const cacheKey = 'blog_posts_all';
+  const cached = getCachedData(cacheKey);
+  if (cached) return cached;
+
   if (!isDBAvailable()) return [];
 
   try {
@@ -218,7 +264,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
     );
     const snapshot = await getDocs(postsQuery);
 
-    return snapshot.docs.map(doc => {
+    const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
       return {
         ...data,
@@ -229,6 +275,8 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
         updatedAt: data.updatedAt?.toDate(),
       } as BlogPost;
     });
+    setCachedData(cacheKey, data);
+    return data;
   } catch (error: any) {
     console.error('Database Error:', error);
     return [];
@@ -245,9 +293,9 @@ export const getBlogPostById = async (id: string): Promise<BlogPost | null> => {
         ...data,
         id: postSnap.id,
         image: getSafeImageUrl(data.image),
-        publishedAt: data.publishedAt?.toDate(),
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        publishedAt: postSnap.data().publishedAt?.toDate(),
+        createdAt: postSnap.data().createdAt?.toDate(),
+        updatedAt: postSnap.data().updatedAt?.toDate(),
       } as BlogPost;
     }
   } catch (error) {
@@ -581,6 +629,67 @@ export const logActivity = async (activityOrAction: string | any, metadata: any 
   } catch (error) {
     console.error('Error logging activity:', error);
   }
+};
+
+// --- Donor Dashboard Enhancements (Phase 5) ---
+
+export interface ImpactMetrics {
+  totalDonated: number;
+  causesCount: number;
+  streakDays: number;
+  livesImpacted: number;
+  impactScore: number;
+}
+
+export const getUserImpactMetrics = async (userId: string): Promise<ImpactMetrics> => {
+  if (!isDBAvailable()) {
+    return { totalDonated: 0, causesCount: 0, streakDays: 0, livesImpacted: 0, impactScore: 0 };
+  }
+  
+  try {
+     const userDoc = await getDoc(doc(getDb(), 'users', userId));
+     if (userDoc.exists() && userDoc.data().impactMetrics) {
+        return userDoc.data().impactMetrics as ImpactMetrics;
+     }
+     
+     // Fallback to manual computation if not pre-computed
+     const donations = await getUserDonations(userId);
+     const total = donations.reduce((acc, d: any) => acc + (d.amount || 0), 0);
+     const causes = new Set(donations.map((d: any) => d.causeId || d.cause)).size;
+     const streak = 5; // Fixed mock for Phase 6
+     
+     return {
+        totalDonated: total,
+        causesCount: causes,
+        streakDays: streak,
+        livesImpacted: Math.ceil(total / 2500),
+        impactScore: Math.floor(total * 0.1 + causes * 5 + streak * 2)
+     };
+  } catch (error) {
+     console.error('Error getting impact metrics:', error);
+     return { totalDonated: 0, causesCount: 0, streakDays: 0, livesImpacted: 0, impactScore: 0 };
+  }
+};
+
+export const getUserRecurringDonations = async (userId: string) => {
+   if (!isDBAvailable()) return [];
+   try {
+      const q = query(collection(getDb(), 'recurring_donations'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+   } catch (error) {
+      console.error('Error getting recurring donations:', error);
+      return [];
+   }
+};
+
+export const toggleRecurringDonation = async (id: string, active: boolean) => {
+   if (!isDBAvailable()) return;
+   try {
+      await updateDoc(doc(getDb(), 'recurring_donations', id), { active, updatedAt: Timestamp.now() });
+   } catch (error) {
+      console.error('Error toggling recurring donation:', error);
+   }
 };
 
 // Tactical Activity Stream

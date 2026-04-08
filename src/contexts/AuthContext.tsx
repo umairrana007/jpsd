@@ -18,6 +18,8 @@ import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
 import { UserRole } from '@/types';
+import { GlobalAlert } from '@/components/ui/GlobalAlert';
+export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
 interface AuthContextType {
   user: User | null;
@@ -35,6 +37,7 @@ interface AuthContextType {
   isContentManager: boolean;
   isVolunteer: boolean;
   permissions: string[];
+  setGlobalAlert: (message: string, type?: AlertType) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +47,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState<any | null>(null);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [globalAlert, setGlobalAlertState] = useState<{ message: string; type: AlertType; isOpen: boolean }>({
+    message: '',
+    type: 'info',
+    isOpen: false,
+  });
+
+  const setGlobalAlert = (message: string, type: AlertType = 'info') => {
+    setGlobalAlertState({ message, type, isOpen: true });
+  };
 
   // Log Activity Helper
   const logLoginActivity = async (userId: string, email: string) => {
@@ -54,7 +66,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         timestamp: serverTimestamp(),
         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
-        // Note: Client IP can be added if using cloud functions or third-party IP services
       });
     } catch (e) {
       console.error('Error logging activity:', e);
@@ -69,9 +80,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const interval = setInterval(() => {
       if (Date.now() - lastActivity > TIMEOUT_MS) {
         logout();
-        alert('Your session has expired for security reasons.');
+        setGlobalAlert('Your session has expired for security reasons. Please re-authenticate.', 'error');
       }
-    }, 60000); // Check every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [user, lastActivity]);
@@ -97,14 +108,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user && db) {
-        // Fetch user data from Firestore
         try {
           const userRef = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setCurrentUserData(userSnap.data());
           } else {
-            // Create user document if it doesn't exist
             await setDoc(userRef, {
               email: user.email,
               name: user.displayName || '',
@@ -136,7 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-
   const login = async (email: string, password: string) => {
     if (!isFirebaseConfigured || !auth || !db) {
       throw new Error('Authentication system is currently offline. Please check your environment variables.');
@@ -164,7 +172,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const loginWithGoogle = async (preferredRole: UserRole = UserRole.DONOR) => {
     if (!isFirebaseConfigured || !auth || !db) {
       throw new Error('Authentication system is currently offline. Please check your environment variables.');
@@ -180,7 +187,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(result.user.email || '');
 
       if (!userSnap.exists()) {
-        // New Google User
         const role = isSuperAdminEmail ? UserRole.ADMIN : preferredRole;
         const autoApprove = role === UserRole.DONOR || isSuperAdminEmail;
 
@@ -202,7 +208,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           throw new Error('Selection committed. Identity verification pending Super Admin review.');
         }
       } else {
-        // Existing Google User
         const data = userSnap.data();
         if (data.isActive === false && !isSuperAdminEmail) {
           await signOut(auth as Auth);
@@ -217,7 +222,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const register = async (email: string, password: string, name: string, role: UserRole = UserRole.DONOR, extraData: any = {}) => {
     if (!auth || !db) {
       throw new Error('Registration system is currently offline.');
@@ -227,11 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await updateProfile(result.user, {
         displayName: name,
       });
-      
-      // Donors are auto-approved, others require admin review
       const autoApprove = role === UserRole.DONOR;
-      
-      // Create user document in Firestore
       await setDoc(doc(db as Firestore, 'users', result.user.uid), {
         email,
         name,
@@ -248,8 +248,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         ...extraData,
       });
-
-      // Send email verification
       await sendEmailVerification(result.user);
     } catch (error: any) {
       throw new Error(error.message || 'Failed to register');
@@ -304,10 +302,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Super Admin Fallback (Hardcoded Identity)
   const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
   const isSuperAdmin = user ? (SUPER_ADMIN_EMAILS.includes(user.email || '') || currentUserData?.role === UserRole.ADMIN) : false;
-
   const isAdmin = currentUserData?.role === UserRole.ADMIN || isSuperAdmin;
   const isContentManager = currentUserData?.role === UserRole.CONTENT_MANAGER;
   const isVolunteer = currentUserData?.role === UserRole.VOLUNTEER;
@@ -329,9 +325,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isContentManager,
     isVolunteer,
     permissions,
+    setGlobalAlert,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <GlobalAlert 
+        message={globalAlert.isOpen ? globalAlert.message : null} 
+        type={globalAlert.type} 
+        onClose={() => setGlobalAlertState({ ...globalAlert, isOpen: false })} 
+      />
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

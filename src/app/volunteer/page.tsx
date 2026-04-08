@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/Input';
 import { FiUsers, FiHeart, FiClock, FiCheck, FiLoader } from 'react-icons/fi';
 import { submitVolunteerApplication } from '@/lib/firebaseUtils';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function VolunteerPage() {
   const { t, language } = useLanguage();
+  const { setGlobalAlert } = useAuth();
   const isUrdu = language === 'ur';
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ export default function VolunteerPage() {
       // Optional: Redirect or scroll to top
     } catch (error) {
       console.error('Submission failed:', error);
-      alert('Application submission failed. Please try again.');
+      setGlobalAlert('Application link severed. Tactical retry recommended.', 'error');
     } finally {
       setLoading(false);
     }

@@ -8,9 +8,10 @@ import { CauseSelection } from '@/components/donation/CauseSelection';
 import { AmountSelection } from '@/components/donation/AmountSelection';
 import { PaymentDetails } from '@/components/donation/PaymentDetails';
 import { createDonation } from '@/lib/firebaseUtils';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 const steps = [
@@ -25,6 +26,7 @@ function DonationContent() {
   const initialCause = searchParams.get('cause');
   
   const { language, t } = useLanguage();
+  const { setGlobalAlert } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   
@@ -74,7 +76,7 @@ function DonationContent() {
       setCurrentStep(4);
     } catch (error) {
       console.error('Error creating donation:', error);
-      alert('There was an error processing your donation. Please try again.');
+      setGlobalAlert('Financial sync failed. Re-initiating contribution protocols.', 'error');
     } finally {
       setLoading(false);
     }

@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, setGlobalAlert } = useAuth();
   const router = useRouter();
   const { t, language } = useLanguage();
   const isUrdu = language === 'ur';
@@ -132,7 +132,7 @@ export default function LoginPage() {
                   if(!email) {
                     setError(t('login.enterEmail'));
                   } else {
-                    alert(t('login.resetSent') + email);
+                    setGlobalAlert(`${t('login.resetSent')} ${email}`, 'success');
                   }
                 }}
                 className={`text-[10px] font-black text-[#1ea05f] uppercase tracking-widest hover:underline underline-offset-4 ${isUrdu ? 'urdu-text' : ''}`}

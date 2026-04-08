@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { FiX, FiUser, FiMail, FiPhone } from 'react-icons/fi';
 import { Event } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RegistrationModalProps {
   event: Event | null;
@@ -23,6 +24,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useLanguage();
+  const { setGlobalAlert } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -40,7 +42,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Registration error:', error);
-      alert('Registration failed. Please try again.');
+      setGlobalAlert('Registration failed. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

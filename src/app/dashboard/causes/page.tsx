@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCauses } from '@/lib/firebaseUtils';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function MyCausesPage() {
   const { language } = useLanguage();
@@ -57,10 +58,13 @@ export default function MyCausesPage() {
              className="bg-white rounded-[3.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-2xl hover:shadow-[#1ea05f]/5 hover:border-[#1ea05f]/20 transition-all duration-700"
            >
               <div className="h-64 bg-slate-100 relative overflow-hidden">
-                 <img 
+                 <Image 
                    src={cause.image || '/images/jpsd_health.jpg'} 
-                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0"
                    alt={cause.title}
+                   fill
+                   loading="lazy"
+                   sizes="(max-width: 768px) 100vw, 33vw"
+                   className="object-cover group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0"
                  />
                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
                  <div className="absolute top-8 left-8 bg-white/20 backdrop-blur-xl px-6 py-2 rounded-2xl text-[9px] font-black text-white uppercase tracking-widest border border-white/20 shadow-xl">

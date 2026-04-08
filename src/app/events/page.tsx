@@ -10,8 +10,10 @@ import { EventFilter } from '@/components/events/EventFilter';
 import { RegistrationModal } from '@/components/events/RegistrationModal';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { FiCalendar } from 'react-icons/fi';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function EventsPage() {
+  const { setGlobalAlert } = useAuth();
   const { t } = useLanguage();
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
@@ -60,7 +62,7 @@ export default function EventsPage() {
 
   const handleSubmitRegistration = async (data: any) => {
     console.log('Registration:', data, 'for event:', selectedEvent?.id);
-    alert('Registration successful! We will contact you soon.');
+    setGlobalAlert('Registration successful! We will contact you soon.', 'success');
   };
 
   return (

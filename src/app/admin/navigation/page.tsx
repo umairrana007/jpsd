@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fi';
 import { motion, Reorder } from 'framer-motion';
 import { getNavigationSettings, updateNavigationSettings } from '@/lib/firebaseUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   id: string;
@@ -20,6 +21,7 @@ interface NavItem {
 }
 
 export default function NavigationManagerPage() {
+  const { setGlobalAlert } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [items, setItems] = useState<NavItem[]>([]);
@@ -40,7 +42,7 @@ export default function NavigationManagerPage() {
     setSaving(true);
     const success = await updateNavigationSettings(updatedItems || items);
     if (success) {
-      alert('Global navigation linkages synchronized successfully.');
+      setGlobalAlert('Global navigation linkages synchronized successfully.', 'success');
     }
     setSaving(false);
   };

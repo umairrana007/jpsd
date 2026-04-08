@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 interface HeroSectionProps {
   settings?: {
     heroTitleEn?: string;
@@ -16,6 +19,12 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
   const { t, language } = useLanguage();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Prefetch donor-critical flows
+    router.prefetch('/donation');
+  }, [router]);
 
   const displayTitleEn = settings?.heroTitleEn || t('home.hero.title.part1');
   const displayTitleUr = settings?.heroTitleUr || t('home.hero.title.full');

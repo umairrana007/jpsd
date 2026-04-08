@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
@@ -114,10 +115,13 @@ export const TestimonialSection: React.FC = () => {
                 <div className="flex items-center pt-6 border-t border-slate-50 mt-auto">
                   <div className={`relative w-14 h-14 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 ${language === 'ur' ? 'ml-5' : 'mr-5'}`}>
                     {testimonial.image ? (
-                      <img
+                      <Image
                         src={testimonial.image}
                         alt={language === 'ur' ? (testimonial.nameUrdu || testimonial.name) : testimonial.name}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                        fill
+                        loading="lazy"
+                        sizes="56px"
+                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                       />
                     ) : (
                       <div className="w-full h-full bg-slate-100 flex items-center justify-center text-[#1ea05f] font-black uppercase text-xs">

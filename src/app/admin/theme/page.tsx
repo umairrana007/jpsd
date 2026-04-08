@@ -8,8 +8,10 @@ import {
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { getThemeSettings, updateThemeSettings } from '@/lib/firebaseUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ThemeManagerPage() {
+  const { setGlobalAlert } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [theme, setTheme] = useState({
@@ -34,7 +36,7 @@ export default function ThemeManagerPage() {
     setSaving(true);
     const success = await updateThemeSettings(theme);
     if (success) {
-      alert('Visual Identity DNA committed and synchronized site-wide.');
+      setGlobalAlert('Visual Identity DNA committed and synchronized site-wide.', 'success');
     }
     setSaving(false);
   };

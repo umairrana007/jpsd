@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
 import { getGlobalConfig, type SiteSettings } from '@/lib/settings';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ContactPage() {
   const { t } = useLanguage();
+  const { setGlobalAlert } = useAuth();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +31,7 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for contacting us! We will get back to you soon.');
+    setGlobalAlert('Communication Synced. Our regional hub commanders will reach out shortly.', 'success');
     setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
   };
 

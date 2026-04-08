@@ -296,6 +296,7 @@ export interface PaymentResponse {
   transactionId?: string;
   message: string;
   errorCode?: string;
+  redirectUrl?: string; // Phase 6: Added for simulation & gateway redirects
 }
 
 export interface PaymentProvider {

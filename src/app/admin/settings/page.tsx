@@ -9,8 +9,10 @@ import { motion } from 'framer-motion';
 import { getGlobalSettings, updateGlobalSettings } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 function AdminSettingsPage() {
+  const { setGlobalAlert } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -37,9 +39,9 @@ function AdminSettingsPage() {
     setSaving(true);
     const success = await updateGlobalSettings(settings);
     if (success) {
-      alert('Global assets synchronized with HQ successfully.');
+      setGlobalAlert('Global assets synchronized with HQ successfully.', 'success');
     } else {
-      alert('Network error detected. Fallback protocols enabled.');
+      setGlobalAlert('Network error detected. Fallback protocols enabled.', 'error');
     }
     setSaving(false);
   };

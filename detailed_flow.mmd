@@ -1,0 +1,74 @@
+flowchart TD
+    %% Node Styling Definitions
+    classDef entry fill:#e2f0d9,stroke:#548235,stroke-width:2px,color:#000
+    classDef auth fill:#deebf7,stroke:#2e75b6,stroke-width:2px,color:#000
+    classDef action fill:#fff2cc,stroke:#d6b656,stroke-width:2px,color:#000
+    classDef payment fill:#fce4d6,stroke:#d56900,stroke-width:2px,color:#000
+    classDef admin fill:#f2f2f2,stroke:#7f7f7f,stroke-width:2px,color:#000
+    classDef notify fill:#dae3f3,stroke:#4472c4,stroke-width:2px,color:#000
+    classDef security fill:#f8cbad,stroke:#c55a11,stroke-width:2px,color:#000
+    
+    A["1. Landing: Visitor Accesses Platform"]:::entry --> B["Currency Auto-Detection (Geo-IP)"]:::entry
+    B --> C["Views Homepage & Dynamic Campaigns"]:::entry
+    
+    C --> D{"2. Authentication"}
+    D -- "Existing" --> E["Sign In"]:::auth
+    D -- "New" --> F["Sign Up"]:::auth
+    D -- "Guest" --> G["Checkout as Guest"]:::auth
+    
+    E --> H["3. Donor Identity Profile"]:::action
+    F --> H
+    
+    H --> I["Vault: Saved Payment Methods"]:::payment
+    H --> J["Manage Recurring Pledges (Pause/Cancel)"]:::action
+    
+    H --> K["4. Browse Global Causes"]:::action
+    G --> K
+    
+    K --> L["Select Campaign & Impact Goal"]:::action
+    
+    L --> M{"Donation Topology?"}
+    M -- "One-Time" --> N["Checkout (Multi-Currency)"]:::payment
+    M -- "Recurring" --> O["Setup Auto-Debit (Monthly/Yearly)"]:::payment
+    
+    N --> P["5. Select Payment Gateway"]:::payment
+    O --> P
+    
+    P --> Q["6. Fraud & Security Layer"]:::security
+    Q --> R{"Risk Evaluation?"}
+    R -- "High/Duplicate" --> S["Block & Alert Admins"]:::security
+    R -- "Safe" --> T["7. Secure Payment Processing"]:::payment
+    
+    T --> U{"Processor Response?"}
+    
+    %% Advanced Failure Recovery Path
+    U -- "Failed/Declined" --> V["Transaction Failed"]:::payment
+    V --> W{"Auto-Retry Eligibility?"}
+    W -- "Eligible" --> T
+    W -- "Exhausted" --> X["Trigger Abandoned Cart Strategy (Email/SMS)"]:::notify
+    X --> Y["Donor Prompts to Update Saved Method"]:::action
+    Y --> T
+    
+    %% Success Fulfillment Path
+    U -- "Success" --> Z["8. Payment Confirmation (Webhook)"]:::payment
+    Z --> AA["Post-Donation Screen (Thank You)"]:::notify
+    AA --> AB["Generate Tax-Compliant PDF Receipt"]:::notify
+    AB --> AC["Dispatch Omnichannel Confirmation (SMS/Email)"]:::notify
+    
+    AC --> AD["9. Dashboard: Access Ledger & Receipts"]:::action
+    AD --> AE["Ongoing Lifecycle Outreach & Campaign Milestones"]:::notify
+    
+    %% Admin Interaction & Advanced Reporting Layer
+    Z -. "Financial Telemetry" .-> AF["10. Admin Configuration Center"]:::admin
+    S -. "Suspension Notice" .-> AF
+    
+    AF --> AG["Reconcile & Verify Offline Bank Transfers"]:::admin
+    AF --> AH["Audit Fraud Logs & Security Escalations"]:::admin
+    AF --> AI["Moderate Active Campaigns & Tiers"]:::admin
+    
+    AF --> AJ["11. Executive Analytics & Reporting"]:::admin
+    AJ --> AK["Visualize Conversion, Revenue, & Top Partners"]:::admin
+    AJ --> AL["Export Master Audits (Excel/CSV/PDF)"]:::admin
+    
+    AG -. "Unlocks Impact Counter" .-> C
+    AI -. "CMS Visual Updates" .-> C

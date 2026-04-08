@@ -1,0 +1,25 @@
+flowchart TD
+    %% High-level Flow for Management
+    classDef entry fill:#e2f0d9,stroke:#548235,stroke-width:2px,color:#000
+    classDef auth fill:#deebf7,stroke:#2e75b6,stroke-width:2px,color:#000
+    classDef payment fill:#fce4d6,stroke:#d56900,stroke-width:2px,color:#000
+    classDef admin fill:#f2f2f2,stroke:#7f7f7f,stroke-width:2px,color:#000
+    classDef notify fill:#dae3f3,stroke:#4472c4,stroke-width:2px,color:#000
+    
+    A["Donor Visits & Selects Cause"]:::entry --> B["Signs In or Donates as Guest"]:::auth
+    B --> C["Sets Amount (One-time/Recurring)"]:::payment
+    
+    C --> D{"Fraud Check Passed?"}
+    D -- "No" --> E["Transaction Blocked & Flagged"]:::admin
+    D -- "Yes" --> F{"Payment Gateway Processed?"}
+    
+    F -- "Declined" --> G["Automatic Retry & Email Follow-up"]:::notify
+    G --> F
+    
+    F -- "Success" --> H["Immediate PDF Receipt & Thank You Screen"]:::notify
+    H --> I["Donor Dashboard Updated"]:::entry
+    
+    %% Admin Side
+    H -.-> J["Funds Recorded & Campaign Auto-Updates"]:::admin
+    E -.-> K["Admin Reviews Logs & Metrics Dashboard"]:::admin
+    J -.-> K
