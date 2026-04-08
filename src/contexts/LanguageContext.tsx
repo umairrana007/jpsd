@@ -153,6 +153,26 @@ const translations = {
     'donation.options.anonymousLabel': 'Make Anonymous',
     'donation.options.anonymousDesc': 'Your name will not be displayed publicly',
     'donation.security.notice': 'Your payment information is secure and encrypted',
+    'donation.payment.mode.sandbox': 'Test Mode Active',
+    'donation.payment.info.title': 'Payment Method Information',
+    'donation.payment.info.button': 'How it works',
+    'donation.options.receiptConsentLabel': 'Receive Email Receipt',
+    'donation.options.receiptConsentDesc': 'I agree to receive a PDF receipt and impact updates via email.',
+    'payment.info.operational.title': 'Operational Details',
+    'payment.info.jazzcash.title': 'How JazzCash Works',
+    'payment.info.jazzcash.step1': 'Enter your registered JazzCash mobile number',
+    'payment.info.jazzcash.step2': "You'll receive an OTP for verification",
+    'payment.info.jazzcash.step3': 'Confirm payment in JazzCash app',
+    'payment.info.jazzcash.fees': 'Processing fee: 1.5% (max Rs. 150)',
+    'payment.info.jazzcash.time': 'Processing time: Instant - 5 minutes',
+    'payment.info.jazzcash.regions': 'Supported: All Pakistan',
+    'payment.info.easypaisa.title': 'How EasyPaisa Works',
+    'payment.info.easypaisa.step1': 'Enter your EasyPaisa account number',
+    'payment.info.easypaisa.step2': 'Verify via OTP or app approval',
+    'payment.info.easypaisa.step3': 'Complete payment confirmation',
+    'payment.info.easypaisa.fees': 'Processing fee: 1.2% (max Rs. 120)',
+    'payment.info.easypaisa.time': 'Processing time: Instant - 3 minutes',
+    'payment.info.easypaisa.regions': 'Supported: All Pakistan + International cards',
 
     // Welfare Page
     'welfare.badge': 'HUMANITARIAN RELIEF',
@@ -295,6 +315,30 @@ const translations = {
     'login.joinMission': 'Join the Mission',
     'login.resetSent': 'Password reset link has been sent to ',
     'login.enterEmail': 'Please enter your email to reset password.',
+
+    // Success Page
+    'success.title': 'Payment Successful',
+    'success.subtitle': 'Your contribution is making a world of difference.',
+    'success.orderSummary': 'Donation Summary',
+    'success.receiptNotice': 'A digital receipt will be emailed shortly.',
+    'success.shareImpact': 'Share Your Impact',
+    'success.returnDashboard': 'Return to Dashboard',
+    'success.donateMore': 'Donate More',
+    'success.shareText': 'I just donated to Baitussalam (JPSD) for {cause}. Join me in making an impact!',
+    
+    // Failure Page
+    'failed.title': 'Payment Incomplete',
+    'failed.subtitle': "We couldn't process your donation at this time.",
+    'failed.reason.timeout': 'Transaction timed out. Connection was lost.',
+    'failed.reason.declined': 'The payment was declined by your bank or provider.',
+    'failed.reason.cancelled': 'The transaction was cancelled.',
+    'failed.reassurance': 'Don\'t worry, no charges were made to your account.',
+    'failed.tryAgain': 'Try Again',
+    'failed.contactSupport': 'Contact Support',
+    
+    // Email/System Stubs
+    'email.stubNotice': 'SYSTEM STUB: Real emails will be active once SMTP credentials are provided.',
+    'email.receiptQueued': '[Email Stub] Receipt queued for {email}',
   },
   ur: {
     // Navigation
@@ -445,6 +489,26 @@ const translations = {
     'donation.options.anonymousLabel': 'گمنام عطیہ کریں',
     'donation.options.anonymousDesc': 'آپ کا نام عوامی طور پر ظاہر نہیں کیا جائے گا',
     'donation.security.notice': 'آپ کی معلومات مکمل محفوظ اور انکرپٹڈ ہے',
+    'donation.payment.mode.sandbox': 'ٹیسٹ موڈ فعال ہے',
+    'donation.payment.info.title': 'ادائیگی کے طریقے کی معلومات',
+    'donation.payment.info.button': 'یہ کیسے کام کرتا ہے؟',
+    'donation.options.receiptConsentLabel': 'ای میل رسید وصول کریں',
+    'donation.options.receiptConsentDesc': 'میں ای میل کے ذریعے پی ڈی ایف رسید اور اپ ڈیٹس وصول کرنے پر راضی ہوں۔',
+    'payment.info.operational.title': 'آپریشنل تفصیلات',
+    'payment.info.jazzcash.title': 'جیزکیش کیسے کام کرتا ہے',
+    'payment.info.jazzcash.step1': 'اپنا رجسٹرڈ جیزکیش نمبر درج کریں',
+    'payment.info.jazzcash.step2': 'تصدیق کے لیے آپ کو OTP موصول ہوگا',
+    'payment.info.jazzcash.step3': 'جیزکیش ایپ میں ادائیگی کی تصدیق کریں',
+    'payment.info.jazzcash.fees': 'پروسسنگ فیس: 1.5% (زیادہ سے زیادہ 150 روپے)',
+    'payment.info.jazzcash.time': 'پروسسنگ وقت: فوری - 5 منٹ',
+    'payment.info.jazzcash.regions': 'سپورٹڈ: پورے پاکستان میں',
+    'payment.info.easypaisa.title': 'ایزی پیسہ کیسے کام کرتا ہے',
+    'payment.info.easypaisa.step1': 'اپنا ایزی پیسہ اکاؤنٹ نمبر درج کریں',
+    'payment.info.easypaisa.step2': 'OTP یا ایپ کے ذریعے تصدیق کریں',
+    'payment.info.easypaisa.step3': 'ادائیگی کی تصدیق مکمل کریں',
+    'payment.info.easypaisa.fees': 'پروسسنگ فیس: 1.2% (زیادہ سے زیادہ 120 روپے)',
+    'payment.info.easypaisa.time': 'پروسسنگ وقت: فوری - 3 منٹ',
+    'payment.info.easypaisa.regions': 'سپورٹڈ: پورے پاکستان + بین الاقوامی کارڈز',
 
     // Welfare Page
     'welfare.badge': 'انسانی ہمدردی کی بنیاد پر امداد',
@@ -586,11 +650,36 @@ const translations = {
     'login.joinMission': 'خیر کے کاموں کا حصہ بنیں',
     'login.resetSent': 'پاس ورڈ ری سیٹ لنک اس ای میل پر بھیج دیا گیا ہے: ',
     'login.enterEmail': 'پاس ورڈ ری سیٹ کرنے کے لیے براہ کرم اپنا ای میل درج کریں۔',
+
+    // Success Page
+    'success.title': 'ادائیگی کامیاب',
+    'success.subtitle': 'آپ کا عطیہ دنیا بدلنے میں مددگار ثابت ہو رہا ہے۔',
+    'success.orderSummary': 'عطیہ کا خلاصہ',
+    'success.receiptNotice': 'عطیہ کی ڈیجیٹل رسید جلد ہی ای میل کر دی جائے گی۔',
+    'success.shareImpact': 'اپنی نیکی شیئر کریں',
+    'success.returnDashboard': 'ڈیش بورڈ پر واپس جائیں',
+    'success.donateMore': 'مزید عطیہ کریں',
+    'success.shareText': 'میں نے ابھی بیت السلام (JPSD) کو {cause} کے لیے عطیہ دیا ہے۔ آپ بھی میرے ساتھ مل کر نیکی کا حصہ بنیں!',
+    
+    // Failure Page
+    'failed.title': 'ادائیگی نامکمل',
+    'failed.subtitle': 'ہم اس وقت آپ کی ادائیگی پروسس نہیں کر سکے۔',
+    'failed.reason.timeout': 'ٹرانزیکشن کا وقت ختم ہو گیا۔ رابطہ منقطع ہو گیا۔',
+    'failed.reason.declined': 'آپ کے بینک یا فراہم کنندہ نے ادائیگی مسترد کر دی۔',
+    'failed.reason.cancelled': 'ٹرانزیکشن منسوخ کر دی گئی۔',
+    'failed.reassurance': 'پریشان نہ ہوں، آپ کے اکاؤنٹ سے کوئی کٹوتی نہیں کی گئی۔',
+    'failed.tryAgain': 'دوبارہ کوشش کریں',
+    'failed.contactSupport': 'سپورٹ سے رابطہ کریں',
+    
+    // Email/System Stubs
+    'email.stubNotice': 'سسٹم سٹب: SMTP کریڈینشلز ملنے کے بعد اصل ای میلز فعال ہو جائیں گی۔',
+    'email.receiptQueued': '[ای میل سٹب] رسید {email} کے لیے قطار میں لگا دی گئی ہے',
   },
 };
 
 const LanguageContext = createContext<LanguageContextType>({
   language: 'en',
+  isUrdu: false,
   setLanguage: () => {},
   t: (key) => key,
 });
@@ -634,8 +723,10 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return translations[language][key] || key;
   };
 
+  const isUrdu = language === 'ur';
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, isUrdu, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

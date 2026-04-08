@@ -8,14 +8,22 @@ import {
   FiZap, FiArrowLeft, FiTag, FiAlertCircle, FiX
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import PaymentInfoModal from '@/components/PaymentInfoModal';
 
 import { createDonation } from '@/lib/firebaseUtils';
 import { processPayment } from '@/lib/paymentUtils';
 import { dispatchDonationNotification } from '@/lib/notificationUtils';
 import { trackDonationCompletion } from '@/lib/analyticsUtils';
 import { useAuth } from '@/contexts/AuthContext';
+import { sendDonationReceipt } from '@/lib/emailService';
 
-export default function DonationPage() {
+import { getPaymentConfig, isSimulationMode } from '@/lib/config/paymentConfig';
+import { generateJazzCashHash, generateEasyPaisaSignature } from '@/lib/payments/hashUtils';
+
+function DonationForm() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [isSimulated, setIsSimulated] = useState(false);
@@ -29,11 +37,33 @@ export default function DonationPage() {
     paymentMethod: ''
   });
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [receiptConsent, setReceiptConsent] = useState(true);
+  const [attemptSubmit, setAttemptSubmit] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [selectedInfoMethod, setSelectedInfoMethod] = useState('jazzcash');
   const [lastPaymentResult, setLastPaymentResult] = useState<any>(null);
+  const searchParams = useSearchParams();
 
-  const { user } = useAuth();
+  // Phase 8 Task 3: Prefill Logic
+  React.useEffect(() => {
+    const prefillData = searchParams.get('prefill');
+    if (prefillData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(prefillData));
+        setFormData(prev => ({ ...prev, ...decoded }));
+        // Optionally move to step 3 if prefill is complete
+        if (decoded.amount && decoded.paymentMethod) {
+          setStep(3);
+        }
+      } catch (e) {
+        console.error('[Prefill Error] Structural data corruption detected.');
+      }
+    }
+  }, [searchParams]);
+
+  const { language, t, isUrdu } = useLanguage();
+  const { user, setGlobalAlert } = useAuth();
 
   const toggleSimulation = () => {
     const newState = !isSimulated;
@@ -51,14 +81,39 @@ export default function DonationPage() {
       return;
     }
 
+    setAttemptSubmit(true);
+
+    // Fix #2 A: Consent Validation
+    if (!receiptConsent) {
+      setGlobalAlert(
+        isUrdu ? 'براہ کرم رسید ای میل کے لیے رضامندی دیں۔' : 'Please consent to receive your donation receipt via email.',
+        'warning'
+      );
+      document.getElementById('receipt-consent')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
     setSubmitting(true);
     
     try {
+      // Phase 8 Task 2: Checksum Generation Protocol
+      let securityHash = '';
+      const config = getPaymentConfig();
+      
+      if (formData.paymentMethod === 'jazzcash') {
+        securityHash = generateJazzCashHash(formData, config.jazzcash.salt);
+        console.log(`[Payment Stub] JazzCash Hash generated: ${securityHash}`);
+      } else if (formData.paymentMethod === 'easypaisa') {
+        securityHash = generateEasyPaisaSignature(JSON.stringify(formData), config.easypaisa.apiKey);
+        console.log(`[Payment Stub] EasyPaisa Signature generated: ${securityHash}`);
+      }
+
       // 1. Initial Tactical Asset Verification (Firebase)
       const donationId = await createDonation({
         ...formData,
         amount: parseFloat(formData.amount),
-        userId: 'MOCK-USER-123'
+        userId: 'MOCK-USER-123',
+        securityHash // Include mock hash in payload
       });
       
       if (!donationId) throw new Error('Asset verification failed.');
@@ -105,19 +160,42 @@ export default function DonationPage() {
           formData.paymentMethod
         );
 
+        // 5. Trigger Email Receipt Stub (Phase 8 Task 3)
+        // This is a stub that logs to activity_logs and console
+        await sendDonationReceipt({
+          id: paymentResult.transactionId,
+          donorName: user?.displayName || 'Valued Humanitarian',
+          donorEmail: user?.email || 'donor@example.com',
+          amount: parseFloat(formData.amount),
+          currency: 'PKR',
+          causeName: formData.cause,
+          paymentMethod: formData.paymentMethod,
+          timestamp: new Date().toISOString()
+        }, user?.email || 'donor@example.com');
+
         if (paymentResult.redirectUrl) {
           window.location.href = paymentResult.redirectUrl;
         } else {
           // Success Path (e.g. for Direct Wallet)
-          setShowSuccessModal(true);
-          setTimeout(() => {
-             window.location.href = '/donation/success';
-          }, 3000);
+          const successParams = new URLSearchParams({
+            txid: paymentResult.transactionId,
+            amount: formData.amount,
+            cause: formData.cause,
+            donor: user?.displayName || 'Humanitarian',
+            timestamp: new Date().toISOString()
+          }).toString();
+          
+          window.location.href = `/donation/success?${successParams}`;
         }
+      } else {
+        // Payment result was not successful
+        const prefill = encodeURIComponent(JSON.stringify(formData));
+        window.location.href = `/donation/failed?reason=declined&prefill=${prefill}`;
       }
     } catch (err) {
       console.error('[BHPGP] Operational Error:', err);
-      setShowErrorModal(true);
+      const prefill = encodeURIComponent(JSON.stringify(formData));
+      window.location.href = `/donation/failed?reason=timeout&prefill=${prefill}`;
     } finally {
       setSubmitting(false);
     }
@@ -353,6 +431,7 @@ export default function DonationPage() {
                             key={method.id}
                             onClick={() => {
                               if (isComingSoon && !isSimulated) {
+                                setSelectedInfoMethod(method.id);
                                 setShowInfoModal(true);
                               } else {
                                 setFormData({...formData, paymentMethod: method.id});
@@ -386,6 +465,27 @@ export default function DonationPage() {
                   </div>
                </div>
 
+                {/* Fix #2 B & C: Consent Checkbox */}
+                <div className={`p-4 rounded-2xl border transition-all ${!receiptConsent && attemptSubmit ? 'border-amber-300 bg-amber-50 animate-pulse' : 'border-slate-100 bg-slate-50'}`}>
+                  <label className="flex items-center gap-4 cursor-pointer">
+                    <input 
+                      id="receipt-consent"
+                      type="checkbox" 
+                      checked={receiptConsent}
+                      onChange={(e) => setReceiptConsent(e.target.checked)}
+                      className="w-5 h-5 text-[#1ea05f] focus:ring-[#1ea05f] rounded-lg cursor-pointer"
+                    />
+                    <div className={isUrdu ? 'text-right' : ''}>
+                      <p className={`font-black text-[10px] uppercase tracking-widest ${!receiptConsent && attemptSubmit ? 'text-amber-700' : 'text-slate-800'}`}>
+                        {t('donation.options.receiptConsentLabel')}
+                      </p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                        {t('donation.options.receiptConsentDesc')}
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
                <button 
                  onClick={handleSubmit}
                  disabled={submitting || !formData.paymentMethod}
@@ -404,54 +504,11 @@ export default function DonationPage() {
       </motion.div>
 
 
-      <AnimatePresence>
-        {showInfoModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xl flex items-center justify-center p-6"
-            onClick={() => setShowInfoModal(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-[3rem] p-12 max-w-lg w-full shadow-2xl space-y-8 relative overflow-hidden"
-            >
-               <div className="absolute top-0 right-0 w-32 h-32 bg-[#1ea05f]/10 rounded-full blur-3xl -mr-16 -mt-16" />
-               <button 
-                 onClick={() => setShowInfoModal(false)}
-                 className="absolute top-8 right-8 w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-all"
-               >
-                 <FiX />
-               </button>
-
-               <div className="w-16 h-16 bg-[#1ea05f]/10 rounded-2xl flex items-center justify-center text-[#1ea05f]">
-                 <FiAlertCircle size={32} />
-               </div>
-
-               <div className="space-y-4">
-                 <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-tight text-slate-800">Payment Gateway <br /><span className="text-[#1ea05f]">Calibration Active.</span></h3>
-                 <p className="text-sm font-medium text-slate-500 leading-relaxed">
-                   Our localized payment hubs (JazzCash & EasyPaisa) are currently undergoing high-security synchronization. Real-time humanitarian asset deployment will be enabled in this region shortly.
-                 </p>
-                 <p className="text-[10px] font-black text-[#1ea05f] uppercase tracking-widest italic border-l-2 border-[#1ea05f] pl-4">
-                    HQ Directives: Manual Bank Transfer is available for immediate impact.
-                 </p>
-               </div>
-
-               <button 
-                 onClick={() => setShowInfoModal(false)}
-                 className="w-full py-5 bg-slate-900 text-white font-black rounded-3xl shadow-xl hover:bg-slate-800 transition-all uppercase tracking-widest italic"
-               >
-                 Acknowledge Protocol
-               </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PaymentInfoModal 
+        isOpen={showInfoModal} 
+        onClose={() => setShowInfoModal(false)} 
+        method={selectedInfoMethod}
+      />
 
        <div className="mt-12 flex flex-col items-center gap-4 relative z-10">
           <button 
@@ -530,6 +587,14 @@ export default function DonationPage() {
          )}
        </AnimatePresence>
     </div>
+  );
+}
+
+export default function DonationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black uppercase tracking-widest text-[#1ea05f] animate-pulse italic">Calibrating Humanitarian Gateway...</div>}>
+      <DonationForm />
+    </Suspense>
   );
 }
 

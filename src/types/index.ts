@@ -268,6 +268,7 @@ export interface SiteSettings {
 
 export interface LanguageContextType {
   language: 'en' | 'ur';
+  isUrdu: boolean;
   setLanguage: (lang: 'en' | 'ur') => void;
   t: (key: string) => string;
 }
@@ -283,6 +284,7 @@ export interface NavItem {
 export type PaymentProcessStatus = 'pending' | 'success' | 'failed' | 'refunded';
 
 export interface PaymentRequest {
+  id?: string;
   amount: number;
   currency: string;
   donorEmail: string;
@@ -297,10 +299,12 @@ export interface PaymentResponse {
   message: string;
   errorCode?: string;
   redirectUrl?: string; // Phase 6: Added for simulation & gateway redirects
+  meta?: any;
 }
 
 export interface PaymentProvider {
   initiatePayment(request: PaymentRequest): Promise<PaymentResponse>;
   verifyTransaction(transactionId: string): Promise<PaymentResponse>;
   getPaymentStatus(transactionId: string): Promise<PaymentProcessStatus>;
+  processRefund?(transactionId: string, amount: number): Promise<PaymentResponse>;
 }

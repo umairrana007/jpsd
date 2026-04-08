@@ -39,6 +39,7 @@ function DonationContent() {
   const [paymentMethod, setPaymentMethod] = useState('jazzcash');
   const [isZakat, setIsZakat] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [receiptConsent, setReceiptConsent] = useState(true);
   const [donationComplete, setDonationComplete] = useState(false);
   const [transactionId, setTransactionId] = useState('');
 
@@ -69,6 +70,7 @@ function DonationContent() {
         anonymous: isAnonymous,
         isZakat,
         isAnonymous,
+        receiptConsent,
       });
 
       setTransactionId(typeof donationId === 'string' ? donationId : `TXN-${Date.now()}`);
@@ -180,12 +182,14 @@ May Allah reward you immensely. ✨
                 paymentMethod={paymentMethod}
                 isZakat={isZakat}
                 isAnonymous={isAnonymous}
+                receiptConsent={receiptConsent}
                 onInfoChange={(field, value) =>
                   setDonorInfo((prev) => ({ ...prev, [field]: value }))
                 }
                 onPaymentMethodChange={setPaymentMethod}
                 onZakatChange={setIsZakat}
                 onAnonymousChange={setIsAnonymous}
+                onReceiptConsentChange={setReceiptConsent}
               />
             )}
 

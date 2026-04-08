@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { FiCreditCard, FiDollarSign, FiUser, FiMail, FiPhone } from 'react-icons/fi';
+import { FiCreditCard, FiDollarSign, FiUser, FiMail, FiPhone, FiInfo } from 'react-icons/fi';
+import PaymentInfoModal from '@/components/PaymentInfoModal';
 
 interface Step3Props {
   donorInfo: {
@@ -16,10 +17,12 @@ interface Step3Props {
   paymentMethod: string;
   isZakat: boolean;
   isAnonymous: boolean;
+  receiptConsent: boolean;
   onInfoChange: (field: string, value: string) => void;
   onPaymentMethodChange: (method: string) => void;
   onZakatChange: (isZakat: boolean) => void;
   onAnonymousChange: (isAnonymous: boolean) => void;
+  onReceiptConsentChange: (consent: boolean) => void;
 }
 
 export const PaymentDetails: React.FC<Step3Props> = ({
@@ -27,12 +30,17 @@ export const PaymentDetails: React.FC<Step3Props> = ({
   paymentMethod,
   isZakat,
   isAnonymous,
+  receiptConsent,
   onInfoChange,
   onPaymentMethodChange,
   onZakatChange,
   onAnonymousChange,
+  onReceiptConsentChange,
 }) => {
   const { language, t } = useLanguage();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  
+  const isSandbox = process.env.NEXT_PUBLIC_PAYMENT_MODE !== 'production';
 
   const paymentMethods = [
     { id: 'jazzcash', name: 'JazzCash', icon: FiDollarSign },
@@ -93,7 +101,14 @@ export const PaymentDetails: React.FC<Step3Props> = ({
       exit={{ opacity: 0, x: -50 }}
       className="space-y-6 max-w-2xl mx-auto"
     >
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 relative">
+        {isSandbox && (
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+            <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200 shadow-sm animate-pulse">
+              🛡️ {t('donation.payment.mode.sandbox')}
+            </span>
+          </div>
+        )}
         <h2 className={`text-3xl font-bold text-[#2c3e50] mb-2 ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.paymentDetails')}</h2>
         <p className={`text-gray-600 ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.payment.subtitle')}</p>
       </div>
@@ -130,7 +145,16 @@ export const PaymentDetails: React.FC<Step3Props> = ({
 
       {/* Payment Method Selection */}
       <div className="pt-6 border-t border-gray-200">
-        <h3 className={`text-xl font-semibold text-[#2c3e50] mb-4 ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.payment.methodTitle')}</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className={`text-xl font-semibold text-[#2c3e50] ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.payment.methodTitle')}</h3>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-1 rtl:space-x-reverse text-[#27ae60] hover:text-[#219150] font-bold text-sm transition-colors group"
+          >
+            <FiInfo className="text-lg group-hover:scale-110 transition-transform" />
+            <span className={language === 'ur' ? 'urdu-text' : ''}>{t('donation.payment.info.button')}</span>
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {paymentMethods.map((method, index) => (
             <motion.button
@@ -228,7 +252,28 @@ export const PaymentDetails: React.FC<Step3Props> = ({
             <p className={`text-sm text-gray-600 ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.options.anonymousDesc')}</p>
           </div>
         </label>
+
+        {/* Receipt Email Consent */}
+        <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-[#27ae60] transition-colors bg-[#27ae60]/5 border-[#27ae60]/20">
+          <input
+            id="receipt-consent"
+            type="checkbox"
+            checked={receiptConsent}
+            onChange={(e) => onReceiptConsentChange(e.target.checked)}
+            className="w-5 h-5 text-[#27ae60] focus:ring-[#27ae60] rounded"
+          />
+          <div className={language === 'ur' ? 'text-right' : ''}>
+            <p className={`font-semibold text-[#2c3e50] ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.options.receiptConsentLabel')}</p>
+            <p className={`text-sm text-gray-600 ${language === 'ur' ? 'urdu-text' : ''}`}>{t('donation.options.receiptConsentDesc')}</p>
+          </div>
+        </label>
       </div>
+
+      <PaymentInfoModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        method={paymentMethod} 
+      />
 
       {/* Security Notice */}
       <motion.div
