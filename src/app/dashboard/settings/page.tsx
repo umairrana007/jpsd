@@ -9,6 +9,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { UserRole } from '@/types';
 
 export default function UserSettingsFinal() {
   const { language, setLanguage } = useLanguage();
@@ -144,11 +145,11 @@ export default function UserSettingsFinal() {
                                </div>
                             </div>
 
-                            {currentUserData?.role === 'VOLUNTEER' && (
+                            {currentUserData?.role === UserRole.VOLUNTEER && (
                                <div className="md:col-span-2 space-y-2">
                                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{isUrdu ? 'مہارتیں' : 'Skills & Expertise'}</label>
                                   <textarea 
-                                     defaultValue={currentUserData?.skills || ''}
+                                     defaultValue={Array.isArray(currentUserData?.skills) ? currentUserData.skills.join(', ') : ''}
                                      className={`w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl outline-none transition-all font-medium h-32`}
                                   />
                                </div>
@@ -180,15 +181,16 @@ export default function UserSettingsFinal() {
                                       className="text-[10px] items-center gap-2 text-red-500 font-black uppercase tracking-widest hover:underline disabled:opacity-50"
                                       disabled={currentUserData?.deletionRequested}
                                       onClick={async () => {
+                                         if (!currentUserData) return;
                                          if(confirm(isUrdu ? 'کیا آپ واقعی اپنا ڈیٹا حذف کرنے کی درخواست کرنا چاہتے ہیں؟' : 'Are you sure you want to request data deletion? This action cannot be undone.')) {
                                             try {
                                                const { updateUserStatus, logActivity } = await import('@/lib/firebaseUtils');
                                                // Update user doc with a special flag
-                                               await updateUserStatus(currentUserData.uid, 'pending_deletion', true);
+                                               await updateUserStatus(currentUserData.id, 'pending_deletion', true);
                                                await logActivity({
                                                   type: 'PRIVACY_REQUEST',
                                                   message: `User ${currentUserData.email} requested data deletion.`,
-                                                  userId: currentUserData.uid,
+                                                  userId: currentUserData.id,
                                                   icon: '🗑️'
                                                });
                                                setGlobalAlert(isUrdu ? 'درخواست بھیج دی گئی ہے۔' : 'Deletion request submitted successfully. Our team will review it within 24 hours.', 'success');

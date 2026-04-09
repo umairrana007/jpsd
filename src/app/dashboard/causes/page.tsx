@@ -8,12 +8,13 @@ import { getCauses } from '@/lib/firebaseUtils';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { Cause } from '@/types';
 
 export default function MyCausesPage() {
   const { language } = useLanguage();
   const { user } = useAuth();
   const isUrdu = language === 'ur';
-  const [causes, setCauses] = useState<any[]>([]);
+  const [causes, setCauses] = useState<Cause[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function MyCausesPage() {
                  </div>
                  <div className="absolute bottom-8 left-8 right-8">
                     <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.3em] mb-1 italic">Mission Status</p>
-                    <p className="text-white text-xs font-black uppercase tracking-widest italic">{cause.status || 'Active Deployment'}</p>
+                    <p className="text-white text-xs font-black uppercase tracking-widest italic">{cause.active ? 'Active Deployment' : 'Mission Completed'}</p>
                  </div>
               </div>
               <div className="p-10 flex flex-col flex-1 space-y-8">
@@ -82,17 +83,17 @@ export default function MyCausesPage() {
                     <div className="flex justify-between items-end">
                        <div>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Impact Velocity</p>
-                          <p className="text-xl font-black text-slate-800 italic uppercase">{(cause.raised / cause.goal * 100).toFixed(0)}% <span className="text-xs text-[#1ea05f] font-bold">READY</span></p>
+                          <p className="text-xl font-black text-slate-800 italic uppercase">{(cause.raisedAmount / cause.goalAmount * 100).toFixed(0)}% <span className="text-xs text-[#1ea05f] font-bold">READY</span></p>
                        </div>
                        <div className="text-right">
                           <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Target Asset</p>
-                          <p className="text-xs font-black text-slate-800 uppercase tracking-tighter">${cause.goal?.toLocaleString()}</p>
+                          <p className="text-xs font-black text-slate-800 uppercase tracking-tighter">${cause.goalAmount?.toLocaleString()}</p>
                        </div>
                     </div>
                     <div className="w-full h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
                        <motion.div 
                          initial={{ width: 0 }}
-                         whileInView={{ width: `${(cause.raised / cause.goal * 100)}%` }}
+                         whileInView={{ width: `${(cause.raisedAmount / cause.goalAmount * 100)}%` }}
                          transition={{ duration: 1.5, ease: "circOut" }}
                          className="h-full bg-gradient-to-r from-[#1ea05f] to-[#34d399] rounded-full shadow-[0_0_15px_rgba(30,160,95,0.3)]"
                        ></motion.div>

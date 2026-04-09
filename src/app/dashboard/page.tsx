@@ -9,6 +9,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserDonations, getLiveStats } from '@/lib/firebaseUtils';
+import { Donation, LiveStats } from '@/types';
 import Link from 'next/link';
 
 export default function DonorDashboardClean() {
@@ -16,8 +17,13 @@ export default function DonorDashboardClean() {
   const { user, currentUserData } = useAuth();
   const isUrdu = language === 'ur';
   
-  const [donations, setDonations] = useState<any[]>([]);
-  const [liveStats, setLiveStats] = useState<any>({ totalLivesServed: 0, totalDonationsReceived: 0 });
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [liveStats, setLiveStats] = useState<LiveStats>({ 
+    totalLivesServed: 0, 
+    totalDonationsReceived: 0,
+    activePrograms: 0,
+    volunteersCount: 0 
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,8 +39,13 @@ export default function DonorDashboardClean() {
         getUserDonations(user!.uid),
         getLiveStats()
       ]);
-      setDonations(userDonations);
-      setLiveStats(stats);
+      setDonations(userDonations as Donation[]);
+      setLiveStats((stats as LiveStats) || { 
+        totalLivesServed: 0, 
+        totalDonationsReceived: 0,
+        activePrograms: 0,
+        volunteersCount: 0 
+      });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -43,8 +54,8 @@ export default function DonorDashboardClean() {
   };
 
   const calculatedStats = {
-    totalDonated: donations.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0),
-    zakatTotal: donations.filter(d => d.type === 'Zakat').reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0),
+    totalDonated: donations.reduce((acc, curr) => acc + (curr.amount || 0), 0),
+    zakatTotal: donations.filter(d => d.isZakat).reduce((acc, curr) => acc + (curr.amount || 0), 0),
     impactScore: donations.length * 15,
   };
 
@@ -175,12 +186,12 @@ export default function DonorDashboardClean() {
                      {donations.slice(0, 3).map((item) => (
                         <tr key={item.id} className="hover:bg-slate-50 transition-all">
                            <td className="px-8 py-6 text-sm font-medium text-slate-500">#{item.id?.slice(-6)}</td>
-                           <td className="px-8 py-6 font-bold text-slate-800">{item.cause || 'General Donation'}</td>
+                           <td className="px-8 py-6 font-bold text-slate-800">{item.causeName || 'General Donation'}</td>
                            <td className="px-8 py-6">
                               <span className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
-                                 item.type === 'Zakat' ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500'
+                                 item.isZakat ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500'
                               }`}>
-                                 {item.type}
+                                 {item.isZakat ? 'Zakat' : 'Sadaqah'}
                               </span>
                            </td>
                            <td className="px-8 py-6 font-bold text-slate-900 text-lg">PKR {item.amount}</td>

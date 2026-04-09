@@ -17,17 +17,17 @@ import {
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
-import { UserRole } from '@/types';
+import { UserRole, User as AppUser } from '@/types';
 import { GlobalAlert } from '@/components/ui/GlobalAlert';
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  currentUserData: any | null;
+  currentUserData: AppUser | null;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (role?: UserRole) => Promise<void>;
-  register: (email: string, password: string, name: string, role: UserRole, extraData?: any) => Promise<void>;
+  register: (email: string, password: string, name: string, role: UserRole, extraData?: Partial<AppUser>) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUserRole: (userId: string, role: UserRole) => Promise<void>;
@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentUserData, setCurrentUserData] = useState<any | null>(null);
+  const [currentUserData, setCurrentUserData] = useState<AppUser | null>(null);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [globalAlert, setGlobalAlertState] = useState<{ message: string; type: AlertType; isOpen: boolean }>({
     message: '',
@@ -112,29 +112,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const userRef = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
-            setCurrentUserData(userSnap.data());
+            setCurrentUserData({ id: userSnap.id, ...userSnap.data() } as AppUser);
           } else {
-            await setDoc(userRef, {
-              email: user.email,
+            const newUser: AppUser = {
+              id: user.uid,
+              email: user.email || '',
               name: user.displayName || '',
               photoURL: user.photoURL || '',
               role: UserRole.DONOR,
               isActive: true,
+              status: 'approved',
               createdAt: new Date(),
-              updatedAt: new Date(),
               lastLogin: new Date(),
-              permissions: [],
-            });
-            setCurrentUserData({
-              email: user.email,
-              name: user.displayName || '',
-              role: UserRole.DONOR,
-              isActive: true,
-              permissions: [],
-            });
+              preferences: {
+                language: 'en',
+                newsletter: false,
+                notifications: true,
+              },
+            };
+            await setDoc(userRef, newUser);
+            setCurrentUserData(newUser);
           }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
+        } catch (error: unknown) {
+          const msg = error instanceof Error ? error.message : 'Authentication data synchronization failed';
+          console.error(msg);
+          setGlobalAlert(msg, 'error');
         }
       } else {
         setCurrentUserData(null);
@@ -167,8 +169,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await updateDoc(userRef, { lastLogin: new Date() });
         await logLoginActivity(result.user.uid, email);
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to login');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to login';
+      setGlobalAlert(msg, 'error');
+      throw error;
     }
   };
 
@@ -216,13 +220,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await updateDoc(userRef, { lastLogin: new Date() });
       }
       await logLoginActivity(result.user.uid, result.user.email || 'google-user');
-    } catch (error: any) {
-      if (error.code === 'auth/popup-closed-by-user') return;
-      throw new Error(error.message || 'Failed to login with Google');
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'auth/popup-closed-by-user') return;
+      const msg = error instanceof Error ? error.message : 'Failed to login with Google';
+      setGlobalAlert(msg, 'error');
+      throw error;
     }
   };
 
-  const register = async (email: string, password: string, name: string, role: UserRole = UserRole.DONOR, extraData: any = {}) => {
+  const register = async (email: string, password: string, name: string, role: UserRole = UserRole.DONOR, extraData: Partial<AppUser> = {}) => {
     if (!auth || !db) {
       throw new Error('Registration system is currently offline.');
     }
@@ -249,8 +255,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...extraData,
       });
       await sendEmailVerification(result.user);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to register');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to register';
+      setGlobalAlert(msg, 'error');
+      throw error;
     }
   };
 
@@ -259,8 +267,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signOut(auth as Auth);
       setCurrentUserData(null);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to logout');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to logout';
+      setGlobalAlert(msg, 'error');
+      throw error;
     }
   };
 
@@ -268,8 +278,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!auth) throw new Error('Auth system offline');
     try {
       await sendPasswordResetEmail(auth as Auth, email);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to send password reset email');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Operation failed';
+      throw new Error(msg);
     }
   };
 
@@ -281,8 +292,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentUserData) {
         setCurrentUserData({ ...currentUserData, role });
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to update user role');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Operation failed';
+      throw new Error(msg);
     }
   };
 
@@ -297,8 +309,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentUserData && userId === user?.uid) {
         setCurrentUserData({ ...currentUserData, permissions });
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to update user permissions');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Operation failed';
+      throw new Error(msg);
     }
   };
 

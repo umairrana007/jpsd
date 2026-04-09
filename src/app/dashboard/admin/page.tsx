@@ -11,6 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, getDocs, doc, updateDoc, where, orderBy, limit } from 'firebase/firestore';
+import { AppUser } from '@/types';
 
 export default function AdminOverview() {
   const { language } = useLanguage();
@@ -24,7 +25,7 @@ export default function AdminOverview() {
     activeCauses: 0
   });
 
-  const [pendingUsersList, setPendingUsersList] = useState<any[]>([]);
+  const [pendingUsersList, setPendingUsersList] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function AdminOverview() {
         activeCauses: causesSnap.size
       });
 
-      const pendingUsers = pendingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const pendingUsers = pendingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as AppUser[];
       setPendingUsersList(pendingUsers);
       setLoading(false);
     } catch (error) {
@@ -181,7 +182,7 @@ export default function AdminOverview() {
                                     <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-[8px] font-black uppercase tracking-widest border border-slate-200">{user.role}</span>
                                  </td>
                                  <td className="px-10 py-8">
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">{user.createdAt?.toDate ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</span>
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">{user.createdAt ? (user.createdAt instanceof Date ? user.createdAt.toLocaleDateString() : 'N/A') : 'N/A'}</span>
                                  </td>
                                  <td className="px-10 py-8 text-right">
                                     <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">

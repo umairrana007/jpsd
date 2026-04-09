@@ -4,10 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FiSearch, FiUser, FiPhone, FiCreditCard, FiX, FiArrowRight } from 'react-icons/fi';
 import { searchUsers } from '@/lib/firebaseUtils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { User } from '@/types';
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);

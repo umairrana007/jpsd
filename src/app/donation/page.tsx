@@ -11,6 +11,7 @@ import { createDonation } from '@/lib/firebaseUtils';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { Donation } from '@/types';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -63,11 +64,10 @@ function DonationContent() {
         donorEmail: donorInfo.email,
         donorPhone: donorInfo.phone,
         amount,
-        programId: selectedCause || 'general',
-        programName: selectedCause || 'General Donation',
-        paymentMethod,
+        causeId: selectedCause || 'general',
+        causeName: selectedCause || 'General Donation',
+        paymentMethod: paymentMethod as Donation['paymentMethod'],
         frequency,
-        anonymous: isAnonymous,
         isZakat,
         isAnonymous,
         receiptConsent,

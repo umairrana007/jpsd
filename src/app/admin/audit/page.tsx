@@ -9,13 +9,13 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { getActivityLogs } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
-import { UserRole } from '@/types';
+import { UserRole, AuditLog } from '@/types';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 function AuditDashboard() {
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('ALL');
@@ -206,8 +206,8 @@ function AuditDashboard() {
                  transition={{ delay: idx * 0.05 }}
                  className="p-8 group hover:bg-slate-50/50 transition-all flex flex-col md:flex-row gap-6 items-start"
                >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${getStatusColor(log.type)}`}>
-                     {getActionIcon(log.type)}
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${getStatusColor(log.type || 'SYSTEM')}`}>
+                     {getActionIcon(log.type || 'SYSTEM')}
                   </div>
                   
                   <div className="flex-1 space-y-2">

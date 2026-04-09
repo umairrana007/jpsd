@@ -63,5 +63,5 @@ export function getPaymentConfig(): PaymentConfig {
  * Returns true if the system is running in simulation/test mode.
  */
 export function isSimulationMode(): boolean {
-    return process.env.NEXT_PUBLIC_PAYMENT_MODE !== 'production';
+    return (process.env.NEXT_PUBLIC_PAYMENT_MODE as string) !== 'production';
 }

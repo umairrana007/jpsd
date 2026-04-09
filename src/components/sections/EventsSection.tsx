@@ -33,7 +33,7 @@ const sampleEvents = [
 
 export const EventsSection: React.FC = () => {
   const { language, t } = useLanguage();
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export const EventsSection: React.FC = () => {
                   <div className={`absolute top-4 ${language === 'ur' ? 'left-4' : 'right-4'} bg-[#f39c12] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider z-10 English-text`}>
                     {event.startDate instanceof Date 
                       ? event.startDate.toLocaleDateString() 
-                      : (event.startDate?.toDate ? event.startDate.toDate().toLocaleDateString() : 'Upcoming')}
+                      : 'Upcoming'}
                   </div>
                 </div>
 

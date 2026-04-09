@@ -78,7 +78,7 @@ export default function VolunteerPortalClean() {
     try {
       const blob = generateVolunteerCertificate({
         name: currentUserData?.name || 'Authorized Volunteer',
-        volunteerId: currentUserData?.uid || 'VOL-456-X',
+        volunteerId: currentUserData?.id || 'VOL-456-X',
         skills: volunteerSkills,
         region: currentUserData?.region || 'karachi',
         joinedAt: new Date().toISOString(),

@@ -21,7 +21,8 @@ import {
   orderBy,
   serverTimestamp,
   updateDoc,
-  Timestamp
+  Timestamp,
+  Firestore
 } from 'firebase/firestore';
 
 interface Event {
@@ -31,8 +32,8 @@ interface Event {
   description: string;
   descriptionUrdu?: string;
   location: string;
-  startDate?: any;
-  endDate?: any;
+  startDate?: Timestamp | Date | null;
+  endDate?: Timestamp | Date | null;
   status: string;
   volunteers?: number;
 }
@@ -57,7 +58,7 @@ function AdminEventsPage() {
   const fetchEvents = async () => {
     if (!db) return;
     try {
-      const q = query(collection(db as any, 'events'), orderBy('createdAt', 'desc'));
+      const q = query(collection(db as Firestore, 'events'), orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
       const items = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -101,9 +102,9 @@ function AdminEventsPage() {
       };
 
       if (editingId) {
-        await updateDoc(doc(db as any, 'events', editingId), eventData);
+        await updateDoc(doc(db as Firestore, 'events', editingId), eventData);
       } else {
-        await addDoc(collection(db as any, 'events'), eventData);
+        await addDoc(collection(db as Firestore, 'events'), eventData);
       }
 
       setIsModalOpen(false);
@@ -117,8 +118,9 @@ function AdminEventsPage() {
     }
   };
 
-  const handleEdit = (ev: any) => {
+  const handleEdit = (ev: Event) => {
     // Convert Timestamp back to string for input[type="date"]
+    // @ts-ignore - toDate exists on Firestore Timestamp
     const dateObj = ev.startDate?.toDate ? ev.startDate.toDate() : new Date();
     const dateStr = dateObj.toISOString().split('T')[0];
     const timeStr = dateObj.toTimeString().split(' ')[0].substring(0, 5);
@@ -139,7 +141,7 @@ function AdminEventsPage() {
   const handleDelete = async (id: string) => {
     if (!db || !window.confirm('Are you sure you want to delete this mission?')) return;
     try {
-      await deleteDoc(doc(db as any, 'events', id));
+      await deleteDoc(doc(db as Firestore, 'events', id));
       fetchEvents();
     } catch (err) {
       console.error("Delete error:", err);
@@ -219,11 +221,19 @@ function AdminEventsPage() {
                             <div className="space-y-2">
                                <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-tighter italic">
                                   <FiCalendar className="text-[#1ea05f]" /> 
-                                  {ev.startDate?.toDate ? ev.startDate.toDate().toLocaleDateString() : 'TBD'}
-                               </div>
-                               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-                                  <FiClock size={10} /> 
-                                  {ev.startDate?.toDate ? ev.startDate.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TBD'}
+                                   {ev.startDate instanceof Timestamp 
+                                     ? ev.startDate.toDate().toLocaleDateString() 
+                                     : ev.startDate instanceof Date 
+                                       ? ev.startDate.toLocaleDateString() 
+                                       : 'TBD'}
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                   <FiClock size={10} /> 
+                                   {ev.startDate instanceof Timestamp 
+                                     ? ev.startDate.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+                                     : ev.startDate instanceof Date 
+                                       ? ev.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                       : 'TBD'}
                                </div>
                             </div>
                          </td>

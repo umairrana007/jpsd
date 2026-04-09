@@ -17,6 +17,7 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -32,13 +33,13 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
             current += increment;
             if (current >= value) {
               setCount(value);
-              clearInterval(timer);
+              if (cleanupRef.current) cleanupRef.current();
             } else {
               setCount(Math.floor(current));
             }
           }, duration / steps);
 
-          return () => clearInterval(timer);
+          cleanupRef.current = () => clearInterval(timer);
         }
       },
       { threshold: 0.5 }
@@ -48,7 +49,10 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
       observer.observe(ref.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (cleanupRef.current) cleanupRef.current();
+    };
   }, [value, hasAnimated]);
 
   return (
@@ -75,17 +79,16 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
   const { language } = useLanguage();
   
   const stats = {
-    totalLivesServed: settings?.livesServed ?? 500000,
-    totalDonationsReceived: settings?.donationsReceived ?? 1240000,
-    activePrograms: settings?.programsCount ?? 42,
-    volunteersCount: settings?.volunteersCount ?? 1500,
+    totalLivesServed: settings?.livesServed ?? 542000,
+    totalDonationsReceived: settings?.donationsReceived ?? 1285000,
+    activePrograms: settings?.programsCount ?? 45,
+    volunteersCount: settings?.volunteersCount ?? 1580,
   };
 
   return (
-    <section className="py-32 bg-white relative overflow-hidden">
+    <section className="py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-16">
-          {/* Section Info */}
           <div className="lg:w-1/3 space-y-6">
             <span className={`text-primary-green font-bold ${language === 'ur' ? 'urdu-text text-xl' : 'tracking-widest uppercase text-sm'} inline-block underline decoration-accent-gold underline-offset-8`}>
               {language === 'ur' ? 'ہمارے عالمی اثرات' : 'Our Global Impact'}
@@ -95,19 +98,19 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
             </h2>
             <p className={`text-gray-500 text-lg leading-relaxed ${language === 'ur' ? 'urdu-text' : 'english-text'}`}>
               {language === 'ur' 
-                ? 'ہر عدد (Number) ایک کہانی ہے استقامت کی، ایک خاندان جسے سہارا ملا، اور ایک ایسا معاشرہ جو آپ کے عطیات کی بدولت بااختیار بنا۔'
+                ? 'ہر عدد ایک کہانی ہے استقامت کی، ایک خاندان جسے سہارا ملا، اور ایک ایسا معاشرہ جو آپ کے عطیات کی بدولت بااختیار بنا۔'
                 : 'Every number represents a story of resilience, a family supported, and a community empowered through your generous contributions.'}
             </p>
           </div>
 
-          {/* Asymmetric Stats Grid */}
-            <div className={`lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8 relative ${language === 'ur' ? 'lg:pr-16 text-right' : ''}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
+          <div className={`lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8 relative ${language === 'ur' ? 'lg:pr-16 text-right' : ''}`} dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <div className="space-y-8">
               <StatItem
                 value={stats.totalLivesServed}
                 label={language === 'ur' ? 'متاثرین کی خدمت' : 'Lives Served'}
                 delay={0}
                 icon="🤝"
+                lang={language}
               />
               <div className={language === 'ur' ? 'lg:-translate-x-12' : 'lg:translate-x-12'}>
                 <StatItem
@@ -115,6 +118,7 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
                   label={language === 'ur' ? 'فعال پروگرام' : 'Active Programs'}
                   delay={0.4}
                   icon="📋"
+                  lang={language}
                 />
               </div>
             </div>
@@ -124,6 +128,7 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
                 label={language === 'ur' ? 'مجموعی عطیات' : 'Donations'}
                 delay={0.2}
                 icon="💰"
+                lang={language}
               />
               <div className={language === 'ur' ? 'lg:translate-x-12' : 'lg:-translate-x-12'}>
                 <StatItem
@@ -131,11 +136,10 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
                   label={language === 'ur' ? 'رضاکار' : 'Volunteers'}
                   delay={0.6}
                   icon="✋"
+                  lang={language}
                 />
               </div>
             </div>
-            
-            {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-green/10 rounded-full blur-[100px] -z-10" />
           </div>
         </div>

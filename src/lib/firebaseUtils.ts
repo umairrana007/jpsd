@@ -17,13 +17,13 @@ import {
   Timestamp,
   Firestore
 } from 'firebase/firestore';
-import { Cause, Event, BlogPost, Volunteer, User, UserRole } from '@/types';
+import { Cause, Event, BlogPost, Volunteer, User, UserRole, Donation, Deployment, NavItem, AuditLog, AppUser, Subscription, Partner, Testimonial } from '@/types';
 import { getSafeImageUrl } from './imageUtils';
 
 // --- In-Memory Cache (Phase 5) ---
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 interface CacheEntry {
-  data: any;
+  data: unknown;
   timestamp: number;
 }
 const queryCache: Record<string, CacheEntry> = {};
@@ -36,7 +36,7 @@ const getCachedData = (key: string) => {
   return null;
 };
 
-const setCachedData = (key: string, data: any) => {
+const setCachedData = (key: string, data: unknown) => {
   queryCache[key] = { data, timestamp: Date.now() };
 };
 
@@ -72,7 +72,7 @@ const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 1000): Promise<
 const isDBAvailable = () => isFirebaseConfigured && db !== null;
 
 // Donation Operations
-export const createDonation = async (donationData: any) => {
+export const createDonation = async (donationData: Partial<Donation>) => {
   if (!isDBAvailable()) return null;
 
   try {
@@ -90,6 +90,7 @@ export const createDonation = async (donationData: any) => {
 };
 
 export const getDonations = async () => {
+  if (!isDBAvailable()) return [];
   try {
     const donationsQuery = query(
       collection(getDb(), 'donations'),
@@ -103,7 +104,7 @@ export const getDonations = async () => {
   }
 };
 
-export const getUserDonations = async (userId: string, status?: string) => {
+export const getUserDonations = async (userId: string, status?: string): Promise<Donation[]> => {
   try {
     let donationsQuery = query(
       collection(getDb(), 'donations'),
@@ -116,11 +117,30 @@ export const getUserDonations = async (userId: string, status?: string) => {
     }
 
     const snapshot = await getDocs(donationsQuery);
-    return snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data(),
-      createdAt: (doc.data().createdAt as Timestamp)?.toDate()
-    }));
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        donorName: data.donorName || '',
+        donorEmail: data.donorEmail || '',
+        donorPhone: data.donorPhone || '',
+        amount: data.amount || 0,
+        userId: data.userId || '',
+        causeId: data.causeId || '',
+        causeName: data.causeName || '',
+        paymentMethod: data.paymentMethod || 'jazzcash',
+        frequency: data.frequency || 'one-time',
+        status: data.status || 'pending',
+        timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
+        receiptConsent: data.receiptConsent || false,
+        isZakat: data.isZakat || false,
+        isAnonymous: data.isAnonymous || false,
+        transactionId: data.transactionId,
+        securityHash: data.securityHash,
+        receiptSent: data.receiptSent || false,
+        createdAt: (data.createdAt as Timestamp)?.toDate()
+      } as Donation;
+    });
   } catch (error) {
     console.error('Error getting user donations:', error);
     return [];
@@ -138,9 +158,10 @@ export const getProgramById = async (id: string) => {
 
 // Cause Operations
 export const getCauses = async (): Promise<Cause[]> => {
+  if (!isDBAvailable()) return [];
   const cacheKey = 'causes_all';
   const cached = getCachedData(cacheKey);
-  if (cached) return cached;
+  if (cached) return cached as Cause[];
 
   if (!isDBAvailable()) return [];
 
@@ -164,7 +185,7 @@ export const getCauses = async (): Promise<Cause[]> => {
     });
     setCachedData(cacheKey, data);
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database Error:', error);
     return [];
   }
@@ -195,7 +216,7 @@ export const getCauseById = async (id: string): Promise<Cause | null> => {
 export const getEvents = async (): Promise<Event[]> => {
   const cacheKey = 'events_all';
   const cached = getCachedData(cacheKey);
-  if (cached) return cached;
+  if (cached) return cached as Event[];
 
   if (!isDBAvailable()) return [];
 
@@ -220,7 +241,7 @@ export const getEvents = async (): Promise<Event[]> => {
     });
     setCachedData(cacheKey, data);
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database Error:', error);
     return [];
   }
@@ -252,7 +273,7 @@ export const getEventById = async (id: string): Promise<Event | null> => {
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
   const cacheKey = 'blog_posts_all';
   const cached = getCachedData(cacheKey);
-  if (cached) return cached;
+  if (cached) return cached as BlogPost[];
 
   if (!isDBAvailable()) return [];
 
@@ -277,7 +298,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
     });
     setCachedData(cacheKey, data);
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database Error:', error);
     return [];
   }
@@ -385,8 +406,63 @@ export const registerForEvent = async (volunteerId: string, eventId: string) => 
   }
 };
 
+// Deployment Operations (Phase 9)
+export const getDeployments = async (volunteerId?: string) => {
+  if (!isDBAvailable()) return [];
+  try {
+    let deploymentsQuery = query(collection(getDb(), 'deployments'), orderBy('updatedAt', 'desc'));
+    if (volunteerId) {
+      deploymentsQuery = query(deploymentsQuery, where('volunteerId', '==', volunteerId));
+    }
+    const snapshot = await getDocs(deploymentsQuery);
+    return snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data(),
+      checkInTime: (doc.data().checkInTime as Timestamp)?.toDate(),
+      checkOutTime: (doc.data().checkOutTime as Timestamp)?.toDate(),
+      updatedAt: (doc.data().updatedAt as Timestamp)?.toDate(),
+    }));
+  } catch (error) {
+    console.error('Error getting deployments:', error);
+    return [];
+  }
+};
+
+export const createDeployment = async (deploymentData: Partial<Deployment>) => {
+  if (!isDBAvailable()) return null;
+  try {
+    const docRef = await addDoc(collection(getDb(), 'deployments'), {
+      ...deploymentData,
+      status: 'assigned',
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating deployment:', error);
+    return null;
+  }
+};
+
+export const updateDeploymentStatus = async (deploymentId: string, status: Deployment['status'], metadata: Record<string, unknown> = {}) => {
+  if (!isDBAvailable()) return false;
+  try {
+    const docRef = doc(getDb(), 'deployments', deploymentId);
+    await updateDoc(docRef, {
+      status,
+      ...metadata,
+      updatedAt: Timestamp.now()
+    });
+    return true;
+  } catch (error) {
+    console.error('Error updating deployment status:', error);
+    return false;
+  }
+};
+
 // Admin Configuration Operations
 export const getGlobalSettings = async () => {
+  if (!isDBAvailable()) return null;
   try {
     const docRef = doc(getDb(), 'global_config', 'site-settings');
     const snap = await getDoc(docRef);
@@ -397,7 +473,8 @@ export const getGlobalSettings = async () => {
   }
 };
 
-export const updateGlobalSettings = async (settings: any) => {
+export const updateGlobalSettings = async (settings: Record<string, unknown>) => {
+  if (!isDBAvailable()) return false;
   try {
     await setDoc(doc(getDb(), 'global_config', 'site-settings'), {
       ...settings,
@@ -421,7 +498,7 @@ export const getThemeSettings = async () => {
   }
 };
 
-export const updateThemeSettings = async (theme: any) => {
+export const updateThemeSettings = async (theme: Record<string, unknown>) => {
   try {
     await setDoc(doc(getDb(), 'settings', 'theme'), {
       ...theme,
@@ -445,7 +522,7 @@ export const getNavigationSettings = async () => {
   }
 };
 
-export const updateNavigationSettings = async (items: any[]) => {
+export const updateNavigationSettings = async (items: NavItem[]) => {
   try {
     await setDoc(doc(getDb(), 'settings', 'navigation'), {
       items,
@@ -469,21 +546,21 @@ export const getLiveStats = async () => {
       return snapshot.docs[0].data();
     }
     return null;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database Error:', error);
     return null;
   }
 };
 
 // User Operations
-export const createUser = async (userData: any) => {
+export const createUser = async (userData: Partial<User>) => {
   try {
-    const userRef = await doc(getDb(), 'users', userData.uid);
+    const userRef = doc(getDb(), 'users', userData.id as string);
     await setDoc(userRef, {
       ...userData,
       createdAt: Timestamp.now()
     });
-    return userData.uid;
+    return userData.id as string;
   } catch (error) {
     console.error('Error creating user:', error);
     throw error;
@@ -491,10 +568,14 @@ export const createUser = async (userData: any) => {
 };
 
 export const getUsers = async () => {
+  if (!isDBAvailable()) return [];
   try {
     const usersQuery = query(collection(getDb(), 'users'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(usersQuery);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    }));
   } catch (error) {
     console.error('Error getting users:', error);
     return [];
@@ -546,6 +627,7 @@ export const updateUserRole = async (userId: string, role: UserRole) => {
 
 // Newsletter Subscription Operations
 export const subscribeToNewsletter = async (email: string) => {
+  if (!isDBAvailable()) return null;
   try {
     const subscriptionRef = await addDoc(collection(getDb(), 'subscriptions'), {
       email,
@@ -560,6 +642,7 @@ export const subscribeToNewsletter = async (email: string) => {
 };
 // System Stats Aggregator (HQ Stats)
 export const getSystemStats = async () => {
+  if (!isDBAvailable()) return null;
   try {
     const [donorsSnap, donationsSnap, volunteersSnap, eventsSnap] = await Promise.all([
       getDocs(collection(getDb(), 'users')), // Filter role=donor if needed
@@ -590,6 +673,7 @@ export const getSystemStats = async () => {
 };
 // HQ Command Intelligence: Global Search
 export const searchUsers = async (searchTerm: string) => {
+  if (!isDBAvailable()) return [];
   try {
     const usersCol = collection(getDb(), 'users');
     const q = query(
@@ -600,8 +684,8 @@ export const searchUsers = async (searchTerm: string) => {
     const snapshot = await getDocs(q);
     
     // Client-side filter for CNIC/Phone/Email for maximum precision
-    const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter((user: any) => 
+    const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User)
+      .filter((user: User) => 
         user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.phone?.includes(searchTerm) ||
@@ -617,7 +701,7 @@ export const searchUsers = async (searchTerm: string) => {
 
 
 // Activity Logging Enhanced (Phase 4)
-export const logActivity = async (activityOrAction: string | any, metadata: any = {}) => {
+export const logActivity = async (activityOrAction: string | Record<string, unknown>, metadata: Record<string, unknown> = {}) => {
   if (!isDBAvailable()) return null;
   
   try {
@@ -654,8 +738,8 @@ export const getUserImpactMetrics = async (userId: string): Promise<ImpactMetric
      
      // Fallback to manual computation if not pre-computed
      const donations = await getUserDonations(userId);
-     const total = donations.reduce((acc, d: any) => acc + (d.amount || 0), 0);
-     const causes = new Set(donations.map((d: any) => d.causeId || d.cause)).size;
+     const total = donations.reduce((acc, d: Donation) => acc + (d.amount || 0), 0);
+     const causes = new Set(donations.map((d: Donation) => d.causeId || d.causeId)).size;
      const streak = 5; // Fixed mock for Phase 6
      
      return {
@@ -671,12 +755,26 @@ export const getUserImpactMetrics = async (userId: string): Promise<ImpactMetric
   }
 };
 
-export const getUserRecurringDonations = async (userId: string) => {
+export const getUserRecurringDonations = async (userId: string): Promise<Subscription[]> => {
    if (!isDBAvailable()) return [];
    try {
       const q = query(collection(getDb(), 'recurring_donations'), where('userId', '==', userId));
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userId: data.userId || userId,
+          causeId: data.causeId || '',
+          cause: data.cause || '',
+          amount: data.amount || 0,
+          frequency: data.frequency || 'monthly',
+          status: data.status || 'active',
+          nextBillingAt: (data.nextBillingAt as Timestamp)?.toDate() || new Date(),
+          nextDate: (data.nextDate as Timestamp)?.toDate(),
+          createdAt: (data.createdAt as Timestamp)?.toDate() || new Date()
+        } as Subscription;
+      });
    } catch (error) {
       console.error('Error getting recurring donations:', error);
       return [];
@@ -694,6 +792,7 @@ export const toggleRecurringDonation = async (id: string, active: boolean) => {
 
 // Tactical Activity Stream
 export const getRecentActivity = async () => {
+  if (!isDBAvailable()) return [];
   try {
     const logsCol = collection(getDb(), 'activity_logs');
     const q = query(logsCol, orderBy('timestamp', 'desc'), limit(15));
@@ -717,7 +816,7 @@ export const getRecentActivity = async () => {
 };
 
 // Activity Logging Enhanced (Phase 4)
-export const getActivityLogs = async (limitCount: number = 100) => {
+export const getActivityLogs = async (limitCount: number = 100): Promise<AuditLog[]> => {
   if (!isDBAvailable()) return [];
   
   try {
@@ -727,11 +826,26 @@ export const getActivityLogs = async (limitCount: number = 100) => {
       limit(limitCount)
     );
     const snapshot = await getDocs(logsQuery);
-    return snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data(),
-      timestamp: (doc.data().timestamp as Timestamp)?.toDate() 
-    }));
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        userId: data.userId || '',
+        userEmail: data.userEmail || '',
+        action: data.action || '',
+        resource: data.resource || '',
+        status: data.status || 'success',
+        details: data.details,
+        metadata: data.metadata,
+        message: data.message,
+        adminUid: data.adminUid,
+        type: data.type,
+        timestamp: (data.timestamp as Timestamp)?.toDate(),
+        affectedUserId: data.affectedUserId,
+        affectedUserIds: data.affectedUserIds,
+        createdAt: (data.createdAt as Timestamp)?.toDate() || (data.timestamp as Timestamp)?.toDate() || new Date()
+      } as AuditLog;
+    });
   } catch (error) {
     console.error('Error getting activity logs:', error);
     return [];

@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getUserDonations, getUserImpactMetrics, getUserRecurringDonations, ImpactMetrics } from '@/lib/firebaseUtils';
 import { format, addMonths } from 'date-fns';
 import dynamic from 'next/dynamic';
+import { Donation, Subscription } from '@/types';
 
 const AreaChart = dynamic(() => import('recharts').then(mod => mod.AreaChart), { ssr: false, loading: () => <div className="h-64 bg-slate-100 animate-pulse rounded"/> });
 const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
@@ -28,9 +29,9 @@ const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.Res
 export default function DonorDashboardPage() {
   const { user, currentUserData, setGlobalAlert } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications'>('profile');
-  const [donations, setDonations] = useState<any[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [impactData, setImpactData] = useState<ImpactMetrics | null>(null);
-  const [recurringSubscriptions, setRecurringSubscriptions] = useState<any[]>([]);
+  const [recurringSubscriptions, setRecurringSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   
   // UI States
@@ -55,7 +56,7 @@ export default function DonorDashboardPage() {
       setImpactData(metrics);
       setRecurringSubscriptions(subscriptions.length > 0 ? subscriptions : [
          // Mock for demonstration if none exist yet
-         { id: 'REC-001', cause: 'Global Food Crisis', amount: 5000, frequency: 'monthly', status: 'Active', nextDate: addMonths(new Date(), 1) }
+         { id: 'REC-001', userId: user!.uid, causeId: 'food-crisis', cause: 'Global Food Crisis', amount: 5000, frequency: 'monthly' as const, status: 'Active' as const, nextBillingAt: addMonths(new Date(), 1), nextDate: addMonths(new Date(), 1), createdAt: new Date() }
       ]);
     } catch (error) {
       console.error('Dashboard Data Error:', error);
@@ -194,7 +195,7 @@ export default function DonorDashboardPage() {
                   <div className="space-y-4">
                      <div>
                         <h4 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Recurring Units</h4>
-                        <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">Active Plans: <span className="text-[#1ea05f]">{recurringSubscriptions.filter(s => s.status === 'Active').length} missions</span></p>
+                        <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">Active Plans: <span className="text-[#1ea05f]">{recurringSubscriptions.filter(s => s.status === 'Active' || s.status === 'active').length} missions</span></p>
                      </div>
                      
                      <div className="space-y-3 max-h-[140px] overflow-y-auto pr-2 scrollbar-hide">
@@ -202,7 +203,7 @@ export default function DonorDashboardPage() {
                           <div key={sub.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group/sub">
                              <div>
                                 <p className="text-[9px] font-black uppercase tracking-tighter text-slate-800">{sub.cause}</p>
-                                <p className="text-[8px] font-bold text-slate-400">Next: {format(new Date(sub.nextDate), 'dd MMM')}</p>
+                                <p className="text-[8px] font-bold text-slate-400">Next: {sub.nextDate ? format(sub.nextDate, 'dd MMM') : 'N/A'}</p>
                              </div>
                              <div className="text-right">
                                 <p className="text-xs font-black text-slate-900">Rs. {sub.amount.toLocaleString()}</p>

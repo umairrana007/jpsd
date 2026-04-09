@@ -7,11 +7,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, limit, Firestore } from 'firebase/firestore';
+import { Testimonial } from '@/types';
 
 export const TestimonialSection: React.FC = () => {
   const { language } = useLanguage();
-  const [testimonials, setTestimonials] = React.useState<any[]>([]);
+  const [testimonials, setTestimonials] = React.useState<Testimonial[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -20,7 +21,7 @@ export const TestimonialSection: React.FC = () => {
       try {
         setLoading(true);
         const q = query(
-          collection(db as any, 'testimonials'), 
+          collection(db as Firestore, 'testimonials'), 
           where('isPublished', '==', true),
           orderBy('createdAt', 'desc'),
           limit(4)
@@ -29,7 +30,7 @@ export const TestimonialSection: React.FC = () => {
         const fetched = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })) as Testimonial[];
         setTestimonials(fetched);
       } catch (error) {
         console.error('Testimonial Error:', error);

@@ -43,7 +43,7 @@ export const Navbar: React.FC = () => {
     setUserMenuOpen(false);
   }, [pathname]);
 
-  const [firestoreNavItems, setFirestoreNavItems] = useState<any[]>([]);
+  const [firestoreNavItems, setFirestoreNavItems] = useState<NavItem[]>([]);
 
   useEffect(() => {
     const fetchNav = async () => {

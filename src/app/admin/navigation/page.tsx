@@ -10,9 +10,11 @@ import {
 import { motion, Reorder } from 'framer-motion';
 import { getNavigationSettings, updateNavigationSettings } from '@/lib/firebaseUtils';
 import { useAuth } from '@/contexts/AuthContext';
+import { NavItem as GlobalNavItem } from '@/types';
 
 interface NavItem {
   id: string;
+  name: string;
   label: string;
   labelUrdu: string;
   href: string;
@@ -36,11 +38,11 @@ export default function NavigationManagerPage() {
   }, []);
 
   const [isAdding, setIsAdding] = useState(false);
-  const [newItem, setNewItem] = useState({ label: '', labelUrdu: '', href: '', location: 'header' as const });
+  const [newItem, setNewItem] = useState({ name: '', label: '', labelUrdu: '', href: '', location: 'header' as const });
 
   const handleSave = async (updatedItems?: NavItem[]) => {
     setSaving(true);
-    const success = await updateNavigationSettings(updatedItems || items);
+    const success = await updateNavigationSettings((updatedItems || items) as unknown as GlobalNavItem[]);
     if (success) {
       setGlobalAlert('Global navigation linkages synchronized successfully.', 'success');
     }
@@ -56,7 +58,7 @@ export default function NavigationManagerPage() {
     const newItems = [...items, item];
     setItems(newItems);
     handleSave(newItems);
-    setNewItem({ label: '', labelUrdu: '', href: '', location: 'header' });
+    setNewItem({ name: '', label: '', labelUrdu: '', href: '', location: 'header' });
     setIsAdding(false);
   };
 

@@ -14,14 +14,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PaymentInfoModal from '@/components/PaymentInfoModal';
 
 import { createDonation } from '@/lib/firebaseUtils';
-import { processPayment } from '@/lib/paymentUtils';
+import { processPayment, generatePaymentSecurityHash } from './actions';
+import { PaymentResponse, Donation } from '@/types';
 import { dispatchDonationNotification } from '@/lib/notificationUtils';
 import { trackDonationCompletion } from '@/lib/analyticsUtils';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendDonationReceipt } from '@/lib/emailService';
 
 import { getPaymentConfig, isSimulationMode } from '@/lib/config/paymentConfig';
-import { generateJazzCashHash, generateEasyPaisaSignature } from '@/lib/payments/hashUtils';
 
 function DonationForm() {
   const [step, setStep] = useState(1);
@@ -42,7 +42,7 @@ function DonationForm() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedInfoMethod, setSelectedInfoMethod] = useState('jazzcash');
-  const [lastPaymentResult, setLastPaymentResult] = useState<any>(null);
+  const [lastPaymentResult, setLastPaymentResult] = useState<PaymentResponse | null>(null);
   const searchParams = useSearchParams();
 
   // Phase 8 Task 3: Prefill Logic
@@ -68,7 +68,7 @@ function DonationForm() {
   const toggleSimulation = () => {
     const newState = !isSimulated;
     setIsSimulated(newState);
-    (window as any).PAYMENT_SIMULATION = newState;
+    (window as Window & typeof globalThis & { PAYMENT_SIMULATION?: boolean }).PAYMENT_SIMULATION = newState;
   };
 
   const nextStep = () => setStep(s => s + 1);
@@ -100,32 +100,39 @@ function DonationForm() {
       let securityHash = '';
       const config = getPaymentConfig();
       
+      const formDataForHash = { 
+        ...formData, 
+        isZakat: String(formData.isZakat), 
+        isAnonymous: String(formData.isAnonymous) 
+      };
+      
       if (formData.paymentMethod === 'jazzcash') {
-        securityHash = generateJazzCashHash(formData, config.jazzcash.salt);
-        console.log(`[Payment Stub] JazzCash Hash generated: ${securityHash}`);
+        securityHash = await generatePaymentSecurityHash('jazzcash', formDataForHash as unknown as Record<string, string | number>, config.jazzcash.salt);
+        console.log(`[Payment Stub] JazzCash Hash generated server-side: ${securityHash}`);
       } else if (formData.paymentMethod === 'easypaisa') {
-        securityHash = generateEasyPaisaSignature(JSON.stringify(formData), config.easypaisa.apiKey);
-        console.log(`[Payment Stub] EasyPaisa Signature generated: ${securityHash}`);
+        securityHash = await generatePaymentSecurityHash('easypaisa', JSON.stringify(formDataForHash), config.easypaisa.apiKey);
+        console.log(`[Payment Stub] EasyPaisa Signature generated server-side: ${securityHash}`);
       }
 
       // 1. Initial Tactical Asset Verification (Firebase)
       const donationId = await createDonation({
         ...formData,
         amount: parseFloat(formData.amount),
-        userId: 'MOCK-USER-123',
-        securityHash // Include mock hash in payload
+        userId: user?.uid,
+        securityHash, // Include mock hash in payload
+        paymentMethod: formData.paymentMethod as Donation['paymentMethod'],
+        frequency: formData.frequency as Donation['frequency']
       });
       
       if (!donationId) throw new Error('Asset verification failed.');
 
       // 2. Tactical Payment Calibration (BHPGP)
-      const paymentResult: any = await processPayment({
+      const paymentResult = await processPayment({
         amount: parseFloat(formData.amount),
-        currency: 'PKR',
-        method: formData.paymentMethod as any,
-        donorName: 'Anonymous Humanitarian',
-        causeId: formData.cause
-      });
+        method: formData.paymentMethod as 'jazzcash' | 'easypaisa',
+        params: formDataForHash as unknown as Record<string, string | number>,
+        salt: config.jazzcash.salt
+      }) as PaymentResponse;
 
       if (paymentResult.success) {
         setLastPaymentResult(paymentResult);
@@ -136,9 +143,9 @@ function DonationForm() {
           const selectedProvider = formData.paymentMethod;
           import('@/lib/payments/simulateWebhook').then(mod => {
             mod.simulateWebhookCallback({ 
-              transactionId: paymentResult.transactionId, 
+              transactionId: paymentResult.transactionId ?? 'STUB-TXN', 
               amount: donationAmount, 
-              paymentMethod: selectedProvider, 
+              paymentMethod: selectedProvider as 'jazzcash' | 'easypaisa', 
               donorEmail: user?.email || '', 
               status: 'success' 
             });
@@ -147,10 +154,10 @@ function DonationForm() {
 
         // 3. Tactical Comms Dispatch (BTCC)
         await dispatchDonationNotification({
-          id: paymentResult.transactionId,
+          id: paymentResult.transactionId ?? 'STUB-TXN',
           amount: formData.amount,
           cause: formData.cause,
-          email: user?.email || 'donor@example.com' // Map properly from session
+          email: user?.email || 'donor@example.com' 
         });
 
         // 4. Tactical Analytics Protocol (BTAT)
@@ -163,7 +170,7 @@ function DonationForm() {
         // 5. Trigger Email Receipt Stub (Phase 8 Task 3)
         // This is a stub that logs to activity_logs and console
         await sendDonationReceipt({
-          id: paymentResult.transactionId,
+          id: paymentResult.transactionId ?? 'STUB-TXN',
           donorName: user?.displayName || 'Valued Humanitarian',
           donorEmail: user?.email || 'donor@example.com',
           amount: parseFloat(formData.amount),
@@ -178,7 +185,7 @@ function DonationForm() {
         } else {
           // Success Path (e.g. for Direct Wallet)
           const successParams = new URLSearchParams({
-            txid: paymentResult.transactionId,
+            txid: paymentResult.transactionId ?? 'STUB-TXN',
             amount: formData.amount,
             cause: formData.cause,
             donor: user?.displayName || 'Humanitarian',

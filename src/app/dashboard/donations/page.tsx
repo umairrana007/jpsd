@@ -8,6 +8,7 @@ import { getUserDonations } from '@/lib/firebaseUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { Donation } from '@/types';
 
 // Initialize PDFMake
 pdfMake.vfs = (pdfFonts as any).pdfMake ? (pdfFonts as any).pdfMake.vfs : pdfFonts.vfs;
@@ -18,7 +19,7 @@ export default function MyDonationsPage() {
   const isUrdu = language === 'ur';
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [donations, setDonations] = useState<any[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function MyDonationsPage() {
     });
   }, [activeTab, searchQuery, donations]);
 
-  const generatePDF = (donation: any) => {
+  const generatePDF = (donation: Donation) => {
     const docDefinition = {
       content: [
         { text: 'JPSD Welfare Trust', style: 'header' },
@@ -82,7 +83,7 @@ export default function MyDonationsPage() {
   const totals = {
     all: donations.length,
     zakat: donations.filter(d => d.type === 'Zakat').length,
-    totalAmount: donations.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0)
+    totalAmount: donations.reduce((acc, curr) => acc + (typeof curr.amount === 'number' ? curr.amount : parseFloat(curr.amount) || 0), 0)
   };
 
   return (
@@ -190,7 +191,7 @@ export default function MyDonationsPage() {
                                <p className="text-base font-black text-slate-800 tracking-tightest italic">{item.cause || item.programName || 'General Welfare'}</p>
                                <div className="flex items-center gap-2 mt-1">
                                   <FiClock size={12} className="text-slate-400" />
-                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.createdAt?.toLocaleDateString() || item.date}</p>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.createdAt?.toLocaleDateString() || (item.date instanceof Date ? item.date.toLocaleDateString() : 'N/A')}</p>
                                </div>
                             </div>
                          </td>

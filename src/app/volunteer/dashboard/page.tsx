@@ -21,9 +21,63 @@ const MISSIONS = [
   { id: 3, title: 'Field Teaching', category: 'teaching', difficulty: 'Low', match: 20, status: 'Draft' },
 ];
 
+import { db } from '@/lib/firebase';
+import { onSnapshot, collection, query, where, orderBy, Timestamp } from 'firebase/firestore';
+import { useAuth } from '@/contexts/AuthContext';
+import { updateDeploymentStatus } from '@/lib/firebaseUtils';
+import { DeploymentData } from '@/types';
+
 export default function VolunteerDashboardPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'mission' | 'history'>('mission');
   const [availability, setAvailability] = useState<string[]>(['Mon-AM', 'Wed-PM', 'Sat-AM']);
+  const [missions, setMissions] = useState<DeploymentData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Phase 9 Task #3: Real-Time Deployment Synchronization
+  React.useEffect(() => {
+    if (!user) return;
+
+    setLoading(true);
+    const deploymentsQuery = query(
+      collection(db!, 'deployments'), 
+      where('volunteerId', '==', user.uid),
+      orderBy('updatedAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(deploymentsQuery, (snapshot) => {
+      const deploymentData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        checkInTime: (doc.data().checkInTime as Timestamp)?.toDate(),
+        updatedAt: (doc.data().updatedAt as Timestamp)?.toDate(),
+        createdAt: (doc.data().createdAt as Timestamp)?.toDate(),
+      })) as DeploymentData[];
+      setMissions(deploymentData);
+      setLoading(false);
+    }, (error) => {
+       console.error('[Deployment Sync] Critical failure:', error);
+       setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const handleCheckIn = async (deploymentId: string) => {
+    // Stub GPS logic - in real apps, this would use navigator.geolocation
+    const mockLocation = { lat: 24.8607, lng: 67.0011 }; 
+    await updateDeploymentStatus(deploymentId, 'checked-in', {
+      checkInTime: Timestamp.now(),
+      location: mockLocation
+    });
+  };
+
+  const handleComplete = async (deploymentId: string) => {
+    await updateDeploymentStatus(deploymentId, 'completed', {
+      checkOutTime: Timestamp.now(),
+      reportSubmitted: true
+    });
+  };
 
   const toggleAvailability = (slot: string) => {
     setAvailability(prev => 
@@ -33,8 +87,8 @@ export default function VolunteerDashboardPage() {
 
   const handleDownloadCertificate = () => {
     generateVolunteerCertificate({
-      volunteerId: 'BGT-VOL-824',
-      name: 'Asad Ullah',
+      volunteerId: user?.uid?.slice(0, 8) || 'BGT-VOL-824',
+      name: user?.displayName || 'Asad Ullah',
       hours: 148.5,
       skills: ['Logistics'],
       region: 'Karachi',
@@ -44,8 +98,17 @@ export default function VolunteerDashboardPage() {
 
   // Skill Match Score Calculation (Dummy Logic)
   const averageMatch = useMemo(() => {
-    return Math.round(MISSIONS.reduce((acc, m) => acc + m.match, 0) / MISSIONS.length);
-  }, []);
+    if (missions.length === 0) return 0;
+    return Math.round(missions.reduce((acc, m) => acc + (m.matchScore || 0), 0) / missions.length);
+  }, [missions]);
+
+  // Tab Filtering
+  const filteredMissions = useMemo(() => {
+    if (activeTab === 'mission') {
+      return missions.filter(m => m.status === 'assigned' || m.status === 'checked-in');
+    }
+    return missions.filter(m => m.status === 'completed' || m.status === 'verified');
+  }, [missions, activeTab]);
 
   return (
     <div className="space-y-10 pb-20">
@@ -141,50 +204,80 @@ export default function VolunteerDashboardPage() {
              </div>
 
              <div className="space-y-6">
-               {(activeTab === 'mission' ? MISSIONS : []).map((mission, i) => (
-                  <motion.div 
-                    initial={{ opacity: 0, x: -10 }} 
-                    animate={{ opacity: 1, x: 0 }}
-                    key={i} 
-                    className="group relative flex flex-col md:flex-row items-start md:items-center gap-8 p-10 bg-white rounded-[3rem] border border-slate-100 hover:border-[#1ea05f] hover:shadow-2xl hover:shadow-[#1ea05f]/5 transition-all cursor-pointer overflow-hidden"
-                  >
-                     <div className="absolute top-0 right-0 p-4">
-                        <div className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${mission.match > 90 ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                           {mission.match}% Match
-                        </div>
-                     </div>
-                     <div className={`w-20 h-20 rounded-[1.8rem] flex items-center justify-center shadow-inner transition-all group-hover:scale-105 ${mission.difficulty === 'High' ? 'bg-red-50 text-red-500' : 'bg-[#1ea05f]/5 text-[#1ea05f]'}`}>
-                        <FiTarget size={30} />
-                     </div>
-                     <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-3">
-                           <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">{mission.category}</span>
-                           <span className="text-[9px] font-black uppercase tracking-widest text-[#1ea05f]">{mission.difficulty} PRIORITY</span>
-                        </div>
-                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800 group-hover:text-[#1ea05f] transition-colors">{mission.title}</h4>
-                        <div className="flex items-center gap-6 mt-2">
-                          <div className="flex items-center gap-2 text-slate-400">
-                             <FiMapPin size={12} />
-                             <span className="text-[9px] font-bold uppercase tracking-widest">Sector 14-B</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-400">
-                             <FiClock size={12} />
-                             <span className="text-[9px] font-bold uppercase tracking-widest">In 14 Hours</span>
-                          </div>
-                        </div>
-                     </div>
-                     <button className="w-full md:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1ea05f] transition-all group-hover:shadow-xl group-hover:shadow-[#1ea05f]/20">Deploy Component</button>
-                  </motion.div>
-               ))}
-               
-               {activeTab === 'history' && (
-                 <div className="p-20 text-center border-4 border-dashed border-slate-100 rounded-[4rem]">
-                    <FiInbox className="mx-auto text-slate-200 mb-4" size={48} />
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Archives currently empty in this sector</p>
+               {loading ? (
+                 <div className="py-20 text-center space-y-4">
+                    <div className="w-12 h-12 border-4 border-[#1ea05f] border-t-transparent rounded-full animate-spin mx-auto" />
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Synchronizing Field Data...</p>
                  </div>
+               ) : (
+                 filteredMissions.length > 0 ? (
+                   filteredMissions.map((mission, i) => (
+                      <motion.div 
+                        initial={{ opacity: 0, x: -10 }} 
+                        animate={{ opacity: 1, x: 0 }}
+                        key={mission.id} 
+                        className="group relative flex flex-col md:flex-row items-start md:items-center gap-8 p-10 bg-white rounded-[3rem] border border-slate-100 hover:border-[#1ea05f] hover:shadow-2xl hover:shadow-[#1ea05f]/5 transition-all cursor-pointer overflow-hidden"
+                      >
+                         <div className="absolute top-0 right-0 p-4">
+                            <div className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${(mission.matchScore || 0) > 90 ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                               {mission.matchScore || 0}% Match
+                            </div>
+                         </div>
+                         <div className={`w-20 h-20 rounded-[1.8rem] flex items-center justify-center shadow-inner transition-all group-hover:scale-105 ${mission.difficulty === 'High' ? 'bg-red-50 text-red-500' : 'bg-[#1ea05f]/5 text-[#1ea05f]'}`}>
+                            <FiTarget size={30} />
+                         </div>
+                         <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-3">
+                               <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">{mission.category || 'General'}</span>
+                               <span className="text-[9px] font-black uppercase tracking-widest text-[#1ea05f]">{mission.difficulty || 'Normal'} PRIORITY</span>
+                               <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${mission.status === 'checked-in' ? 'border-[#1ea05f] text-[#1ea05f]' : 'border-slate-200 text-slate-400'}`}>
+                                 {mission.status}
+                               </span>
+                            </div>
+                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800 group-hover:text-[#1ea05f] transition-colors">{mission.title || 'Untitled Mission'}</h4>
+                            <div className="flex items-center gap-6 mt-2">
+                              <div className="flex items-center gap-2 text-slate-400">
+                                 <FiMapPin size={12} />
+                                 <span className="text-[9px] font-bold uppercase tracking-widest">{mission.locationName || 'Field Site'}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-400">
+                                 <FiClock size={12} />
+                                 <span className="text-[9px] font-bold uppercase tracking-widest">
+                                   {mission.checkInTime ? `Checked in: ${mission.checkInTime.toLocaleTimeString()}` : 'Awaiting Deployment'}
+                                 </span>
+                              </div>
+                            </div>
+                         </div>
+                         
+                         {mission.status === 'assigned' && (
+                           <button 
+                             onClick={() => handleCheckIn(mission.id)}
+                             className="w-full md:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1ea05f] transition-all group-hover:shadow-xl group-hover:shadow-[#1ea05f]/20"
+                           >
+                             Confirm Deployment
+                           </button>
+                         )}
+
+                         {mission.status === 'checked-in' && (
+                           <button 
+                             onClick={() => handleComplete(mission.id)}
+                             className="w-full md:w-auto px-10 py-5 bg-[#1ea05f] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg shadow-[#1ea05f]/20"
+                           >
+                             Submit Mission Logs
+                           </button>
+                         )}
+                      </motion.div>
+                   ))
+                 ) : (
+                   <div className="p-20 text-center border-4 border-dashed border-slate-100 rounded-[4rem]">
+                      <FiInbox className="mx-auto text-slate-200 mb-4" size={48} />
+                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">No active field directives found</p>
+                   </div>
+                 )
                )}
              </div>
           </section>
+               
 
           {/* Temporal Matrix: Availability Section */}
           <section className="bg-slate-900 p-12 rounded-[4rem] text-white space-y-10 relative overflow-hidden">

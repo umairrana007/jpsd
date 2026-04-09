@@ -9,12 +9,12 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUsers, updateUserStatus, updateUserRole, logActivity } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
-import { UserRole } from '@/types';
+import { UserRole, User as AppUser } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
 function AdminUsersPage() {
   const { user: authUser, setGlobalAlert } = useAuth();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,7 +30,7 @@ function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     const data = await getUsers();
-    setUsers(data);
+    setUsers(data as unknown as AppUser[]);
     setLoading(false);
   };
 

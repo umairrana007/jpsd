@@ -8,13 +8,14 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/Button';
 import { getEventById } from '@/lib/firebaseUtils';
+import { Event } from '@/types';
 import { FiMapPin, FiCalendar, FiClock, FiArrowLeft, FiShare2, FiUsers, FiTag } from 'react-icons/fi';
 
 export default function EventDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const { language, t } = useLanguage();
-  const [eventData, setEventData] = useState<any>(null);
+  const [eventData, setEventData] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

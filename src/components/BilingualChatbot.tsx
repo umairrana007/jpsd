@@ -4,7 +4,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiMessageSquare, FiX, FiSend, FiMinimize2, FiMaximize2, FiCpu, FiGlobe } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const BOT_KNOWLEDGE: any = {
+interface ChatMessage {
+  text: string;
+  sender: 'bot' | 'user';
+  timestamp?: Date;
+}
+
+interface KnowledgeItem {
+  keywords: string[];
+  response: string;
+}
+
+const BOT_KNOWLEDGE: Record<'en' | 'ur', KnowledgeItem[]> = {
   en: [
     { keywords: ['register', 'join', 'volunteer'], response: "To join as a volunteer, complete the 3-step registration. Admin approval takes 24-48 hours." },
     { keywords: ['event', 'mission'], response: "Check the 'Operational Feed' in your dashboard or browse 'Events' in the main menu to see active missions." },
@@ -29,7 +40,7 @@ export default function BilingualChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [lang, setLang] = useState<'en' | 'ur'>('en');
-  const [messages, setMessages] = useState<any[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     { text: "Assalam-o-Alaikum! I am JPSD HQ Intelligence. How can I assist your mission today?", sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
@@ -44,7 +55,7 @@ export default function BilingualChatbot() {
   const handleSend = () => {
     if (!input.trim()) return;
 
-    const userMsg = { text: input, sender: 'user' };
+    const userMsg: ChatMessage = { text: input, sender: 'user' };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
 

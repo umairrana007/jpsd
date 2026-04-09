@@ -22,10 +22,23 @@ const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.Res
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
 
+interface AdminStats {
+  todayDonations: number;
+  totalDonors: number;
+  upcomingMissions: number;
+}
+
+interface AdminActivity {
+  id: string;
+  message: string;
+  time: string;
+  icon: string;
+}
+
 function AdminDashboardPage() {
   const { setGlobalAlert } = useAuth();
-  const [stats, setStats] = useState<any>(null);
-  const [activities, setActivities] = useState<any[]>([]);
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [activities, setActivities] = useState<AdminActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,17 +48,17 @@ function AdminDashboardPage() {
           getSystemStats(),
           getRecentActivity()
         ]);
-        setStats(statsData || { todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
-        setActivities(activityData && activityData.length > 0 ? activityData : [
+        setStats((statsData as AdminStats) || { todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
+        setActivities((activityData && activityData.length > 0 ? activityData : [
           { id: '1', message: 'New Volunteer Deployment Request: Korangi District', time: 'Just Now', icon: '🚨' },
           { id: '2', message: 'Major Donation Deployment: Syrian Emergency Relief', time: '12 mins ago', icon: '💰' }
-        ]);
+        ]) as AdminActivity[]);
       } catch (err) {
         console.warn('[HQ Intel] Data Fetch Calibration failed, using tactical defaults.');
         setStats({ todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
         setActivities([
           { id: '1', message: 'System Override: Manual Data Calibration Active', time: 'Now', icon: '⚙️' }
-        ]);
+        ] as AdminActivity[]);
       } finally {
         setLoading(false);
       }

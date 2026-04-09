@@ -8,7 +8,7 @@ export interface NotificationPayload {
   subject?: string;
   body: string;
   type: 'email' | 'sms' | 'push';
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -49,7 +49,7 @@ export const sendSMS = async (payload: NotificationPayload) => {
 /**
  * Automated Receipt Dispatch Protocol
  */
-export const dispatchDonationNotification = async (donation: any) => {
+export const dispatchDonationNotification = async (donation: { id: string; amount: string | number; cause: string; email: string; phone?: string }) => {
   // 1. Email Receipt via SendGrid
   await sendEmail({
     to: donation.email || 'donor@example.com',
@@ -71,7 +71,7 @@ export const dispatchDonationNotification = async (donation: any) => {
 /**
  * Field Operational Alert (For Volunteers)
  */
-export const dispatchVolunteerAlert = async (volunteer: any, event: any) => {
+export const dispatchVolunteerAlert = async (volunteer: { phone: string }, event: { title: string; location: string }) => {
   await sendSMS({
     to: volunteer.phone,
     body: `HQ ALERT: Mission ${event.title} starting in 2 hours at ${event.location}. Status: Tactical Presence Required.`,

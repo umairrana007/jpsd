@@ -90,8 +90,12 @@ export interface Donation {
   donorEmail: string;
   donorPhone: string;
   amount: number;
+  userId: string;
   causeId: string;
   causeName: string;
+  cause?: string;
+  causeTitle?: string;
+  programName?: string;
   paymentMethod: 'jazzcash' | 'easypaisa' | 'stripe' | 'bank_transfer';
   frequency: 'one-time' | 'monthly' | 'yearly';
   status: PaymentStatus;
@@ -99,6 +103,12 @@ export interface Donation {
   isZakat: boolean;
   isAnonymous: boolean;
   receiptSent: boolean;
+  receiptConsent: boolean;
+  securityHash?: string;
+  type?: string;
+  currency?: string;
+  date?: Date;
+  ref?: string;
   createdAt: Date;
 }
 
@@ -111,6 +121,7 @@ export interface Event {
   image: string;
   type: EventType;
   location: string;
+  locationUrdu?: string;
   address: string;
   coordinates?: { lat: number; lng: number };
   startDate: Date;
@@ -201,12 +212,19 @@ export interface User {
   createdAt: Date;
   lastLogin?: Date;
   isActive: boolean;
+  status: 'active' | 'inactive' | 'pending' | 'approved' | 'pending_deletion';
+  permissions?: string[];
+  skills?: string[];
+  region?: string;
+  deletionRequested?: boolean;
   preferences?: {
     language: 'en' | 'ur';
     newsletter: boolean;
     notifications: boolean;
   };
 }
+
+export type AppUser = User;
 
 export interface AdminUser {
   id: string;
@@ -228,7 +246,7 @@ export interface Report {
   id: string;
   type: 'financial' | 'campaign' | 'donor' | 'event';
   title: string;
-  data: any;
+  data: unknown;
   generatedAt: Date;
   period: {
     start: Date;
@@ -274,9 +292,12 @@ export interface LanguageContextType {
 }
 
 export interface NavItem {
-  label: string;
+  name: string;
+  label?: string;
   labelUrdu?: string;
   href: string;
+  icon?: React.ElementType;
+  location?: 'header' | 'footer' | 'sidebar';
   subItems?: NavItem[];
 }
 
@@ -290,7 +311,7 @@ export interface PaymentRequest {
   donorEmail: string;
   donorPhone: string;
   causeId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PaymentResponse {
@@ -299,7 +320,7 @@ export interface PaymentResponse {
   message: string;
   errorCode?: string;
   redirectUrl?: string; // Phase 6: Added for simulation & gateway redirects
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 export interface PaymentProvider {
@@ -308,3 +329,128 @@ export interface PaymentProvider {
   getPaymentStatus(transactionId: string): Promise<PaymentProcessStatus>;
   processRefund?(transactionId: string, amount: number): Promise<PaymentResponse>;
 }
+import { Timestamp } from 'firebase/firestore';
+
+export interface DeploymentData {
+  id: string;
+  volunteerId: string;
+  volunteerName?: string;
+  missionId: string;
+  title: string;
+  locationName: string;
+  category: string;
+  difficulty: string;
+  matchScore: number;
+  status: 'assigned' | 'checked-in' | 'completed' | 'verified';
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  location?: { lat: number; lng: number };
+  hoursLogged?: number;
+  reportSubmitted?: boolean;
+  verifiedBy?: string;
+  verifiedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DeploymentUpdate {
+  status?: DeploymentData['status'];
+  checkInTime?: Timestamp;
+  checkOutTime?: Timestamp;
+  hoursLogged?: number;
+  reportSubmitted?: boolean;
+  verifiedAt?: Timestamp;
+  verifiedBy?: string;
+  updatedAt?: Timestamp;
+}
+
+export interface JazzCashHashParams {
+  [key: string]: string | number;
+}
+
+export interface EasyPaisaPayload {
+  transactionId: string;
+  amount: number;
+  merchantId: string;
+  storeId: string;
+  timestamp: string;
+}
+
+export interface PaymentPayload {
+  method: 'jazzcash' | 'easypaisa';
+  amount: number;
+  params?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+  salt?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userEmail: string;
+  action: string;
+  resource: string;
+  status: 'success' | 'failure';
+  details?: string;
+  metadata?: Record<string, unknown>;
+  message?: string;
+  adminUid?: string;
+  type?: string;
+  timestamp?: Date;
+  affectedUserId?: string;
+  affectedUserIds?: string[];
+  createdAt: Date;
+}
+
+export interface Partner {
+  id: string;
+  name: string;
+  logo?: string;
+  image?: string;
+  website?: string;
+  isPublished?: boolean;
+  order?: number;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  nameUrdu?: string;
+  role: string;
+  roleUrdu?: string;
+  content?: string;
+  text?: string;
+  textUrdu?: string;
+  rating?: number;
+  image?: string;
+  isPublished?: boolean;
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  causeId: string;
+  cause?: string;
+  amount: number;
+  frequency: 'monthly' | 'yearly';
+  status: 'active' | 'cancelled' | 'paused' | 'Active';
+  nextBillingAt: Date;
+  nextDate?: Date;
+  createdAt: Date;
+}
+
+export interface ActivityLog {
+  id: string;
+  type: string;
+  message: string;
+  time?: string;
+  timestamp?: Date;
+  icon?: string;
+  userId?: string;
+  userEmail?: string;
+  action?: string;
+  resource?: string;
+  status?: string;
+}
+
+export type Deployment = DeploymentData;

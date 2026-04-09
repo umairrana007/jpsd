@@ -6,11 +6,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Image from 'next/image';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, Firestore } from 'firebase/firestore';
+import { Partner } from '@/types';
 
 export const PartnersSection: React.FC = () => {
   const { language } = useLanguage();
-  const [partners, setPartners] = React.useState<any[]>([]);
+  const [partners, setPartners] = React.useState<Partner[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -19,7 +20,7 @@ export const PartnersSection: React.FC = () => {
       try {
         setLoading(true);
         const q = query(
-          collection(db as any, 'partners'), 
+          collection(db as Firestore, 'partners'), 
           where('isPublished', '==', true),
           orderBy('order', 'asc')
         );
@@ -27,7 +28,7 @@ export const PartnersSection: React.FC = () => {
         const fetched = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })) as Partner[];
         setPartners(fetched);
       } catch (error) {
         console.error('Partners Fetch Error:', error);
