@@ -1,17 +1,17 @@
 import DOMPurify from 'dompurify';
 
 export const sanitizeHTML = (html: string): string => {
-  if (typeof window === 'undefined') return html; // DOMPurify needs a DOM, server-side bypass or use JSDOM (for now return as is or handle appropriately)
+  if (typeof window === 'undefined') return html; // DOMPurify needs a DOM
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code'],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ALLOWED_TAGS: ['p','br','strong','em','u','ul','ol','li','a','h1','h2','h3','h4','blockquote'],
+    ALLOWED_ATTR: ['href','target','rel']
   });
 };
 
 export const validateURL = (url: string): boolean => {
   try {
-    new URL(url);
-    return true;
+    new URL(url, 'http://dummy.com'); // added dummy base for relative URLs
+    return url.startsWith('http') || url.startsWith('/');
   } catch {
     return false;
   }

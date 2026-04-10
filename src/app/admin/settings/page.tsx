@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { siteConfigSchema } from '@/lib/schemas/cmsSchemas';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { HomepageSectionBuilder, HomepageSection } from '@/components/admin/HomepageSectionBuilder';
+import { BilingualInput } from '@/components/admin/BilingualInput';
 
 function AdminSettingsPage() {
   const { setGlobalAlert } = useAuth();
@@ -25,6 +26,8 @@ function AdminSettingsPage() {
     maintenanceMode: false,
     primaryColor: '#1ea05f',
     secondaryColor: '#3b82f6',
+    metaDescription: 'JPSD Welfare Trust is providing global relief and sustainable charity programs.',
+    metaDescriptionUrdu: '',
     navMenu: [] as { label: string; labelUrdu?: string; href: string }[],
     homepageSections: [] as HomepageSection[]
   });
@@ -57,6 +60,11 @@ function AdminSettingsPage() {
           address: data.address || 'Jamiyat House, 9 Faran Society, Hyder Ali Road, Karachi, Pakistan',
           logoUrl: data.logoUrl || '/logo.png',
         });
+        setSettings(prev => ({
+          ...prev,
+          metaDescription: data.metaDescription || prev.metaDescription,
+          metaDescriptionUrdu: data.metaDescriptionUrdu || prev.metaDescriptionUrdu
+        }));
       }
       setLoading(false);
     };
@@ -427,9 +435,17 @@ function AdminSettingsPage() {
                              <button className="flex-1 py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest">Urdu</button>
                           </div>
                        </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Meta Description</label>
-                          <textarea rows={3} defaultValue="JPSD Welfare Trust is providing global relief and sustainable charity programs." className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 text-xs focus:ring-0 shadow-inner" />
+                       <div className="space-y-4">
+                          <BilingualInput 
+                            label="SEO Meta Description"
+                            name="metaDescription"
+                            valueEn={settings.metaDescription}
+                            valueUr={settings.metaDescriptionUrdu}
+                            onChangeEn={(val) => setSettings({...settings, metaDescription: val})}
+                            onChangeUr={(val) => setSettings({...settings, metaDescriptionUrdu: val})}
+                            isTextArea
+                            placeholderEn="JPSD Welfare Trust is providing global relief..."
+                          />
                        </div>
                        <div className="flex items-center justify-between p-6 bg-red-500/5 border border-red-500/10 rounded-2xl group cursor-pointer" 
                             onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})}>
