@@ -11,6 +11,10 @@ export enum UserRole {
   VIEWER = 'viewer'
 }
 
+export type ContentRole = 'content_editor' | 'publisher' | 'super_admin';
+
+export type ReviewStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
+
 export enum EventStatus {
   UPCOMING = 'upcoming',
   ONGOING = 'ongoing',
@@ -84,6 +88,12 @@ export interface Cause {
   updatedAt: Date;
   status: 'draft' | 'published';
   publishedAt?: Date;
+  scheduledPublishAt?: string;
+  publishAt?: string;
+  reviewStatus: ReviewStatus;
+  reviewComments?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
 }
 
 export interface Donation {
@@ -162,6 +172,12 @@ export interface BlogPost {
   views: number;
   status: 'draft' | 'published';
   publishedAt?: Date;
+  scheduledPublishAt?: string;
+  publishAt?: string;
+  reviewStatus: ReviewStatus;
+  reviewComments?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -215,6 +231,8 @@ export interface User {
   lastLogin?: Date;
   isActive: boolean;
   status: 'active' | 'inactive' | 'pending' | 'approved' | 'pending_deletion';
+  contentRole?: ContentRole;
+  allowedCollections?: string[];
   permissions?: string[];
   skills?: string[];
   region?: string;

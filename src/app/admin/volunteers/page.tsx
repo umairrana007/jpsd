@@ -13,11 +13,14 @@ import { withAuth } from '@/components/admin/withAuth';
 import { UserRole, Volunteer } from '@/types';
 import { getVolunteers, updateVolunteer } from '@/lib/firebaseUtils';
 import { format } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
+import { canEditCollection } from '@/lib/permissionGuard';
 
 const SKILL_CATEGORIES = ['Medical', 'Logistics', 'Education', 'IT Support', 'Religious', 'Field Rescue'];
 const REGIONS = ['karachi', 'sindh', 'northern', 'other'];
 
 function AdminVolunteersPage() {
+  const { currentUserData: user } = useAuth();
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -46,6 +49,10 @@ function AdminVolunteersPage() {
   };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
+    if (!canEditCollection(user as any, 'volunteers')) {
+      alert('You do not have the mandate to authorize personnel.');
+      return;
+    }
     await updateVolunteer(id, { status: newStatus as any });
     await fetchVolunteers();
   };

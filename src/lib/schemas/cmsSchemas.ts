@@ -33,6 +33,8 @@ export const causeSchema = z.object({
   active: z.boolean(),
   featured: z.boolean(),
   status: z.enum(['draft','published']),
+  scheduledPublishAt: z.string().nullable().optional(),
+  reviewStatus: z.enum(['draft', 'pending_review', 'approved', 'rejected']).optional(),
   publishedAt: z.string().optional()
 });
 

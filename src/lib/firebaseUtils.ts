@@ -618,18 +618,20 @@ export const updateUserStatus = async (userId: string, status: 'approved' | 'rej
   }
 };
 
-export const updateUserRole = async (userId: string, role: UserRole) => {
+export const updateUserRole = async (userId: string, role: UserRole, extra?: Record<string, any>) => {
   try {
     const userRef = doc(getDb(), 'users', userId);
     await updateDoc(userRef, {
       role,
+      ...extra,
       updatedAt: Timestamp.now()
     });
 
     await logActivity({
       type: 'USER_ROLE',
       message: `User ${userId} role changed to ${role}`,
-      icon: 'ðŸ›¡ï¸'
+      icon: '🛡️',
+      ...extra
     });
 
     return true;

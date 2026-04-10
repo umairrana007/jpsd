@@ -30,7 +30,11 @@ const CommandAlert = ({ message, type, onClose }: { message: string, type: 'succ
   </div>
 );
 
+import { useAuth } from '@/contexts/AuthContext';
+import { canEditCollection } from '@/lib/permissionGuard';
+
 export function AdminMissionsPage() {
+  const { currentUserData: user } = useAuth();
   const [showCreator, setShowCreator] = useState(false);
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [alert, setAlert] = useState<{message: string, type: 'success' | 'error'} | null>(null);
@@ -79,6 +83,11 @@ export function AdminMissionsPage() {
   };
 
   const handleLaunchMission = async () => {
+    if (!canEditCollection(user as any, 'events', true)) {
+      setAlert({ message: 'Tactical Clearance Deficit. Only Publishers can launch live missions.', type: 'error' });
+      return;
+    }
+
     if (!newMission.title || !newMission.date || newMission.requiredSkills.length === 0) {
       setAlert({ message: 'Primary Parameters Missing. Operation Aborted.', type: 'error' });
       return;

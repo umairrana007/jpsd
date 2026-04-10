@@ -20,6 +20,7 @@ const GlobalSearch = dynamic(() => import('@/components/admin/GlobalSearch'), {
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
 import { UserRole } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,6 +30,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                pathname?.startsWith('/admin/theme');
   
   const portalName = isWebsiteManagement ? "Website Management" : "Administration Portal";
+
+  const { currentUserData } = useAuth();
+
+  const mainNavItems = [
+    { href: '/admin', label: 'Dashboard', icon: FiHome },
+    { href: '/admin/donations', label: 'Donations', icon: FiDollarSign, collection: 'donations' },
+    { href: '/admin/treasury', label: 'Treasury', icon: FiPieChart, role: [UserRole.ADMIN] },
+    { href: '/admin/volunteers', label: 'Volunteers', icon: FiUsers, collection: 'volunteers' },
+    { href: '/admin/missions', label: 'Mission Planning', icon: FiTarget, collection: 'events' },
+    { href: '/admin/users', label: 'Users', icon: FiUser, role: [UserRole.ADMIN] },
+    { href: '/admin/causes', label: 'Causes', icon: FiHome, collection: 'causes' },
+    { href: '/admin/events', label: 'Events', icon: FiUser, collection: 'events' },
+    { href: '/admin/reports', label: 'Reports', icon: FiBarChart2, role: [UserRole.ADMIN] },
+    { href: '/admin/analytics', label: 'Analytics', icon: FiActivity, role: [UserRole.ADMIN] },
+    { href: '/admin/webhooks', label: 'Webhooks', icon: FiZap, role: [UserRole.ADMIN] },
+  ];
+
+  const managementNavItems = [
+    { href: '/admin/pages', label: 'Page Manager', icon: FiFileText, collection: 'pages' },
+    { href: '/admin/testimonials', label: 'Testimonials', icon: FiUsers, collection: 'testimonials' },
+    { href: '/admin/partners', label: 'Partners', icon: FiBriefcase, collection: 'partners' },
+    { href: '/admin/navigation', label: 'Menu Manager', icon: FiMenu, role: [UserRole.ADMIN] },
+    { href: '/admin/theme', label: 'Theme & Colors', icon: FiLayout, role: [UserRole.ADMIN] },
+    { href: '/admin/layout-manager', label: 'Layout Manager', icon: FiLayout, role: [UserRole.ADMIN] },
+    { href: '/admin/media', label: 'Media Vault', icon: FiImage, collection: 'media' },
+    { href: '/admin/email-templates', label: 'Email Templates', icon: FiMail, role: [UserRole.ADMIN] },
+    { href: '/admin/settings', label: 'Foundation Identity', icon: FiSettings, role: [UserRole.ADMIN] },
+  ];
+
+  const hasAccess = (item: any) => {
+    if (currentUserData?.role === UserRole.ADMIN) return true;
+    if (item.role && !item.role.includes(currentUserData?.role)) return false;
+    if (item.collection && !currentUserData?.allowedCollections?.includes(item.collection)) return false;
+    return true;
+  };
+
+  const visibleMainItems = mainNavItems.filter(hasAccess);
+  const visibleManagementItems = managementNavItems.filter(hasAccess);
 
   return (
     <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VOLUNTEER]}>
@@ -54,106 +93,52 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <GlobalSearch />
           <nav className="flex-1 space-y-2">
-            <Link href="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname === '/admin' ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiHome className="text-lg" />
-              <span className="text-sm">Dashboard</span>
-            </Link>
-            <Link href="/admin/donations" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/donations') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiDollarSign className="text-lg" />
-              <span className="text-sm">Donations</span>
-            </Link>
-            <Link href="/admin/treasury" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/treasury') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiPieChart className="text-lg" />
-              <span className="text-sm">Treasury</span>
-            </Link>
-            <Link href="/admin/volunteers" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/volunteers') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiUsers className="text-lg" />
-              <span className="text-sm">Volunteers</span>
-            </Link>
-            <Link href="/admin/missions" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/missions') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiTarget className="text-lg" />
-              <span className="text-sm">Mission Planning</span>
-            </Link>
-            <Link href="/admin/users" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/users') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiUser className="text-lg" />
-              <span className="text-sm">Users</span>
-            </Link>
-            <Link href="/admin/causes" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/causes') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiHome className="text-lg" />
-              <span className="text-sm">Causes</span>
-            </Link>
-            <Link href="/admin/events" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/events') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiUser className="text-lg" />
-              <span className="text-sm">Events</span>
-            </Link>
-            <Link href="/admin/reports" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/reports') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiBarChart2 className="text-lg" />
-              <span className="text-sm">Reports</span>
-            </Link>
-            <Link href="/admin/analytics" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/analytics') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiActivity className="text-lg" />
-              <span className="text-sm">Analytics</span>
-            </Link>
-            <Link href="/admin/webhooks" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/webhooks') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiZap className="text-lg" />
-              <span className="text-sm">Webhooks</span>
-            </Link>
+            {visibleMainItems.map((item) => (
+              <Link 
+                key={item.href}
+                href={item.href} 
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                  pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href)) 
+                  ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' 
+                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'
+                }`}
+              >
+                <item.icon className="text-lg" />
+                <span className="text-sm">{item.label}</span>
+              </Link>
+            ))}
 
-            <div className="pt-4 pb-2 px-4">
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Website Management</p>
-            </div>
-
-            <Link href="/admin/pages" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/pages') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiFileText className="text-lg" />
-              <span className="text-sm">Page Manager</span>
-            </Link>
-
-            <Link href="/admin/testimonials" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/testimonials') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiUsers className="text-lg" />
-              <span className="text-sm">Testimonials</span>
-            </Link>
-
-            <Link href="/admin/partners" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/partners') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiBriefcase className="text-lg" />
-              <span className="text-sm">Partners</span>
-            </Link>
-
-            <Link href="/admin/navigation" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/navigation') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiMenu className="text-lg" />
-              <span className="text-sm">Menu Manager</span>
-            </Link>
-
-            <Link href="/admin/theme" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/theme') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiLayout className="text-lg" />
-              <span className="text-sm">Theme & Colors</span>
-            </Link>
-
-            <Link href="/admin/layout-manager" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/layout-manager') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiLayout className="text-lg" />
-              <span className="text-sm">Layout Manager</span>
-            </Link>
-
-            <Link href="/admin/media" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/media') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiImage className="text-lg" />
-              <span className="text-sm">Media Vault</span>
-            </Link>
-            <Link href="/admin/email-templates" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/email-templates') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiMail className="text-lg" />
-              <span className="text-sm">Email Templates</span>
-            </Link>
-
-            <Link href="/admin/settings" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/settings') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
-              <FiSettings className="text-lg" />
-              <span className="text-sm">Foundation Identity</span>
-            </Link>
+            {visibleManagementItems.length > 0 && (
+              <>
+                <div className="pt-4 pb-2 px-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Website Management</p>
+                </div>
+                {visibleManagementItems.map((item) => (
+                  <Link 
+                    key={item.href}
+                    href={item.href} 
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      pathname?.startsWith(item.href) 
+                      ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' 
+                      : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'
+                    }`}
+                  >
+                    <item.icon className="text-lg" />
+                    <span className="text-sm">{item.label}</span>
+                  </Link>
+                ))}
+              </>
+            )}
           </nav>
           <div className="mt-auto pt-6 border-t border-slate-200/50 px-4 flex items-center gap-3 pb-4">
             <div className="w-10 h-10 rounded-full bg-[#1ea05f]/20 flex items-center justify-center overflow-hidden flex-shrink-0">
-              <div className="w-full h-full bg-[#1ea05f] text-white flex items-center justify-center font-bold">M</div>
+              <div className="w-full h-full bg-[#1ea05f] text-white flex items-center justify-center font-bold">
+                {currentUserData?.name?.charAt(0) || 'M'}
+              </div>
             </div>
             <div className="flex-1 truncate">
-              <p className="text-sm font-bold text-slate-800 truncate">Management</p>
-              <p className="text-xs text-slate-400 truncate">Super Admin</p>
+              <p className="text-sm font-bold text-slate-800 truncate">{currentUserData?.name || 'Management'}</p>
+              <p className="text-xs text-slate-400 truncate">{currentUserData?.role?.replace('_', ' ') || 'Super Admin'}</p>
             </div>
           </div>
         </aside>
@@ -167,26 +152,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Mobile Bottom NavBar */}
         <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-3xl z-50">
-          <Link href="/admin" className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${pathname === '/admin' ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'text-slate-400'}`}>
-            <FiHome className="text-xl" />
-            <span className="text-[10px] font-medium mt-1">Home</span>
-          </Link>
-          <Link href="/admin/donations" className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${pathname?.startsWith('/admin/donations') ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'text-slate-400'}`}>
-            <FiDollarSign className="text-xl" />
-            <span className="text-[10px] font-medium mt-1">Funds</span>
-          </Link>
-          <Link href="/admin/missions" className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${pathname?.startsWith('/admin/missions') ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'text-slate-400'}`}>
-            <FiTarget className="text-xl" />
-            <span className="text-[10px] font-medium mt-1">Mission</span>
-          </Link>
-          <Link href="/admin/reports" className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${pathname?.startsWith('/admin/reports') ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'text-slate-400'}`}>
-            <FiBarChart2 className="text-xl" />
-            <span className="text-[10px] font-medium mt-1">Stats</span>
-          </Link>
-          <Link href="/admin/settings" className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${pathname?.startsWith('/admin/settings') ? 'bg-[#1ea05f]/10 text-[#1ea05f]' : 'text-slate-400'}`}>
-            <FiSettings className="text-xl" />
-            <span className="text-[10px] font-medium mt-1">Menu</span>
-          </Link>
+          {visibleMainItems.slice(0, 5).map((item) => (
+            <Link 
+              key={item.href}
+              href={item.href} 
+              className={`flex flex-col items-center justify-center px-3 py-1 rounded-2xl ${
+                pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href)) 
+                ? 'bg-[#1ea05f]/10 text-[#1ea05f]' 
+                : 'text-slate-400'
+              }`}
+            >
+              <item.icon className="text-xl" />
+              <span className="text-[10px] font-medium mt-1">{item.label.split(' ')[0]}</span>
+            </Link>
+          ))}
         </nav>
       </div>
     </ProtectedRoute>

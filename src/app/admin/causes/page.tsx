@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { 
   FiPlus, FiSearch, FiEdit3, FiTrash2,
-  FiUsers, FiX, FiDollarSign
+  FiUsers, FiX, FiDollarSign, FiActivity, FiZap, FiTarget as FiMissionTarget, FiClock, FiCheckCircle, FiAlertCircle 
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/firebase';
@@ -23,7 +23,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { logCMSAnalytics } from '@/lib/cmsAnalytics';
 import { triggerWebhook } from '@/lib/webhookDispatcher';
 import { CMSAnalyticsDashboard } from '@/components/admin/CMSAnalyticsDashboard';
-import { FiActivity, FiZap, FiTarget as FiMissionTarget } from 'react-icons/fi';
+import { canEditCollection, canPublishContent, canReviewContent } from '@/lib/permissionGuard';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface Program {
   id: string;
@@ -37,6 +39,9 @@ interface Program {
   active: boolean;
   status: 'draft' | 'published';
   donors?: number;
+  scheduledPublishAt?: string;
+  reviewStatus?: 'draft' | 'pending_review' | 'approved' | 'rejected';
+  reviewComments?: string;
 }
 
 const fetcher = async () => {
@@ -53,7 +58,8 @@ const fetcher = async () => {
 function AdminCausesPage() {
   const { user } = useAuth();
   const { data: programs, error, mutate, isLoading: loading } = useSWR<Program[]>('causes', fetcher);
-  
+  const [globalAlert, setGlobalAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -71,17 +77,30 @@ function AdminCausesPage() {
       location: 'Global',
       goalAmount: 0,
       raisedAmount: 0,
-      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       urgency: 'medium',
       active: false,
       featured: false,
       status: 'draft' as 'draft' | 'published',
-      image: '/images/jpsd_main.jpg'
+      image: '/images/jpsd_main.jpg',
+      scheduledPublishAt: null as string | null,
+      reviewStatus: 'draft' as 'draft'
     }
   });
 
   const onSubmit = async (data: any) => {
-    if (!db) return;
+    if (!db || !user) return;
+    
+    if (!canEditCollection(user as any, 'causes')) {
+      alert('You do not have permission to edit causes strategy.');
+      return;
+    }
+
+    if (data.status === 'published' && !canPublishContent(user as any)) {
+      alert('Only publishers can approve strategic missions.');
+      return;
+    }
+
     setSaving(true);
     try {
       const active = data.status === 'published';
@@ -92,10 +111,8 @@ function AdminCausesPage() {
       };
 
       if (editingId && editingProgram) {
-        // Validation + Version History
         await saveVersion('causes', editingId, editingProgram as unknown as Record<string, unknown>, user?.uid || 'unknown');
         
-        // Audit log
         await logActivity({
           type: 'UPDATE_CAUSE',
           message: `Cause "${data.title}" updated`,
@@ -109,7 +126,6 @@ function AdminCausesPage() {
 
         await updateDoc(doc(db, 'causes', editingId), programData);
 
-        // Record high-level telemetry
         await logCMSAnalytics({
           docId: editingId,
           collection: 'causes',
@@ -118,7 +134,6 @@ function AdminCausesPage() {
           metadata: { fieldsChanged: Object.keys(data) }
         });
 
-        // Trigger Webhook if published
         if (data.status === 'published') {
           await triggerWebhook({ url: process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL || '', isActive: true }, {
             type: 'cause_published',
@@ -145,7 +160,7 @@ function AdminCausesPage() {
         await logCMSAnalytics({
           docId: docRef.id,
           collection: 'causes',
-          action: 'publish', // New document creation is treated as first publish if active
+          action: 'publish',
           actorUid: user?.uid || 'unknown'
         });
       }
@@ -154,7 +169,7 @@ function AdminCausesPage() {
       setEditingId(null);
       setEditingProgram(null);
       reset();
-      mutate(); // Reload data
+      mutate();
     } catch (err) {
       console.error("Save error:", err);
       alert('Failed to save. Check the console.');
@@ -179,7 +194,9 @@ function AdminCausesPage() {
       active: p.active || false,
       featured: p.featured || false,
       status: p.status || (p.active ? 'published' : 'draft'),
-      image: p.image || '/images/jpsd_main.jpg'
+      image: p.image || '/images/jpsd_main.jpg',
+      scheduledPublishAt: p.scheduledPublishAt || null,
+      reviewStatus: p.reviewStatus || 'draft'
     });
     setEditingId(p.id);
     setIsModalOpen(true);
@@ -205,6 +222,13 @@ function AdminCausesPage() {
 
   return (
     <div className="space-y-10">
+      {globalAlert && (
+        <div className={`fixed top-6 right-6 z-[200] px-6 py-4 rounded-2xl shadow-2xl font-black text-[10px] uppercase tracking-widest animate-in fade-in slide-in-from-right-10 ${globalAlert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+          {globalAlert.message}
+          <button onClick={() => setGlobalAlert(null)} className="ml-4 opacity-50 hover:opacity-100">✕</button>
+        </div>
+      )}
+
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Funding Missions</h2>
@@ -281,8 +305,11 @@ function AdminCausesPage() {
                              </td>
                              <td className="px-10 py-8">
                                 <div className="flex items-center gap-3">
-                                   <div className={`w-2 h-2 rounded-full ${cause.active ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : 'bg-slate-300'}`}></div>
-                                   <span className={`text-[10px] font-black uppercase tracking-widest ${cause.active ? 'text-slate-800' : 'text-slate-400'}`}>{cause.active ? 'Active' : 'Draft'}</span>
+                                   <div className={`w-2 h-2 rounded-full ${cause.active ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : (cause.scheduledPublishAt ? 'bg-amber-400' : 'bg-slate-300')}`}></div>
+                                   <span className={`text-[10px] font-black uppercase tracking-widest ${cause.active ? 'text-slate-800' : 'text-slate-400'}`}>
+                                      {cause.active ? 'Active' : (cause.scheduledPublishAt ? 'Scheduled' : 'Draft')}
+                                      {cause.reviewStatus === 'pending_review' && <span className="ml-2 text-blue-500">(Review)</span>}
+                                   </span>
                                 </div>
                              </td>
                               <td className="px-10 py-8 text-right">
@@ -347,7 +374,7 @@ function AdminCausesPage() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Bilingual Input for Title */}
+                  {/* Bilngual Input for Title */}
                   <Controller
                     name="title"
                     control={control}
@@ -440,22 +467,110 @@ function AdminCausesPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Publishing Status</label>
-                    <Controller
-                      name="status"
-                      control={control}
-                      render={({ field }) => (
-                        <select 
-                          {...field}
-                          className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
-                        >
-                          <option value="draft">Draft (Hidden from public)</option>
-                          <option value="published">Published (Live on site)</option>
-                        </select>
-                      )}
-                    />
+                  {/* Status & Schedule */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Status</label>
+                      <Controller
+                        name="status"
+                        control={control}
+                        render={({ field }) => (
+                          <div className="flex p-1 bg-slate-100 rounded-2xl w-full">
+                            {['draft', 'published'].map((s) => (
+                              <button
+                                key={s}
+                                type="button"
+                                onClick={() => field.onChange(s)}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                  field.value === s ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                              >
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Scheduled Uplink</label>
+                      <Controller
+                        name="scheduledPublishAt"
+                        control={control}
+                        render={({ field }) => (
+                          <DatePicker
+                            selected={field.value ? new Date(field.value) : null}
+                            onChange={(date: Date | null) => field.onChange(date?.toISOString() || null)}
+                            showTimeSelect
+                            dateFormat="MMMM d, yyyy h:mm aa"
+                            placeholderText="Set auto-publish time"
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/5 outline-none transition-all placeholder:text-slate-300"
+                          />
+                        )}
+                      />
+                    </div>
                   </div>
+
+                  {/* Review System */}
+                  {editingProgram && editingProgram.reviewStatus === 'pending_review' && canReviewContent(user as any) && (
+                    <div className="p-8 bg-amber-50 rounded-[2.5rem] border border-amber-100 space-y-6">
+                       <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-2">
+                         <FiAlertCircle /> Strategic Review Required
+                       </h4>
+                       <textarea 
+                         placeholder="Add executive feedback here..."
+                         className="w-full p-6 bg-white border border-amber-200 rounded-3xl text-sm italic font-medium focus:ring-4 focus:ring-amber-500/5 outline-none"
+                         onChange={(e) => (editingProgram as any).reviewComments = e.target.value}
+                       />
+                       <div className="flex gap-4">
+                          <button 
+                            type="button" 
+                            onClick={async () => {
+                              if (!db) return;
+                              await updateDoc(doc(db, 'causes', editingId!), { reviewStatus: 'approved', status: 'published', reviewedAt: serverTimestamp() });
+                              setGlobalAlert?.({ message: 'Mission Approved & Launched', type: 'success' });
+                              setIsModalOpen(false);
+                              mutate();
+                            }}
+                            className="flex-1 py-4 bg-green-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-green-600/20"
+                          >
+                            Approve Strategy
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={async () => {
+                              if (!db) return;
+                              await updateDoc(doc(db, 'causes', editingId!), { reviewStatus: 'rejected', status: 'draft', reviewedAt: serverTimestamp() });
+                              setGlobalAlert?.({ message: 'Revision Protocol Triggered', type: 'error' });
+                              setIsModalOpen(false);
+                              mutate();
+                            }}
+                            className="flex-1 py-4 bg-red-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-red-600/20"
+                          >
+                            Deny Strategy
+                          </button>
+                       </div>
+                    </div>
+                  )}
+
+                  {/* Submission for Review */}
+                  {user && (user as any).contentRole === 'content_editor' && watch('status') === 'draft' && (
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        if (!db) return;
+                        const values = watch();
+                        await updateDoc(doc(db, 'causes', editingId!), { ...values, reviewStatus: 'pending_review', updatedAt: serverTimestamp() });
+                        setGlobalAlert?.({ message: 'Strategic proposal submitted for review.', type: 'success' });
+                        setIsModalOpen(false);
+                        mutate();
+                      }}
+                      className="w-full py-5 bg-blue-50 text-blue-600 font-black text-[10px] uppercase tracking-widest rounded-2xl border border-blue-100 italic"
+                    >
+                      Submit for Intelligence Approval
+                    </button>
+                  )}
                 </div>
 
                 <div className="pt-6 flex gap-4">
@@ -480,5 +595,5 @@ function AdminCausesPage() {
 }
 
 export default withAuth(AdminCausesPage, { 
-  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER] 
 });

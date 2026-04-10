@@ -22,6 +22,7 @@ function AdminUsersPage() {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [bulkRole, setBulkRole] = useState<UserRole | ''>('');
+  const [advancedEditId, setAdvancedEditId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -57,10 +58,10 @@ function AdminUsersPage() {
     }
   };
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+  const handleRoleChange = async (userId: string, newRole: UserRole, extra: Record<string, any> = {}) => {
     setActionLoading(userId);
     try {
-      await updateUserRole(userId, newRole);
+      await updateUserRole(userId, newRole, extra);
 
       // Log Activity
       await logActivity({
@@ -69,7 +70,8 @@ function AdminUsersPage() {
         message: `Admin ${authUser?.email} changed user ${userId} role to ${newRole}`,
         adminUid: authUser?.uid,
         affectedUserId: userId,
-        newRole
+        newRole,
+        ...extra
       });
 
       await fetchUsers();
@@ -303,104 +305,183 @@ function AdminUsersPage() {
                <tbody className="divide-y divide-slate-50/50">
                   <AnimatePresence>
                     {filteredUsers.map((user) => (
-                      <motion.tr 
-                        key={user.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`group hover:bg-slate-50/30 transition-all ${selectedUserIds.includes(user.id) ? 'bg-[#1ea05f]/5' : ''}`}
-                      >
-                         <td className="px-10 py-8">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedUserIds.includes(user.id)}
-                              onChange={() => toggleSelectUser(user.id)}
-                              className="w-5 h-5 rounded-lg border-slate-300 text-[#1ea05f] focus:ring-[#1ea05f]/20 cursor-pointer"
-                            />
-                         </td>
-                         <td className="px-10 py-8">
-                            <div className="flex items-center gap-5">
-                               <div className="w-14 h-14 rounded-3xl bg-slate-100 flex items-center justify-center text-[#1ea05f] font-black text-lg border border-slate-200 group-hover:border-[#1ea05f]/30 transition-all shadow-sm">
-                                  {user.name?.charAt(0) || user.email?.charAt(0)}
-                               </div>
-                               <div>
-                                  <p className="text-base font-black text-slate-800 tracking-tightest">{user.name}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                     <FiMail size={12} className="text-slate-400" />
-                                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user.email}</p>
-                                  </div>
-                               </div>
-                            </div>
-                         </td>
-                         <td className="px-10 py-8">
-                            <div className="relative inline-block">
-                               <select
-                                  value={user.role}
-                                  onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                                  disabled={actionLoading === user.id}
-                                  className={`appearance-none px-4 py-2 pr-8 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border outline-none bg-transparent cursor-pointer transition-all ${
-                                    user.role === UserRole.ADMIN ? 'bg-red-50 text-red-600 border-red-100' : 
-                                    user.role === UserRole.VOLUNTEER ? 'bg-blue-50 text-blue-600 border-blue-100' : 
-                                    user.role === UserRole.CONTENT_MANAGER ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                    'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                  }`}
-                               >
-                                  {Object.values(UserRole).map(role => (
-                                     <option key={role} value={role} className="bg-white text-slate-800">{role.replace('_', ' ')}</option>
-                                  ))}
-                               </select>
-                               <FiShield className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 text-[10px]" />
-                            </div>
-                         </td>
-                         <td className="px-10 py-8">
-                            <div className="flex items-center gap-3">
-                               <div className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-[#1ea05f] shadow-[0_0_10px_#1ea05f]' : 'bg-slate-300'}`}></div>
-                               <span className={`text-[10px] font-black uppercase tracking-widest ${user.isActive ? 'text-slate-800' : 'text-slate-400'}`}>
-                                  {user.status || 'Unknown'}
-                               </span>
-                            </div>
-                         </td>
-                         <td className="px-10 py-8 text-right">
-                            <div className="flex justify-end gap-2">
-                               {user.status === 'pending_deletion' ? (
-                                 <button 
-                                   disabled={actionLoading === user.id}
-                                   onClick={() => handleAction(user.id, 'inactive', false)}
-                                   className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                      <React.Fragment key={user.id}>
+                        <motion.tr 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className={`group hover:bg-slate-50/30 transition-all ${selectedUserIds.includes(user.id) ? 'bg-[#1ea05f]/5' : ''}`}
+                        >
+                           <td className="px-10 py-8">
+                              <input 
+                                type="checkbox" 
+                                checked={selectedUserIds.includes(user.id)}
+                                onChange={() => toggleSelectUser(user.id)}
+                                className="w-5 h-5 rounded-lg border-slate-300 text-[#1ea05f] focus:ring-[#1ea05f]/20 cursor-pointer"
+                              />
+                           </td>
+                           <td className="px-10 py-8">
+                              <div className="flex items-center gap-5">
+                                 <div className="w-14 h-14 rounded-3xl bg-slate-100 flex items-center justify-center text-[#1ea05f] font-black text-lg border border-slate-200 group-hover:border-[#1ea05f]/30 transition-all shadow-sm">
+                                    {user.name?.charAt(0) || user.email?.charAt(0)}
+                                 </div>
+                                 <div>
+                                    <p className="text-base font-black text-slate-800 tracking-tightest">{user.name}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                       <FiMail size={12} className="text-slate-400" />
+                                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user.email}</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </td>
+                           <td className="px-10 py-8">
+                              <div className="relative inline-block">
+                                 <select
+                                    value={user.role}
+                                    onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                                    disabled={actionLoading === user.id}
+                                    className={`appearance-none px-4 py-2 pr-8 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border outline-none bg-transparent cursor-pointer transition-all ${
+                                      user.role === UserRole.ADMIN ? 'bg-red-50 text-red-600 border-red-100' : 
+                                      user.role === UserRole.VOLUNTEER ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                                      user.role === UserRole.CONTENT_MANAGER ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                      'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                    }`}
                                  >
-                                   <FiX strokeWidth={3} /> SAFE PURGE (DEACTIVATE)
+                                    {Object.values(UserRole).map(role => (
+                                       <option key={role} value={role} className="bg-white text-slate-800">{role.replace('_', ' ')}</option>
+                                    ))}
+                                 </select>
+                                 <FiShield className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 text-[10px]" />
+                               </div>
+                               {user.role === UserRole.CONTENT_MANAGER && (
+                                 <button 
+                                   onClick={() => setAdvancedEditId(advancedEditId === user.id ? null : user.id)}
+                                   className="ml-3 p-1.5 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition-all shadow-sm"
+                                   title="Advanced Permissions"
+                                 >
+                                   <FiKey size={12} />
                                  </button>
-                               ) : user.status === 'pending' ? (
-                                 <>
-                                   <button 
-                                     disabled={actionLoading === user.id}
-                                     onClick={() => handleAction(user.id, 'approved', true)}
-                                     className="flex items-center gap-2 px-5 py-2.5 bg-[#1ea05f] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#15804a] transition-all disabled:opacity-50"
-                                   >
-                                     <FiCheck strokeWidth={3} /> Approve
-                                   </button>
-                                   <button 
-                                     disabled={actionLoading === user.id}
-                                     onClick={() => handleAction(user.id, 'rejected', false)}
-                                     className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50"
-                                   >
-                                     <FiX strokeWidth={3} /> Reject
-                                   </button>
-                                 </>
-                               ) : (
-                                 <>
-                                   <button 
-                                      onClick={() => handleAction(user.id, user.isActive ? 'inactive' : 'approved', !user.isActive)}
-                                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                                        user.isActive ? 'text-red-500 border-red-100 hover:bg-red-50' : 'text-[#1ea05f] border-[#1ea05f]/20 hover:bg-[#1ea05f]/5'
-                                      }`}
-                                   >
-                                      {user.isActive ? 'Deactivate' : 'Activate'}
-                                   </button>
-                                 </>
                                )}
-                            </div>
-                         </td>
-                      </motion.tr>
+                            </td>
+                           <td className="px-10 py-8">
+                              <div className="flex items-center gap-3">
+                                 <div className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-[#1ea05f] shadow-[0_0_10px_#1ea05f]' : 'bg-slate-300'}`}></div>
+                                 <span className={`text-[10px] font-black uppercase tracking-widest ${user.isActive ? 'text-slate-800' : 'text-slate-400'}`}>
+                                    {user.status || 'Unknown'}
+                                 </span>
+                              </div>
+                           </td>
+                           <td className="px-10 py-8 text-right">
+                              <div className="flex justify-end gap-2">
+                                 {user.status === 'pending_deletion' ? (
+                                   <button 
+                                     disabled={actionLoading === user.id}
+                                     onClick={() => handleAction(user.id, 'inactive', false)}
+                                     className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                                   >
+                                     <FiX strokeWidth={3} /> SAFE PURGE (DEACTIVATE)
+                                   </button>
+                                 ) : user.status === 'pending' ? (
+                                   <>
+                                     <button 
+                                       disabled={actionLoading === user.id}
+                                       onClick={() => handleAction(user.id, 'approved', true)}
+                                       className="flex items-center gap-2 px-5 py-2.5 bg-[#1ea05f] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#15804a] transition-all disabled:opacity-50"
+                                     >
+                                       <FiCheck strokeWidth={3} /> Approve
+                                     </button>
+                                     <button 
+                                       disabled={actionLoading === user.id}
+                                       onClick={() => handleAction(user.id, 'rejected', false)}
+                                       className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50"
+                                     >
+                                       <FiX strokeWidth={3} /> Reject
+                                     </button>
+                                   </>
+                                 ) : (
+                                   <>
+                                     <button 
+                                        onClick={() => handleAction(user.id, user.isActive ? 'inactive' : 'approved', !user.isActive)}
+                                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                          user.isActive ? 'text-red-500 border-red-100 hover:bg-red-50' : 'text-[#1ea05f] border-[#1ea05f]/20 hover:bg-[#1ea05f]/5'
+                                        }`}
+                                     >
+                                        {user.isActive ? 'Deactivate' : 'Activate'}
+                                     </button>
+                                   </>
+                                 )}
+                              </div>
+                           </td>
+                        </motion.tr>
+                        <AnimatePresence>
+                          {advancedEditId === user.id && (
+                            <motion.tr 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                            >
+                              <td colSpan={5} className="px-10 py-10 bg-slate-50/50 border-y border-slate-100/50">
+                                 <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    <div className="space-y-4">
+                                       <div className="flex items-center gap-2 mb-2">
+                                          <div className="p-2 bg-blue-100 text-blue-600 rounded-xl"><FiShield size={14}/></div>
+                                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">Command Authority</label>
+                                       </div>
+                                       <div className="grid grid-cols-2 gap-2">
+                                          {[
+                                            { id: 'content_editor', label: 'Tactical (Editor)', sub: 'Propose changes' },
+                                            { id: 'content_publisher', label: 'Executive (Publisher)', sub: 'Direct live uplink' }
+                                          ].map((r) => (
+                                            <button 
+                                              key={r.id}
+                                              onClick={() => handleRoleChange(user.id, user.role, { contentRole: r.id })}
+                                              className={`p-4 rounded-[1.5rem] border text-left transition-all ${
+                                                (user.contentRole || 'content_editor') === r.id 
+                                                ? 'border-blue-500 bg-blue-50/50 shadow-sm' 
+                                                : 'border-slate-100 bg-white hover:border-slate-200'
+                                              }`}
+                                            >
+                                               <p className={`text-[10px] font-black uppercase tracking-widest ${ (user.contentRole || 'content_editor') === r.id ? 'text-blue-600' : 'text-slate-600' }`}>{r.label}</p>
+                                               <p className="text-[9px] text-slate-400 font-medium tracking-tight mt-0.5">{r.sub}</p>
+                                            </button>
+                                          ))}
+                                       </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                       <div className="flex items-center gap-2 mb-2">
+                                          <div className="p-2 bg-amber-100 text-amber-600 rounded-xl"><FiLock size={14}/></div>
+                                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">Sector Clearance</label>
+                                       </div>
+                                       <div className="flex flex-wrap gap-2">
+                                          {['causes', 'events', 'blog_posts', 'volunteers', 'partners'].map(col => {
+                                            const isSelected = user.allowedCollections?.includes(col);
+                                            return (
+                                               <button 
+                                                 key={col}
+                                                 onClick={() => {
+                                                    const current = user.allowedCollections || [];
+                                                    const next = isSelected ? current.filter(c => c !== col) : [...current, col];
+                                                    handleRoleChange(user.id, user.role, { allowedCollections: next });
+                                                 }}
+                                                 className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.05em] transition-all border ${
+                                                    isSelected 
+                                                    ? 'bg-amber-500 text-white border-transparent shadow-lg shadow-amber-500/20 scale-105' 
+                                                    : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'
+                                                 }`}
+                                               >
+                                                 {col.replace('_', ' ')}
+                                               </button>
+                                            );
+                                          })}
+                                       </div>
+                                       <p className="text-[9px] text-slate-400 font-bold italic">Defining the boundaries of this operative's command interface.</p>
+                                    </div>
+                                 </div>
+                              </td>
+                            </motion.tr>
+                          )}
+                        </AnimatePresence>
+                      </React.Fragment>
                     ))}
                   </AnimatePresence>
                   {filteredUsers.length === 0 && !loading && (
