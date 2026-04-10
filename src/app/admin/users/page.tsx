@@ -40,7 +40,8 @@ function AdminUsersPage() {
       await updateUserStatus(userId, status, isActive);
       
       // Log Activity
-      await logActivity('USER_STATUS_UPDATE', {
+      await logActivity({
+        action: 'USER_STATUS_UPDATE',
         type: 'PRIVILEGE',
         message: `Admin ${authUser?.email} updated user ${userId} status to ${status}`,
         adminUid: authUser?.uid,
@@ -62,7 +63,8 @@ function AdminUsersPage() {
       await updateUserRole(userId, newRole);
 
       // Log Activity
-      await logActivity('USER_ROLE_UPDATE', {
+      await logActivity({
+        action: 'USER_ROLE_UPDATE',
         type: 'PRIVILEGE',
         message: `Admin ${authUser?.email} changed user ${userId} role to ${newRole}`,
         adminUid: authUser?.uid,
@@ -108,7 +110,8 @@ function AdminUsersPage() {
        await fetchUsers();
 
        // Log Bulk Activity
-       await logActivity('BULK_USER_ACTION', {
+       await logActivity({
+          action: 'BULK_USER_ACTION',
           type: 'PRIVILEGE',
           message: `Admin ${authUser?.email} performed bulk ${type} on ${selectedUserIds.length} users`,
           adminUid: authUser?.uid,

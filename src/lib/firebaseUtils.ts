@@ -15,6 +15,7 @@ import {
   orderBy,
   limit,
   Timestamp,
+  serverTimestamp,
   Firestore
 } from 'firebase/firestore';
 import { Cause, Event, BlogPost, Volunteer, User, UserRole, Donation, Deployment, NavItem, AuditLog, AppUser, Subscription, Partner, Testimonial } from '@/types';
@@ -341,7 +342,7 @@ export const submitVolunteerApplication = async (volunteerData: Partial<Voluntee
     await logActivity({ 
       type: 'VOLUNTEER_REGISTER', 
       message: 'New volunteer application submitted', 
-      icon: '🙋' 
+      icon: 'ðŸ™‹' 
     });
 
     return docRef.id;
@@ -607,7 +608,7 @@ export const updateUserStatus = async (userId: string, status: 'approved' | 'rej
     await logActivity({
       type: 'USER_ADMIN',
       message: `User ${userId} status updated to ${status} (${isActive ? 'Active' : 'Inactive'})`,
-      icon: '👤'
+      icon: 'ðŸ‘¤'
     });
 
     return true;
@@ -628,7 +629,7 @@ export const updateUserRole = async (userId: string, role: UserRole) => {
     await logActivity({
       type: 'USER_ROLE',
       message: `User ${userId} role changed to ${role}`,
-      icon: '🛡️'
+      icon: 'ðŸ›¡ï¸'
     });
 
     return true;
@@ -713,35 +714,6 @@ export const searchUsers = async (searchTerm: string) => {
 };
 
 
-// Activity Logging Enhanced (Phase 10.5 Audit Logs)
-export type AuditLogData = {
-  type: string;
-  message?: string;
-  action?: string;
-  icon?: string;
-  collection?: string;
-  docId?: string;
-  beforeState?: Record<string, unknown>;
-  afterState?: Record<string, unknown>;
-  actorUid?: string;
-  actorEmail?: string;
-  ipAddress?: string;
-  timestamp?: Timestamp;
-};
-
-export const logActivity = async (activityOrAction: string | AuditLogData | Record<string, unknown>, metadata: Record<string, unknown> = {}) => {
-  if (!isDBAvailable()) return null;
-  
-  try {
-    const data = typeof activityOrAction === 'string' 
-      ? { action: activityOrAction, ...metadata, timestamp: Timestamp.now() }
-      : { ...activityOrAction, timestamp: Timestamp.now() };
-
-    await addDoc(collection(getDb(), 'activity_logs'), data);
-  } catch (error) {
-    console.error('Error logging activity:', error);
-  }
-};
 
 // --- Donor Dashboard Enhancements (Phase 5) ---
 
@@ -829,10 +801,10 @@ export const getRecentActivity = async () => {
     if (snapshot.empty) {
       // Return high-fidelity mock stream if live logs are empty for demo
       return [
-        { id: '1', type: 'DONATION', message: 'Anonymous donor contributed $500', time: '2m ago', icon: '💰' },
-        { id: '2', type: 'VOLUNTEER', message: 'Ali Khan checked-in at Korangi Site', time: '15m ago', icon: '📍' },
-        { id: '3', type: 'EVENT', message: 'Ramadan Ration Drive mission created', time: '1h ago', icon: '📦' },
-        { id: '4', type: 'SYSTEM', message: 'Theme tokens updated site-wide', time: '3h ago', icon: '🎨' },
+        { id: '1', type: 'DONATION', message: 'Anonymous donor contributed $500', time: '2m ago', icon: 'ðŸ’°' },
+        { id: '2', type: 'VOLUNTEER', message: 'Ali Khan checked-in at Korangi Site', time: '15m ago', icon: 'ðŸ“' },
+        { id: '3', type: 'EVENT', message: 'Ramadan Ration Drive mission created', time: '1h ago', icon: 'ðŸ“¦' },
+        { id: '4', type: 'SYSTEM', message: 'Theme tokens updated site-wide', time: '3h ago', icon: 'ðŸŽ¨' },
       ];
     }
     
@@ -879,3 +851,53 @@ export const getActivityLogs = async (limitCount: number = 100): Promise<AuditLo
     return [];
   }
 };
+
+export type AuditLogData = {
+  type: string;
+  message: string;
+  collection?: string;
+  docId?: string;
+  beforeState?: Record<string, unknown>;
+  afterState?: Record<string, unknown>;
+  actorUid?: string;
+  actorEmail?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp?: any;
+  [key: string]: any; // Allow for extra metadata fields
+};
+
+export const logActivity = async (data: AuditLogData) => {
+  if (!isDBAvailable()) return;
+  await addDoc(collection(getDb() as Firestore, 'activity_logs'), {
+    ...data,
+    timestamp: data.timestamp || serverTimestamp()
+  });
+};
+
+export const saveVersion = async (collectionName: string, docId: string, data: Record<string, unknown>, actorUid: string) => {
+  if (!isDBAvailable()) return;
+  const versionRef = doc(collection(getDb() as Firestore, collectionName, docId, 'versions'), Date.now().toString());
+  await setDoc(versionRef, {
+    data,
+    createdAt: serverTimestamp(),
+    actorUid,
+    action: 'update'
+  });
+};
+
+export const restoreVersion = async (collectionName: string, docId: string, versionId: string) => {
+  if (!isDBAvailable()) return;
+  const versionRef = doc(getDb() as Firestore, collectionName, docId, 'versions', versionId);
+  const versionSnap = await getDoc(versionRef);
+  if (!versionSnap.exists()) throw new Error('Version not found');
+  const versionData = versionSnap.data();
+  await updateDoc(doc(getDb() as Firestore, collectionName, docId), {
+    ...(versionData.data as any),
+    updatedAt: serverTimestamp(),
+    restoredFrom: versionId
+  });
+};
+
+
+
