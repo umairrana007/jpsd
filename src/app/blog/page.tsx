@@ -170,7 +170,7 @@ export default function BlogPage() {
 
                           <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                              {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                              {new Date(post.publishedAt || post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                             </span>
                             <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-[#1ea05f] group-hover:bg-[#1ea05f] group-hover:text-white transition-all duration-300">
                               <FiArrowRight />

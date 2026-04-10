@@ -14,10 +14,15 @@ import {
   FiBell, FiCalendar, FiBook, FiImage, FiUserPlus, FiMail,
   FiMoreHorizontal
 } from 'react-icons/fi';
-import { getNavigationSettings } from '@/lib/firebaseUtils';
-import { NavItem } from '@/types';
+import { NavItemConfig } from '@/lib/settings';
+import { useSiteConfig } from '@/context/SiteConfigContext';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  navMenu?: NavItemConfig[];
+  logoUrl?: string;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: propsLogoUrl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showMoreDesktop, setShowMoreDesktop] = useState(false);
@@ -36,6 +41,8 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const { navigation, siteConfig } = useSiteConfig();
+
   // Close menus on route change
   useEffect(() => {
     setIsOpen(false);
@@ -43,32 +50,12 @@ export const Navbar: React.FC = () => {
     setUserMenuOpen(false);
   }, [pathname]);
 
-  const [firestoreNavItems, setFirestoreNavItems] = useState<NavItem[]>([]);
+  const navItems = navigation.filter(n => n.isVisible && n.requiredRole === 'public').map(item => ({
+    name: item.label,
+    href: item.href
+  }));
 
-  useEffect(() => {
-    const fetchNav = async () => {
-      const data = await getNavigationSettings();
-      if (data && data.items) setFirestoreNavItems(data.items);
-    };
-    fetchNav();
-  }, []);
-
-  const DEFAULT_NAV_ITEMS = [
-    { name: t('nav.home'), href: '/' },
-    { name: t('nav.welfare'), href: '/welfare' },
-    { name: t('nav.education'), href: '/education' },
-    { name: t('nav.spirituality'), href: '/spirituality' },
-    { name: t('nav.causes'), href: '/causes' },
-  ];
-
-  const navItems = firestoreNavItems.length > 0
-    ? firestoreNavItems
-        .filter(item => item.location === 'header')
-        .map(item => ({ 
-          name: isUrdu ? item.labelUrdu || item.label : item.label, 
-          href: item.href 
-        }))
-    : DEFAULT_NAV_ITEMS;
+  const logoSource = siteConfig?.logoUrl || propsLogoUrl || '/logo.png';
 
   const moreItems = [
     { name: t('nav.events'), href: '/events', icon: <FiCalendar /> },
@@ -111,14 +98,12 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <Link href="/" className="relative z-10 flex items-center gap-3 group">
             <div className="relative w-12 h-12 md:w-14 md:h-14 overflow-hidden rounded-2xl bg-white shadow-lg p-1.5 transition-transform group-hover:scale-105 active:scale-95 duration-500">
-               <Image 
-                src="/logo.png" 
-                alt="JPSD Logo" 
-                width={200} 
-                height={200} 
-                className="w-full h-full object-contain"
-                priority
-              />
+                <img 
+                 src={logoSource} 
+                 alt="JPSD Logo" 
+                 className="w-full h-full object-contain"
+                 onError={(e) => { (e.target as any).src = '/logo.png' }}
+               />
             </div>
             <div className={`flex flex-col ${isUrdu ? 'items-end text-right' : 'items-start'}`}>
               <span className={`text-xl md:text-2xl font-black tracking-tighter leading-none ${scrolled ? 'text-slate-900' : 'text-slate-800'} ${isUrdu ? 'font-urdu' : ''}`}>
@@ -293,7 +278,7 @@ export const Navbar: React.FC = () => {
             <div className="p-8 space-y-10">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center p-2">
-                   <Image src="/logo.png" alt="Logo" width={100} height={100} />
+                   <img src={logoSource} alt="Logo" className="w-full h-full object-contain" onError={(e) => { (e.target as any).src = '/logo.png' }} />
                 </div>
                 <button 
                   onClick={() => setIsOpen(false)}

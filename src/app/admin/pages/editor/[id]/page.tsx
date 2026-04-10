@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiSave, FiEye, FiArrowLeft, FiImage, FiType, FiLayout, FiCode, FiRefreshCw } from 'react-icons/fi';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, Firestore } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function PageEditor({ params }: { params: { id: string } }) {
@@ -14,21 +14,45 @@ export default function PageEditor({ params }: { params: { id: string } }) {
   const [content, setContent] = useState('Welcome to Baitussalam. We are dedicated to serving humanity.');
   const [isPublishing, setIsPublishing] = useState(false);
 
-  const handlePublish = async () => {
+  useEffect(() => {
+    if (params.id && params.id !== 'new') {
+      const fetchPage = async () => {
+        try {
+          const docRef = doc(db as Firestore, 'pages', params.id);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            setTitle(data.title || '');
+            setContent(data.content || '');
+          }
+        } catch (error) {
+          console.error('Failed to load page:', error);
+        }
+      }
+      fetchPage();
+    }
+  }, [params.id]);
+
+  const handleSave = async (status: 'draft' | 'published') => {
     setIsPublishing(true);
     try {
       if (!db) throw new Error('Firebase connection severed.');
       
-      const docRef = doc(db, 'pages', params.id);
-      await setDoc(docRef, {
+      const docRef = doc(db as Firestore, 'pages', params.id);
+      const data: any = {
         title,
         content,
         updatedAt: serverTimestamp(),
-        status: 'published'
-      }, { merge: true });
+        status
+      };
       
+      if (status === 'published') {
+        data.publishedAt = serverTimestamp();
+      }
       
-      setGlobalAlert('Propagated changes to edge network!', 'success');
+      await setDoc(docRef, data, { merge: true });
+      
+      setGlobalAlert(`Transmitted as ${status}!`, 'success');
     } catch (error: any) {
       console.error('Publishing failed:', error);
       setGlobalAlert(`Critical: ${error.message || 'Transmission failed.'}`, 'error');
@@ -55,7 +79,14 @@ export default function PageEditor({ params }: { params: { id: string } }) {
              <FiEye /> Preview
            </button>
             <button 
-              onClick={handlePublish}
+              onClick={() => handleSave('draft')}
+              disabled={isPublishing}
+              className="flex items-center gap-2 px-6 py-4 bg-slate-100 text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all disabled:opacity-50"
+            >
+              <FiSave /> Save Draft
+            </button>
+            <button 
+              onClick={() => handleSave('published')}
               disabled={isPublishing}
               className="flex items-center gap-2 px-8 py-4 bg-[#1ea05f] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:bg-[#15804a] transition-all disabled:opacity-50"
             >

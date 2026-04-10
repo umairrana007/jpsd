@@ -42,13 +42,22 @@ function AdminCausesPage() {
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [programs, setPrograms] = useState<Program[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    titleEn: string;
+    titleUr: string;
+    descEn: string;
+    descUr: string;
+    category: string;
+    target: string;
+    status: 'draft' | 'published';
+  }>({
     titleEn: '',
     titleUr: '',
     descEn: '',
     descUr: '',
     category: '',
-    target: ''
+    target: '',
+    status: 'draft'
   });
   const [translating, setTranslating] = useState<string | null>(null);
 
@@ -78,7 +87,7 @@ function AdminCausesPage() {
     if (!db) return;
     setSaving(true);
     try {
-      const programData = {
+      const programData: any = {
         title: formData.titleEn,
         titleUrdu: formData.titleUr,
         description: formData.descEn,
@@ -86,11 +95,16 @@ function AdminCausesPage() {
         category: formData.category,
         goalAmount: Number(formData.target),
         raisedAmount: 0,
-        active: true,
+        active: formData.status === 'published',
+        status: formData.status,
         featured: false,
         createdAt: serverTimestamp(),
         image: '/images/jpsd_main.jpg' // Default image
       };
+
+      if (formData.status === 'published') {
+        programData.publishedAt = serverTimestamp();
+      }
 
       if (editingId) {
         await updateDoc(doc(db as any, 'causes', editingId), programData);
@@ -100,7 +114,7 @@ function AdminCausesPage() {
 
       setIsModalOpen(false);
       setEditingId(null);
-      setFormData({ titleEn: '', titleUr: '', descEn: '', descUr: '', category: '', target: '' });
+      setFormData({ titleEn: '', titleUr: '', descEn: '', descUr: '', category: '', target: '', status: 'draft' });
       fetchPrograms();
     } catch (err) {
       console.error("Save error:", err);
@@ -116,7 +130,8 @@ function AdminCausesPage() {
       descEn: p.description || '',
       descUr: p.descriptionUrdu || '',
       category: p.category || '',
-      target: String(p.goalAmount || 0)
+      target: String(p.goalAmount || 0),
+      status: p.status || (p.active ? 'published' : 'draft')
     });
     setEditingId(p.id);
     setIsModalOpen(true);
@@ -358,6 +373,18 @@ function AdminCausesPage() {
                       />
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Publishing Status</label>
+                  <select 
+                    value={formData.status}
+                    onChange={(e) => setFormData({...formData, status: e.target.value as 'draft' | 'published'})}
+                    className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
+                  >
+                    <option value="draft">Draft (Hidden from public)</option>
+                    <option value="published">Published (Live on site)</option>
+                  </select>
                 </div>
 
                 <div className="pt-6 flex gap-4">

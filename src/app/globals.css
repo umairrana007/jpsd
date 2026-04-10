@@ -3,6 +3,8 @@
 
 :root {
   /* Brand Colors - Baitussalam Identity */
+  --primary: #1e40af;
+  --secondary: #059669;
   --primary-green: #27ae60;
   --primary-blue: #2980b9;
   --accent-gold: #f39c12;

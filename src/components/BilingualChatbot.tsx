@@ -86,7 +86,7 @@ export default function BilingualChatbot() {
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 45 }}
             onClick={() => setIsOpen(true)}
-            className="w-16 h-16 bg-[#1ea05f] rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all group border-4 border-white"
+            className="w-16 h-16 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all group border-4 border-white"
           >
             <FiMessageSquare size={24} />
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse" />
@@ -101,14 +101,14 @@ export default function BilingualChatbot() {
             className={`bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-all ${minimized ? 'h-20 w-80' : 'h-[550px] w-[360px] max-w-[calc(100vw-4rem)] max-h-[70vh]'}`}
           >
             {/* Header */}
-            <div className={`p-6 bg-slate-900 text-white flex items-center justify-between transition-all ${minimized ? 'bg-[#1ea05f]' : ''}`}>
+            <div className={`p-6 bg-slate-900 text-white flex items-center justify-between transition-all ${minimized ? 'bg-primary' : ''}`}>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-[#1ea05f]/20 flex items-center justify-center text-[#1ea05f]">
+                <div className="w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
                   <FiCpu size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm font-black italic uppercase tracking-widest leading-none">HQ Intelligence</h4>
-                  {!minimized && <p className="text-[9px] font-bold text-[#1ea05f] uppercase tracking-widest mt-1">Status: Operational</p>}
+                  {!minimized && <p className="text-[9px] font-bold text-primary uppercase tracking-widest mt-1">Status: Operational</p>}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function BilingualChatbot() {
                       key={i}
                       className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`max-w-[80%] p-4 rounded-3xl text-sm font-medium shadow-sm ${m.sender === 'user' ? 'bg-[#1ea05f] text-white rounded-br-none' : 'bg-white text-slate-800 rounded-bl-none border border-slate-100'} ${lang === 'ur' ? 'urdu-text' : ''}`}>
+                      <div className={`max-w-[80%] p-4 rounded-3xl text-sm font-medium shadow-sm ${m.sender === 'user' ? 'bg-primary text-white rounded-br-none' : 'bg-white text-slate-800 rounded-bl-none border border-slate-100'} ${lang === 'ur' ? 'urdu-text' : ''}`}>
                         {m.text}
                       </div>
                     </motion.div>
@@ -157,11 +157,11 @@ export default function BilingualChatbot() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    className={`flex-1 bg-slate-100 border-none rounded-2xl py-4 px-6 text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20 transition-all ${lang === 'ur' ? 'urdu-text' : ''}`}
+                    className={`flex-1 bg-slate-100 border-none rounded-2xl py-4 px-6 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all ${lang === 'ur' ? 'urdu-text' : ''}`}
                   />
                   <button 
                     onClick={handleSend}
-                    className="w-12 h-12 bg-[#1ea05f] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#1ea05f]/20 hover:scale-105 active:scale-95 transition-all"
+                    className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
                   >
                     <FiSend size={18} />
                   </button>

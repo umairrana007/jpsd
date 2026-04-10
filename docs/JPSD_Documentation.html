@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JPSD Welfare – Complete Documentation Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#1e40af; --primary-dark:#1d4ed8; --primary-light:#3b82f6;
+      --secondary:#059669; --secondary-dark:#047857;
+      --accent:#f59e0b; --accent-dark:#d97706;
+      --bg:#f8fafc; --surface:#ffffff; --text:#0f172a; --text-muted:#475569;
+      --border:#e2e8f0; --shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --radius:12px; --transition:all 0.2s ease;
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      background:var(--bg); color:var(--text); line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+    }
+    .urdu{font-family:'Noto Nastaliq Urdu',serif; direction:rtl; line-height:2}
+    
+    /* Header */
+    header{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:white; padding:2rem 1rem; text-align:center; position:sticky; top:0; z-index:100;
+      box-shadow:var(--shadow);
+    }
+    header h1{font-size:1.75rem; font-weight:700; margin-bottom:0.5rem}
+    header p{opacity:0.9; font-size:1rem; max-width:600px; margin:0 auto}
+    
+    /* Navigation Tabs */
+    .tabs{
+      display:flex; justify-content:center; gap:0.5rem; padding:1rem;
+      background:var(--surface); border-bottom:1px solid var(--border);
+      position:sticky; top:72px; z-index:99; flex-wrap:wrap;
+    }
+    .tab-btn{
+      padding:0.75rem 1.5rem; border:none; border-radius:999px;
+      background:transparent; color:var(--text-muted); font-weight:500;
+      cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:0.5rem;
+    }
+    .tab-btn:hover{background:var(--bg); color:var(--primary)}
+    .tab-btn.active{
+      background:var(--primary); color:white; box-shadow:0 2px 4px rgba(30,64,175,0.3);
+    }
+    .tab-btn .icon{font-size:1.1rem}
+    
+    /* Main Content */
+    main{max-width:1100px; margin:0 auto; padding:2rem 1rem}
+    .guide-section{
+      display:none; animation:fadeIn 0.3s ease;
+    }
+    .guide-section.active{display:block}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    
+    /* Guide Card */
+    .guide-card{
+      background:var(--surface); border-radius:var(--radius); padding:2rem;
+      box-shadow:var(--shadow); margin-bottom:2rem; border:1px solid var(--border);
+    }
+    .guide-header{
+      display:flex; align-items:center; gap:1rem; padding-bottom:1rem;
+      border-bottom:1px solid var(--border); margin-bottom:1.5rem;
+    }
+    .guide-icon{
+      width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; color:white; flex-shrink:0;
+    }
+    .guide-icon.user{background:linear-gradient(135deg,var(--primary),var(--primary-light))}
+    .guide-icon.admin{background:linear-gradient(135deg,var(--secondary),var(--secondary-dark))}
+    .guide-icon.volunteer{background:linear-gradient(135deg,var(--accent),var(--accent-dark))}
+    .guide-title h2{font-size:1.5rem; font-weight:700; margin-bottom:0.25rem}
+    .guide-title p{color:var(--text-muted); font-size:0.95rem}
+    
+    /* Content Styling */
+    .guide-content h3{
+      font-size:1.25rem; font-weight:600; margin:1.5rem 0 0.75rem; color:var(--primary);
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .guide-content h3::before{
+      content:"▸"; color:var(--primary); font-weight:bold;
+    }
+    .guide-content p{margin-bottom:1rem; color:var(--text)}
+    .guide-content ul{margin:0.5rem 0 1rem 1.5rem}
+    .guide-content li{margin-bottom:0.35rem}
+    .guide-content a{color:var(--primary-light); text-decoration:none; font-weight:500}
+    .guide-content a:hover{text-decoration:underline}
+    
+    /* Tables */
+    table{
+      width:100%; border-collapse:collapse; margin:1rem 0;
+      background:var(--bg); border-radius:8px; overflow:hidden;
+    }
+    th,td{padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border)}
+    th{background:var(--primary); color:white; font-weight:600}
+    tr:last-child td{border-bottom:none}
+    tr:hover{background:var(--bg)}
+    
+    /* Steps */
+    .steps{counter-reset:step}
+    .steps li{
+      list-style:none; position:relative; padding-left:2.5rem; margin-bottom:1rem;
+    }
+    .steps li::before{
+      counter-increment:step; content:counter(step);
+      position:absolute; left:0; top:0; width:24px; height:24px;
+      background:var(--primary); color:white; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.85rem; font-weight:600;
+    }
+    
+    /* Code/Commands */
+    code{
+      background:var(--bg); padding:0.2rem 0.4rem; border-radius:4px;
+      font-family:ui-monospace,monospace; font-size:0.9em; color:var(--secondary-dark);
+    }
+    
+    /* Footer */
+    footer{
+      text-align:center; padding:2rem 1rem; color:var(--text-muted);
+      font-size:0.9rem; border-top:1px solid var(--border); margin-top:2rem;
+    }
+    footer a{color:var(--primary); text-decoration:none}
+    
+    /* Responsive */
+    @media(max-width:768px){
+      header h1{font-size:1.4rem}
+      .tabs{padding:0.5rem}
+      .tab-btn{padding:0.5rem 1rem; font-size:0.9rem}
+      .guide-card{padding:1.5rem}
+      .guide-header{flex-direction:column; text-align:center}
+    }
+    
+    /* Print */
+    @media print{
+      header,.tabs,footer{position:static; box-shadow:none}
+      .guide-section{display:block !important; page-break-after:always}
+      .guide-card{box-shadow:none; border:1px solid #ccc}
+    }
+    
+    /* Screenshot Styling */
+    .screenshot{
+      width:100%; max-width:900px; height:auto; border-radius:12px;
+      margin:1.5rem auto; display:block; border:1px solid var(--border);
+      box-shadow:var(--shadow); transition:var(--transition);
+      cursor: zoom-in;
+    }
+    .screenshot:hover{
+      transform:translateY(-4px); 
+      box-shadow:0 12px 20px -5px rgba(0,0,0,0.1);
+    }
+    .screenshot-caption{
+      text-align:center; font-size:0.85rem; color:var(--text-muted);
+      margin-bottom:2.5rem; font-style:italic; display:block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>📘 JPSD Welfare Documentation Hub</h1>
+    <p>Complete user, admin, and volunteer guides for the Baitussalam Humanitarian Platform</p>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="user-guide">
+      <span class="icon">👤</span> User Guide
+    </button>
+    <button class="tab-btn" data-target="admin-guide">
+      <span class="icon">⚙️</span> Admin Guide
+    </button>
+    <button class="tab-btn" data-target="volunteer-guide">
+      <span class="icon">🎖️</span> Volunteer Guide
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- USER GUIDE SECTION -->
+    <section id="user-guide" class="guide-section active">
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-icon user">👤</div>
+          <div class="guide-title">
+            <h2>User Manual – Donor Guide</h2>
+            <p>How to navigate, donate, and track your impact on JPSD</p>
+          </div>
+        </div>
+        <div class="guide-content">
+
+          <h3>1️⃣ Getting Started</h3>
+          <p><strong>Website URL:</strong> <a href="https://jpsd.vercel.app/" target="_blank">https://jpsd.vercel.app/</a></p>
+          <img src="images/home_ui.png" alt="JPSD Homepage" class="screenshot"/>
+          <span class="screenshot-caption">Figure 1.1: JPSD Official Humanitarian Platform – Premium Homepage Hero Section</span>
+          
+          <p><strong>Supported Browsers:</strong> Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge (latest versions recommended).</p>
+          <p><strong>Language Toggle:</strong> Access the English/Urdu switch in the top-right corner of the header to localize your experience.</p>
+          <p><strong>Account Policy:</strong> You can browse causes and make one-time donations without an account. However, creating a profile is recommended for impact tracking.</p>
+
+          <h3>2️⃣ Making a Donation (Step-by-Step)</h3>
+          <p>Contributing to a mission is a seamless process:</p>
+          <ol class="steps">
+            <li><strong>Visit /donate:</strong> Click the "Donate" button in the navigation or visit <a href="https://jpsd.vercel.app/donate" target="_blank">jpsd.vercel.app/donate</a>.</li>
+            <li><strong>Selection:</strong> Choose a predefined amount or enter a custom value.</li>
+            <li><strong>Choose Cause:</strong> Select the category (Food, Water, Health, Education, or Emergency).</li>
+            <li><strong>Payment Method:</strong> Select between JazzCash or EasyPaisa (Simulation Mode active).</li>
+            <li><strong>Identity:</strong> Fill in your name, email, and phone. Use the "Anonymous" toggle if you prefer privacy.</li>
+            <li><strong>Consent:</strong> Check "Receipt Consent" to receive an automated email confirmation of your contribution.</li>
+            <li><strong>Finalize:</strong> Click "Donate Now". You will be redirected to a premium success page.</li>
+            <li><strong>Post-Success:</strong> Download your PDF receipt immediately or share your impact on WhatsApp/Twitter.</li>
+          </ol>
+          <img src="images/donate_ui.png" alt="Donation Selection" class="screenshot"/>
+          <span class="screenshot-caption">Figure 1.2: Interactive Donation Selection and Cause Matching Logic</span>
+
+          <h3>3️⃣ Payment Methods Explained</h3>
+          <table>
+            <thead><tr><th>Method</th><th>Type</th><th>Functionality</th></tr></thead>
+            <tbody>
+              <tr><td>JazzCash</td><td>Simulation</td><td>Direct wallet simulation. No real funds are deducted.</td></tr>
+              <tr><td>EasyPaisa</td><td>Simulation</td><td>Mobile banking simulation for humanitarian testing.</td></tr>
+              <tr><td>Test Numbers</td><td>Credentials</td><td>Use <code>03001234567</code> for Success and <code>03000000000</code> for Failure testing.</td></tr>
+            </tbody>
+          </table>
+          <p><em>What to expect:</em> Upon completion, the system logs the transaction in our activity stream and generates a unique reference ID for your records.</p>
+
+          <h3>4️⃣ Managing Your Donor Profile</h3>
+          <p>Access your personal command center at <code>/donor/dashboard</code>:</p>
+          <ul>
+            <li><strong>Donation History:</strong> View all past contributions with status filters (Pending, Verified, Completed).</li>
+            <li><strong>Analytics:</strong> View the impact of your funds across different missions.</li>
+            <li><strong>Bulk Receipts:</strong> Download consolidated tax receipts in PDF or CSV format.</li>
+            <li><strong>Recurring Status:</strong> Toggle your monthly contribution logic (Stub feature).</li>
+            <li><strong>Impact Score:</strong> Earn points for consistency, mission diversity, and total influence.</li>
+          </ul>
+
+          <h3>5️⃣ Bilingual Support (English/Urdu)</h3>
+          <p>JPSD is built for global inclusivity:</p>
+          <ul>
+            <li><strong>Toggle:</strong> Click the language icon in the navigation bar to shift the entire UI.</li>
+            <li><strong>Coverage:</strong> All public-facing pages (Home, Causes, Donate, Volunteer) are fully translated.</li>
+            <li><strong>Limitations:</strong> Advanced Administrative panels and certain technical logs remain in English for operational precision.</li>
+          </ul>
+
+          <h3>6️⃣ Troubleshooting & FAQ</h3>
+          <ul>
+            <li><strong>"My donation failed":</strong> Ensure you are using the correct simulation test numbers. Check your internet connection.</li>
+            <li><strong>"Where is my receipt?":</strong> Check your email Spam/Junk folder. Ensure "Receipt Consent" was checked during checkout.</li>
+            <li><strong>"Is my data secure?":</strong> Yes. We use Firebase Security Rules and zero real-world payment processing is live in this sandbox.</li>
+            <li><strong>"How do I track a specific cause?":</strong> Visit the individual cause page to see real-time progress bars and deployment updates.</li>
+          </ul>
+
+          <h3>7️⃣ Contact & Support</h3>
+          <ul>
+            <li><strong>Technical Issues:</strong> <a href="mailto:tech-lead@jpsd.org">tech-lead@jpsd.org</a></li>
+            <li><strong>Donation Queries:</strong> <a href="mailto:support@jpsd.org">support@jpsd.org</a></li>
+            <li><strong>Admin Inquiry:</strong> Use the <a href="#admin-guide">Admin Guide</a> for management-specific help.</li>
+          </ul>
+
+          <p style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.9rem">
+            <em>Document Version: 1.0 | Last Updated: April 9, 2026 | Owner: JPSD Tech Team</em>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN GUIDE SECTION -->
+    <section id="admin-guide" class="guide-section">
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-icon admin">⚙️</div>
+          <div class="guide-title">
+            <h2>Admin Guide – Management Manual</h2>
+            <p>Authoritative guidance for JPSD administrators and tech leads</p>
+          </div>
+        </div>
+        <div class="guide-content">
+
+          <h3>1️⃣ Admin Access & Security</h3>
+          <ul>
+            <li><strong>Login:</strong> Access the platform via <code>/login</code> using authorized administrative credentials.</li>
+            <li><strong>Permissions:</strong> Only identities with <code>UserRole.ADMIN</code> can bypass security middleware for <code>/admin/*</code> routes.</li>
+            <li><strong>Session Stability:</strong> Active sessions persist for 30 minutes. Re-authentication is enforced thereafter.</li>
+            <li><strong>Policy:</strong> Minimum 8-character passwords with alphanumeric and symbolic requirements.</li>
+          </ul>
+
+          <h3>2️⃣ Admin Dashboard Overview</h3>
+          <p>Access your command center at <a href="https://jpsd.vercel.app/admin" target="_blank">jpsd.vercel.app/admin</a>:</p>
+          <img src="images/admin_dashboard_ui.png" alt="Admin Dashboard" class="screenshot"/>
+          <span class="screenshot-caption">Figure 2.1: Admin Strategic Command Dashboard – Real-time Analytics & Intelligence</span>
+          
+          <ul>
+            <li><strong>Global Metrics:</strong> Real-time cards displaying Total Donations, Active Volunteers, and Pending Approvals.</li>
+            <li><strong>Forensic Chronology:</strong> A condensed activity feed of recent system events.</li>
+            <li><strong>Quick Directives:</strong> Shortcuts to Create Causes, Approve Volunteers, and Export Intelligence.</li>
+          </ul>
+
+          <h3>3️⃣ User Management (/admin/users)</h3>
+          <ul>
+            <li><strong>Intelligence Filtering:</strong> Sort archives by Role (Donor, Volunteer, Admin) and Status (Active, Pending, Deactivated).</li>
+            <li><strong>Directives:</strong>
+              <ul>
+                <li><em>Approve:</em> Elevate pending identities to active status.</li>
+                <li><em>Deactivate:</em> Immediate suspension of system access.</li>
+                <li><em>Edit:</em> Modify roles, reset tactical credentials, and update metadata.</li>
+              </ul>
+            </li>
+            <li><strong>Deletion Protocol:</strong> Soft-delete enforced. Record retention for 30 days before total purging.</li>
+          </ul>
+
+          <h3>4️⃣ Donation Management (/admin/donations)</h3>
+          <ul>
+            <li><strong>Forensic Audit:</strong> View all contributions with deep-scan filters (Date, Cause, Payment Engine).</li>
+            <li><strong>Signal Export:</strong> Generate production-ready PDF or CSV reports for financial reconciliation.</li>
+            <li><strong>Simulated Refunds:</strong> Mark transactions as refunded in the metadata without affecting real-time banking (Stub).</li>
+            <li><strong>Traffic Analysis:</strong> Monitor for suspicious donation clusters (Anomaly detection).</li>
+          </ul>
+
+          <h3>5️⃣ Cause/Mission Management (/admin/causes)</h3>
+          <ul>
+            <li><strong>Create:</strong> Initialize new missions with titles, descriptions, goals, and premium imagery.</li>
+            <li><strong>Lifecycle Control:</strong> Toggle status between <code>ACTIVE</code>, <code>PAUSED</code>, and <code>COMPLETED</code>.</li>
+            <li><strong>Archival:</strong> Deletion archives the data, preserving historical donation integrity.</li>
+            <li><strong>Mission Linking:</strong> Connect causes to specific volunteer deployment IDs.</li>
+          </ul>
+          <img src="images/cause_editor_ui.png" alt="Cause Editor" class="screenshot"/>
+          <span class="screenshot-caption">Figure 2.2: Mission Authorization & Real-time Content Editor</span>
+
+          <h3>6️⃣ Volunteer Approval Workflow (/admin/volunteers)</h3>
+          <ul>
+            <li><strong>Queue:</strong> Review the influx of field operative applications.</li>
+            <li><strong>Assessment:</strong> Verify skills (Medical, Tech, Logistics) and regional proximity.</li>
+            <li><strong>Governance:</strong>
+              <ul>
+                <li><em>Approve:</em> Grants access to the Volunteer Dashboard and Mission Hub.</li>
+                <li><em>Reject:</em> Triggers a feedback protocol for the applicant.</li>
+              </ul>
+            </li>
+            <li><strong>Bulk Onboarding:</strong> Select and approve multiple operatives in a single operation.</li>
+          </ul>
+
+          <h3>7️⃣ Deployment Management (/admin/deployments)</h3>
+          <ul>
+            <li><strong>Initialization:</strong> Define deployment parameters (Skill Requirements, Target Location, Mission Start).</li>
+            <li><strong>Assignment:</strong> Query the approved pool for specific skill-sets and dispatch operatives.</li>
+            <li><strong>Telemetry:</strong> Real-time status updates via Firestore <code>onSnapshot</code> listeners.</li>
+            <li><strong>Verification:</strong> Final admin sign-off triggers operative certificates.</li>
+          </ul>
+
+          <h3>8️⃣ Reports & Analytics (/admin/reports)</h3>
+          <ul>
+            <li><strong>Pre-sets:</strong> Instant visibility into Monthly Revenue, Impact by Cause, and Volunteer Hours.</li>
+            <li><strong>Customization:</strong> Build tailored reports by selecting specific forensic fields and formats.</li>
+            <li><strong>Scheduling:</strong> Automate report delivery via email (Stub UI).</li>
+          </ul>
+
+          <h3>9️⃣ System Settings (/admin/settings)</h3>
+          <ul>
+            <li><strong>Branding:</strong> Update site titles, logos, and global contact metadata.</li>
+            <li><strong>Simulation Mode:</strong> Global toggle for JazzCash/EasyPaisa sandbox states.</li>
+            <li><strong>Forensic Logs:</strong> Full-view of the <code>activity_logs</code> collection with actor UID and action details.</li>
+          </ul>
+
+          <h3>🔐 Security Best Practices</h3>
+          <ul>
+            <li><strong>Credential Integrity:</strong> NEVER share admin keys.</li>
+            <li><strong>Session Cleanliness:</strong> LOG OUT immediately after operational completion.</li>
+            <li><strong>Anomaly Reporting:</strong> Report unusual system behavior to the Tech Lead immediately.</li>
+            <li><strong>Rotation:</strong> Rotate administrative passwords every 90 days.</li>
+          </ul>
+
+          <p style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.9rem">
+            <em>Document Version: 1.0 | Last Updated: April 9, 2026 | Owner: JPSD Tech Team</em><br/>
+            Links: <a href="#user-guide">User Manual</a> | <a href="#volunteer-guide">Volunteer Guide</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOLUNTEER GUIDE SECTION -->
+    <section id="volunteer-guide" class="guide-section">
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-icon volunteer">🎖️</div>
+          <div class="guide-title">
+            <h2>Volunteer Guide – Field Operative Manual</h2>
+            <p>Complete tactical instructions for JPSD volunteers and field workers</p>
+          </div>
+        </div>
+        <div class="guide-content">
+
+          <h3>1️⃣ Getting Started as a Volunteer</h3>
+          <p>Joining the mission requires a 4-step registration at <code>/volunteer/signup</code>:</p>
+          <ol class="steps">
+            <li><strong>Identity:</strong> Basic personal information (Name, Email, Phone).</li>
+            <li><strong>Specialization:</strong> Define your skill-set (Medical, Logistics, Teaching, Tech, or Emergency Response).</li>
+            <li><strong>Geography:</strong> Select your primary operational region (Karachi, Sindh, Northern Areas, etc.).</li>
+            <li><strong>Submission:</strong> Await administrator review for mission clearance.</li>
+          </ol>
+          <img src="images/volunteer_signup_ui.png" alt="Volunteer Signup" class="screenshot"/>
+          <span class="screenshot-caption">Figure 3.1: 5-Step Field Operative Onboarding & Skill Verification</span>
+          
+          <p><em>Notification:</em> You will receive an email upon status escalation to "Approved".</p>
+
+          <h3>2️⃣ Volunteer Dashboard (/volunteer/dashboard)</h3>
+          <p>Once approved, your dashboard becomes your humanitarian hub:</p>
+          <img src="images/volunteer_dashboard_ui.png" alt="Volunteer Dashboard" class="screenshot"/>
+          <span class="screenshot-caption">Figure 3.2: Volunteer Tactical Hub – Mission Telemetry & Impact Metrics</span>
+          
+          <ul>
+            <li><strong>My Missions:</strong> View your currently assigned deployments.</li>
+            <li><strong>Skill Match Score:</strong> Compare your specialization against live mission requirements.</li>
+            <li><strong>Impact Metrics:</strong> Real-time tracking of logged hours and deployments completed.</li>
+            <li><strong>Digital Recognition:</strong> Access your badges and certificates.</li>
+          </ul>
+
+          <h3>3️⃣ Browsing & Accepting Missions</h3>
+          <p><strong>Discovery:</strong> Filter the repository of active deployments by skill, region, and urgency.</p>
+          <p><strong>Protocol:</strong></p>
+          <ul>
+            <li><em>Review:</em> Read mission descriptions, location data, and deadlines.</li>
+            <li><em>Join:</em> Click "Join Mission" to commit. Status shifts to "Assigned".</li>
+            <li><em>Decline:</em> If unable to participate, provide optional feedback for better future matching.</li>
+          </ul>
+
+          <h3>4️⃣ Check-In / Check-Out Protocol</h3>
+          <p>Accurate timing is critical for impact reporting:</p>
+          <ul>
+            <li><strong>Activation:</strong> Upon arrival at the mission site, click "I've Arrived". This logs your timestamp and coordinates.</li>
+            <li><strong>Telemetry:</strong> During the mission, use the "Submit Report" modal to update task progress.</li>
+            <li><strong>Completion:</strong> Click "Mission Complete" to check-out. The system auto-calculates hours worked.</li>
+          </ul>
+
+          <h3>5️⃣ Submitting Mission Reports</h3>
+          <p>Documentation ensures mission transparency:</p>
+          <ul>
+            <li><strong>Fields:</strong> Log tasks completed, hours worked (auto-filled), and mission notes.</li>
+            <li><strong>Evidence:</strong> Upload field photos (Stub feature; production deployment will store in Firebase).</li>
+            <li><strong>Locking:</strong> Reports are editable until verified by an Administrator, after which they are finalized.</li>
+          </ul>
+
+          <h3>6️⃣ Impact Tracking & Recognition</h3>
+          <p>Your contributions are transformed into dynamic metrics:</p>
+          <ul>
+            <li><strong>Logged Hours:</strong> Cumulative total of all verified deployments.</li>
+            <li><strong>Badges:</strong> Earn unique identifiers like "First Mission", "10 Hours", or "Emergency Responder".</li>
+            <li><strong>Certification:</strong> Eligible for a PDF Certificate of Excellence after 3 verified missions OR 20 hours logged.</li>
+          </ul>
+
+          <h3>7️⃣ Profile Management (/volunteer/profile)</h3>
+          <ul>
+            <li><strong>Metadata:</strong> Update contact info and emergency contacts.</li>
+            <li><strong>Skills:</strong> Refine your specialization as you gain more field experience.</li>
+            <li><strong>Availability:</strong> Set your operational status (Available / On Leave).</li>
+            <li><strong>Subscriptions:</strong> Opt-in for SMS or Email mission alerts.</li>
+          </ul>
+
+          <h3>8️⃣ Bilingual Support for Volunteers</h3>
+          <ul>
+            <li><strong>Language Switching:</strong> Toggle between English and Urdu using the header control.</li>
+            <li><strong>Local Content:</strong> All operative-facing instructions and logs are fully translated.</li>
+            <li><strong>Mission Data:</strong> Note that some admin-generated mission descriptions may remain in English.</li>
+          </ul>
+
+          <h3>9️⃣ Troubleshooting & Volunteer FAQ</h3>
+          <ul>
+            <li><strong>"Approval Status is Pending":</strong> Reviews typically take 24-48 hours. Ensure your profile is complete.</li>
+            <li><strong>"Check-In Failed":</strong> Refresh the browser and ensure connectivity. Manual log requests can be sent via support.</li>
+            <li><strong>"Where is my certificate?":</strong> Certificates are auto-generated at <code>/volunteer/certificate</code> once thresholds are met.</li>
+            <li><strong>"Can I volunteer for multiple missions?":</strong> Up to 3 concurrent assignments are permitted.</li>
+          </ul>
+
+          <h3>🔐 Volunteer Code of Conduct</h3>
+          <ul>
+            <li><strong>Professionalism:</strong> Represent JPSD with integrity and empathy in the field.</li>
+            <li><strong>Privacy:</strong> Beneficiary data is confidential. NEVER share personal identifiers publicly.</li>
+            <li><strong>Safety:</strong> Report any field hazards to the Administrator immediately.</li>
+            <li><strong>Accuracy:</strong> Document your hours and tasks with 100% honesty.</li>
+          </ul>
+
+          <p style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.9rem">
+            <em>Document Version: 1.0 | Last Updated: April 9, 2026 | Owner: JPSD Tech Team</em><br/>
+            Links: <a href="#user-guide">User Manual</a> | <a href="#admin-guide">Admin Guide</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>📘 JPSD Welfare Documentation Hub | <a href="https://jpsd.vercel.app/" target="_blank">jpsd.vercel.app</a></p>
+    <p style="margin-top:0.5rem">© 2026 Baitussalam Welfare Trust. All rights reserved.</p>
+  </footer>
+
+  <!-- Tab Switching Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const sections = document.querySelectorAll('.guide-section');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all
+          tabs.forEach(t => t.classList.remove('active'));
+          sections.forEach(s => s.classList.remove('active'));
+          
+          // Add active to clicked
+          tab.classList.add('active');
+          const target = tab.dataset.target;
+          document.getElementById(target).classList.add('active');
+          
+          // Update URL hash for bookmarking
+          history.replaceState(null, null, `#${target}`);
+        });
+      });
+      
+      // Load section from URL hash on page load
+      const hash = window.location.hash.slice(1);
+      if(hash && document.getElementById(hash)) {
+        tabs.forEach(t => t.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        document.querySelector(`[data-target="${hash}"]`)?.classList.add('active');
+        document.getElementById(hash)?.classList.add('active');
+      }
+    });
+  </script>
+</body>
+</html>

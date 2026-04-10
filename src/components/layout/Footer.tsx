@@ -21,8 +21,13 @@ const quickLinks = [
   { label: 'nav.contact', href: '/contact-us' },
 ];
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  logoUrl?: string;
+}
+
+export const Footer: React.FC<FooterProps> = ({ logoUrl }) => {
   const { language, t } = useLanguage();
+  const logoSource = logoUrl || '/logo.png';
 
   return (
     <motion.footer
@@ -41,13 +46,11 @@ export const Footer: React.FC = () => {
           <div className="space-y-6">
             <Link href="/" className="inline-block group ml-2 mb-2">
               <div className="relative w-80 h-20 brightness-0 invert opacity-95 transition-transform group-hover:scale-105">
-                <Image 
-                  src="/logo.png" 
+                <img 
+                  src={logoSource} 
                   alt="JPSD Logo" 
-                  fill
-                  sizes="(max-width: 768px) 100vw, 320px"
-                  className="object-contain object-left" 
-                  priority
+                  className="w-full h-full object-contain object-left"
+                  onError={(e) => { (e.target as any).src = '/logo.png' }}
                 />
               </div>
             </Link>

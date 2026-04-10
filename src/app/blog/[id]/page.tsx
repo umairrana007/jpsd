@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,6 +13,7 @@ import { FiClock, FiUser, FiArrowLeft, FiShare2, FiCalendar, FiTag, FiChevronRig
 export default function BlogDetailPage() {
   const { id } = useParams();
   const { t, language } = useLanguage();
+  const router = useRouter();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,6 +22,10 @@ export default function BlogDetailPage() {
       setLoading(true);
       try {
         const data = await getBlogPostById(id as string);
+        if (data && data.status === 'draft') {
+          router.push('/blog'); // Redirect to blog list
+          return;
+        }
         setPost(data);
       } catch (error) {
         console.error('Error fetching blog post:', error);
@@ -32,7 +37,7 @@ export default function BlogDetailPage() {
     if (id) {
       fetchPost();
     }
-  }, [id]);
+  }, [id, router]);
 
   if (loading) {
     return (
@@ -98,7 +103,7 @@ export default function BlogDetailPage() {
             </span>
             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-l border-slate-200 pl-4">
               <FiCalendar className="text-[#1ea05f]" />
-              {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(post.publishedAt || post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
             </div>
             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-l border-slate-200 pl-4">
               <FiClock className="text-[#1ea05f]" />

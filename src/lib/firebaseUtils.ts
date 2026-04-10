@@ -168,6 +168,7 @@ export const getCauses = async (): Promise<Cause[]> => {
   try {
     const causesQuery = query(
       collection(getDb() as Firestore, 'causes'),
+      where('status', '==', 'published'),
       orderBy('createdAt', 'desc')
     );
     const snapshot = await getDocs(causesQuery);
@@ -280,7 +281,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
     const postsQuery = query(
       collection(getDb() as Firestore, 'blog_posts'),
-      where('published', '==', true),
+      where('status', '==', 'published'),
       orderBy('publishedAt', 'desc')
     );
     const snapshot = await getDocs(postsQuery);
@@ -464,7 +465,7 @@ export const updateDeploymentStatus = async (deploymentId: string, status: Deplo
 export const getGlobalSettings = async () => {
   if (!isDBAvailable()) return null;
   try {
-    const docRef = doc(getDb(), 'global_config', 'site-settings');
+    const docRef = doc(getDb(), 'site_config', 'main');
     const snap = await getDoc(docRef);
     return snap.exists() ? snap.data() : null;
   } catch (error) {
@@ -476,7 +477,7 @@ export const getGlobalSettings = async () => {
 export const updateGlobalSettings = async (settings: Record<string, unknown>) => {
   if (!isDBAvailable()) return false;
   try {
-    await setDoc(doc(getDb(), 'global_config', 'site-settings'), {
+    await setDoc(doc(getDb(), 'site_config', 'main'), {
       ...settings,
       updatedAt: Timestamp.now()
     }, { merge: true });
@@ -489,7 +490,7 @@ export const updateGlobalSettings = async (settings: Record<string, unknown>) =>
 
 export const getThemeSettings = async () => {
   try {
-    const docRef = doc(getDb(), 'settings', 'theme');
+    const docRef = doc(getDb(), 'theme_settings', 'main');
     const snap = await getDoc(docRef);
     return snap.exists() ? snap.data() : null;
   } catch (error) {
@@ -500,7 +501,7 @@ export const getThemeSettings = async () => {
 
 export const updateThemeSettings = async (theme: Record<string, unknown>) => {
   try {
-    await setDoc(doc(getDb(), 'settings', 'theme'), {
+    await setDoc(doc(getDb(), 'theme_settings', 'main'), {
       ...theme,
       updatedAt: Timestamp.now()
     }, { merge: true });
@@ -513,21 +514,33 @@ export const updateThemeSettings = async (theme: Record<string, unknown>) => {
 
 export const getNavigationSettings = async () => {
   try {
-    const docRef = doc(getDb(), 'settings', 'navigation');
-    const snap = await getDoc(docRef);
-    return snap.exists() ? snap.data() : { items: [] };
+    const q = query(collection(getDb(), 'navigation'), orderBy('order', 'asc'));
+    const snap = await getDocs(q);
+    return { items: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
   } catch (error) {
     console.error('Error getting navigation:', error);
     return { items: [] };
   }
 };
 
-export const updateNavigationSettings = async (items: NavItem[]) => {
+export const updateNavigationSettings = async (items: any[]) => {
   try {
-    await setDoc(doc(getDb(), 'settings', 'navigation'), {
-      items,
-      updatedAt: Timestamp.now()
+    const batch = (await import('firebase/firestore')).writeBatch(getDb());
+    
+    // Simplest logic for UI: We can just let the UI handle individual updateDoc calls
+    // But if we want to save all items at once, we use batch
+    
+    items.forEach(item => {
+      // If it doesn't have an id, we'll create one shortly!
+      const docRef = item.id ? doc(getDb(), 'navigation', item.id) : doc(collection(getDb(), 'navigation'));
+      batch.set(docRef, {
+        ...item,
+        id: docRef.id,
+        updatedAt: Timestamp.now()
+      }, { merge: true });
     });
+    
+    await batch.commit();
     return true;
   } catch (error) {
     console.error('Error updating navigation:', error);
@@ -700,8 +713,23 @@ export const searchUsers = async (searchTerm: string) => {
 };
 
 
-// Activity Logging Enhanced (Phase 4)
-export const logActivity = async (activityOrAction: string | Record<string, unknown>, metadata: Record<string, unknown> = {}) => {
+// Activity Logging Enhanced (Phase 10.5 Audit Logs)
+export type AuditLogData = {
+  type: string;
+  message?: string;
+  action?: string;
+  icon?: string;
+  collection?: string;
+  docId?: string;
+  beforeState?: Record<string, unknown>;
+  afterState?: Record<string, unknown>;
+  actorUid?: string;
+  actorEmail?: string;
+  ipAddress?: string;
+  timestamp?: Timestamp;
+};
+
+export const logActivity = async (activityOrAction: string | AuditLogData | Record<string, unknown>, metadata: Record<string, unknown> = {}) => {
   if (!isDBAvailable()) return null;
   
   try {

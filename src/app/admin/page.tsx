@@ -82,7 +82,7 @@ function AdminDashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <button 
-            className="flex items-center gap-2 px-6 py-3 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl border border-slate-200 hover:text-[#1ea05f] shadow-sm transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl border border-slate-200 hover:text-primary shadow-sm transition-all"
           >
             <FiPlus /> Add Cause
           </button>
@@ -98,10 +98,10 @@ function AdminDashboardPage() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#1ea05f]/10 flex items-center justify-center text-[#1ea05f]">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
               <FiDollarSign size={24} />
             </div>
-            <span className="text-[10px] font-black text-[#1ea05f] bg-[#1ea05f]/10 px-3 py-1 rounded-full uppercase tracking-widest">Today</span>
+            <span className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">Today</span>
           </div>
           <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Today's Donations</p>
           <h3 className="text-3xl font-black mt-1 text-slate-800">${stats?.todayDonations.toLocaleString()}</h3>
@@ -133,15 +133,15 @@ function AdminDashboardPage() {
         <div className="bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group md:col-span-3">
            <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
-                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]"></span>
                 <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Database: Live</span>
               </div>
               <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
-                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]"></span>
                 <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Assets Store: Healthy</span>
               </div>
               <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
-                <span className="w-2.5 h-2.5 bg-[#1ea05f] rounded-full animate-pulse shadow-[0_0_10px_#1ea05f]"></span>
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]"></span>
                 <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Auth Service: Operational</span>
               </div>
               <span className="ml-auto text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health: 100% Operational</span>
@@ -205,7 +205,7 @@ function AdminDashboardPage() {
           <div className="bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <h4 className="text-xl font-bold">Recent Donations</h4>
-              <Link className="text-sm font-semibold text-[#1ea05f] hover:underline" href="/admin/donations">View All</Link>
+              <Link className="text-sm font-semibold text-primary hover:underline" href="/admin/donations">View All</Link>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -234,7 +234,7 @@ function AdminDashboardPage() {
                   <tr className="group hover:bg-slate-50/50 transition-colors">
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#1ea05f]/20 flex items-center justify-center text-[#1ea05f] font-bold text-xs">JH</div>
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">JH</div>
                         <span className="text-sm font-semibold text-slate-700">James Hensen</span>
                       </div>
                     </td>
@@ -285,7 +285,7 @@ function AdminDashboardPage() {
                   <span className="text-[10px] uppercase font-bold opacity-70">Mins</span>
                 </div>
               </div>
-              <button onClick={() => setGlobalAlert('Event management protocol initiating. Full dashboard sync in progress.', 'success')} className="mt-4 w-full py-3 bg-[#1ea05f] text-white font-bold rounded-xl hover:bg-[#15804a] transition-colors">Manage Event</button>
+              <button onClick={() => setGlobalAlert('Event management protocol initiating. Full dashboard sync in progress.', 'success')} className="mt-4 w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors">Manage Event</button>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ function AdminDashboardPage() {
                    <div className="flex justify-between items-start">
                       <div>
                          <p className="text-sm font-black text-slate-800 italic uppercase">{v.name}</p>
-                         <p className="text-[9px] text-[#1ea05f] font-black uppercase tracking-widest mt-1">Field Unit: {v.skills}</p>
+                         <p className="text-[9px] text-primary font-black uppercase tracking-widest mt-1">Field Unit: {v.skills}</p>
                       </div>
                       <p className="text-[10px] font-bold text-slate-400">{v.phone}</p>
                    </div>

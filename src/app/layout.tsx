@@ -9,6 +9,8 @@ import { Footer } from "@/components/layout/Footer";
 import ClientMetadataUpdater from "@/components/ui/ClientMetadataUpdater";
 import { getGlobalConfig } from "@/lib/settings";
 import React from "react";
+import BilingualChatbot from "@/components/BilingualChatbot";
+import { SiteConfigProvider } from "@/context/SiteConfigContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -28,8 +30,6 @@ export const metadata: Metadata = {
   keywords: ["welfare", "charity", "donation", "pakistan", "JPSD", "Jamiyat", "zakat", "sadaqah"],
 };
 
-import BilingualChatbot from "@/components/BilingualChatbot";
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -43,19 +43,27 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${montserrat.variable} ${inter.variable} h-full antialiased`}
-      style={{ '--font-family': fontFamily, '--border-radius': `${borderRadius}px` } as React.CSSProperties}
+      style={{ 
+        '--font-family': fontFamily, 
+        '--border-radius': `${borderRadius}px`,
+        '--primary-color': config.primaryColor || '#1ea05f',
+        '--secondary-color': config.secondaryColor || '#3b82f6',
+        '--logo-url': `url(${config.logoUrl || '/logo.png'})`
+      } as React.CSSProperties}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-inter">
         <AuthProvider>
-          <LanguageProvider>
-            <FontLoader />
-            <ClientMetadataUpdater />
-            <Navbar />
-            <main className="flex-grow pt-24">{children}</main>
-            <Footer />
-            <BilingualChatbot />
-          </LanguageProvider>
+          <SiteConfigProvider>
+            <LanguageProvider>
+              <FontLoader />
+              <ClientMetadataUpdater />
+              <Navbar navMenu={config.navMenu} logoUrl={config.logoUrl} />
+              <main className="flex-grow pt-24">{children}</main>
+              <Footer logoUrl={config.logoUrl} />
+              <BilingualChatbot />
+            </LanguageProvider>
+          </SiteConfigProvider>
         </AuthProvider>
       </body>
     </html>

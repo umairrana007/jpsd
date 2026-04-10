@@ -82,6 +82,8 @@ export interface Cause {
   featured: boolean;
   createdAt: Date;
   updatedAt: Date;
+  status: 'draft' | 'published';
+  publishedAt?: Date;
 }
 
 export interface Donation {
@@ -156,10 +158,10 @@ export interface BlogPost {
   category: string;
   authorId: string;
   readTimeMinutes: number;
-  published: boolean;
   featured: boolean;
   views: number;
-  publishedAt: Date;
+  status: 'draft' | 'published';
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

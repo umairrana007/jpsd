@@ -17,6 +17,7 @@ const GlobalSearch = dynamic(() => import('@/components/admin/GlobalSearch'), {
   ssr: false
 });
 
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
 import { UserRole } from '@/types';
 
@@ -147,7 +148,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content */}
         <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto pt-28 md:pt-32">
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
 
         {/* Mobile Bottom NavBar */}

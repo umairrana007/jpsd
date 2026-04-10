@@ -212,7 +212,7 @@ function DonationForm() {
     <div className="min-h-screen bg-[#f9f9fb] flex flex-col items-center justify-start pt-32 md:pt-40 p-6 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#1ea05f]/5 rounded-full blur-[140px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[140px]" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[130px]" />
       </div>
 
@@ -220,7 +220,7 @@ function DonationForm() {
       <div className="w-full max-w-xl mb-12 flex justify-between items-center relative z-10">
          {[1, 2, 3].map((s) => (
            <div key={s} className="flex flex-col items-center gap-3">
-             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black transition-all ${step >= s ? 'bg-[#1ea05f] text-white shadow-xl shadow-[#1ea05f]/20' : 'bg-white text-slate-400 border border-slate-100 shadow-sm'}`}>
+             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black transition-all ${step >= s ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-white text-slate-400 border border-slate-100 shadow-sm'}`}>
                 {step > s ? <FiCheck /> : s}
              </div>
              <span className={`text-[9px] font-black uppercase tracking-widest ${step >= s ? 'text-slate-800' : 'text-slate-300'}`}>
@@ -232,7 +232,7 @@ function DonationForm() {
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${(step - 1) * 50}%` }}
-              className="h-full bg-[#1ea05f]" 
+              className="h-full bg-primary"
             />
          </div>
       </div>
@@ -259,7 +259,7 @@ function DonationForm() {
                   <button 
                     onClick={() => setFormData({...formData, frequency: 'one-time'})}
                     className={`flex-1 py-4 px-6 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${
-                      formData.frequency === 'one-time' ? 'bg-white text-[#1ea05f] shadow-sm' : 'text-slate-400'
+                      formData.frequency === 'one-time' ? 'bg-white text-primary shadow-sm' : 'text-slate-400'
                     }`}
                   >
                     Flash One-Time
@@ -267,7 +267,7 @@ function DonationForm() {
                   <button 
                     onClick={() => setFormData({...formData, frequency: 'monthly'})}
                     className={`flex-1 py-4 px-6 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${
-                      formData.frequency === 'monthly' ? 'bg-white text-[#1ea05f] shadow-sm' : 'text-slate-400'
+                      formData.frequency === 'monthly' ? 'bg-white text-primary shadow-sm' : 'text-slate-400'
                     }`}
                   >
                     Monthly Sustained
@@ -305,7 +305,7 @@ function DonationForm() {
                <button 
                  onClick={nextStep}
                  disabled={!formData.amount}
-                 className="w-full py-6 bg-[#1ea05f] text-white font-black rounded-3xl shadow-2xl shadow-[#1ea05f]/20 hover:opacity-90 transition-all flex items-center justify-center gap-3 group disabled:opacity-30"
+                 className="w-full py-6 bg-primary text-white font-black rounded-3xl shadow-2xl shadow-primary/20 hover:opacity-90 transition-all flex items-center justify-center gap-3 group disabled:opacity-30"
                >
                  <span>Verify Asset Allocation</span>
                  <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
@@ -333,13 +333,13 @@ function DonationForm() {
                      <div className="space-y-4">
                         <div 
                           onClick={() => setFormData({...formData, isZakat: true})}
-                          className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex justify-between items-center ${formData.isZakat ? 'border-[#1ea05f] bg-[#1ea05f]/5 shadow-lg shadow-[#1ea05f]/5' : 'border-slate-100 bg-slate-50 opactiy-60'}`}
+                          className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex justify-between items-center ${formData.isZakat ? 'border-primary bg-primary/5 shadow-lg shadow-primary/5' : 'border-slate-100 bg-slate-50 opactiy-60'}`}
                         >
                            <div className="flex items-center gap-4">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${formData.isZakat ? 'bg-[#1ea05f] text-white' : 'bg-slate-200 text-slate-400'}`}>Z</div>
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${formData.isZakat ? 'bg-primary text-white' : 'bg-slate-200 text-slate-400'}`}>Z</div>
                               <span className="font-black text-xs uppercase tracking-widest">Al-Zakat</span>
                            </div>
-                           {formData.isZakat && <FiCheckCircle className="text-[#1ea05f]" />}
+                           {formData.isZakat && <FiCheckCircle className="text-primary" />}
                         </div>
                         <div 
                           onClick={() => setFormData({...formData, isZakat: false})}
@@ -363,7 +363,7 @@ function DonationForm() {
                               <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-1 italic">Anonymize Source</p>
                               <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Wipe identity from live feed.</p>
                            </div>
-                           <div className={`w-10 h-6 rounded-full relative transition-colors ${formData.isAnonymous ? 'bg-[#1ea05f]' : 'bg-slate-200'}`}>
+                           <div className={`w-10 h-6 rounded-full relative transition-colors ${formData.isAnonymous ? 'bg-primary' : 'bg-slate-200'}`}>
                               <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isAnonymous ? 'right-1' : 'left-1'}`} />
                            </div>
                         </div>
@@ -372,7 +372,7 @@ function DonationForm() {
                      <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 italic">Legacy Dedication (In Memory Of)</label>
                         <div className="relative group">
-                          <FiMessageSquare className="absolute left-5 top-5 text-slate-400 group-focus-within:text-[#1ea05f] transition-colors" />
+                          <FiMessageSquare className="absolute left-5 top-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                           <textarea 
                             rows={3} 
                             placeholder="Name or message..."
@@ -390,7 +390,7 @@ function DonationForm() {
                  className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3 group"
                >
                  <span>Calibrate Payment Hub</span>
-                 <FiZap className="text-[#1ea05f] group-hover:scale-125 transition-transform" />
+                 <FiZap className="text-primary group-hover:scale-125 transition-transform" />
                </button>
             </motion.div>
           )}
@@ -415,7 +415,7 @@ function DonationForm() {
                   </div>
                   <div className="flex justify-between border-b border-slate-200 pb-4">
                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Type</span>
-                     <span className="text-xs font-black text-[#1ea05f] uppercase tracking-widest">{formData.isZakat ? 'Zakat (Al-Kareem)' : 'Sadaqah (Voluntary)'}</span>
+                     <span className="text-xs font-black text-primary uppercase tracking-widest">{formData.isZakat ? 'Zakat (Al-Kareem)' : 'Sadaqah (Voluntary)'}</span>
                   </div>
                   <div className="flex justify-between">
                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Frequency Scale</span>
@@ -458,7 +458,7 @@ function DonationForm() {
                              <div className="flex flex-col">
                                 <span className="text-[10px] font-black uppercase tracking-widest">{method.label}</span>
                                 {isComingSoon && (
-                                  <span className="text-[8px] font-black text-[#1ea05f] uppercase tracking-tighter mt-1 italic">Tactical Integration In Progress</span>
+                                  <span className="text-[8px] font-black text-primary uppercase tracking-tighter mt-1 italic">Tactical Integration In Progress</span>
                                 )}
                              </div>
                              {isComingSoon && (
@@ -480,7 +480,7 @@ function DonationForm() {
                       type="checkbox" 
                       checked={receiptConsent}
                       onChange={(e) => setReceiptConsent(e.target.checked)}
-                      className="w-5 h-5 text-[#1ea05f] focus:ring-[#1ea05f] rounded-lg cursor-pointer"
+                      className="w-5 h-5 text-primary focus:ring-primary rounded-lg cursor-pointer"
                     />
                     <div className={isUrdu ? 'text-right' : ''}>
                       <p className={`font-black text-[10px] uppercase tracking-widest ${!receiptConsent && attemptSubmit ? 'text-amber-700' : 'text-slate-800'}`}>

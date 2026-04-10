@@ -42,11 +42,16 @@ service cloud.firestore {
     match /partners/{id} { allow read: if true; allow write: if isAdmin(); }
     match /testimonials/{id} { allow read: if true; allow write: if isAdmin(); }
 
-    // Dynamic Navigation / Settings
+    // Dynamic Navigation / Settings / CMS
     match /settings/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /site_config/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /theme_settings/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /navigation/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /homepage_sections/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /email_templates/{id} { allow read: if true; allow write: if isAdmin(); }
 
     // Users (Private read/write, role protected)
     match /users/{userId} {

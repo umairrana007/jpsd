@@ -31,7 +31,7 @@ export default function NavigationManagerPage() {
   useEffect(() => {
     const fetchNav = async () => {
       const data = await getNavigationSettings();
-      if (data && data.items) setItems(data.items);
+      if (data && data.items) setItems(data.items as unknown as NavItem[]);
       setLoading(false);
     };
     fetchNav();
