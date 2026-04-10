@@ -49,10 +49,10 @@ export default function UserDashboardLayout({
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-row font-inter selection:bg-[#1ea05f]/20" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#f8fafc] flex flex-row font-inter selection:bg-[#1ea05f]/20" dir={isUrdu ? 'rtl' : 'ltr'}>
       
       {/* Sidebar - Desktop (Natural Flow + Sticky) */}
-      <aside className="hidden lg:flex flex-col w-80 bg-white border-x border-slate-100 h-screen sticky top-0 z-50 shrink-0 overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-80 bg-white border-r-4 border-[#1ea05f] h-screen sticky top-0 z-50 shrink-0 overflow-y-auto shadow-sm">
         <div className="flex flex-col h-full">
           {/* Brand Identity */}
           <div className="p-10 flex flex-col items-center">
@@ -75,27 +75,27 @@ export default function UserDashboardLayout({
           </div>
 
           {/* Navigation Core */}
-          <nav className="flex-1 px-6 space-y-3">
-             <p className="px-4 text-[9px] font-black text-slate-300 uppercase tracking-widest mb-6 italic opacity-50 text-left">
+          <nav className="flex-1 px-8 space-y-3">
+             <p className="px-4 text-[9px] font-black font-inter text-slate-400 uppercase tracking-[0.25em] mb-8 italic opacity-70 text-left">
                 {isUrdu ? 'بنیادی ہدایات' : 'Main Directives'}
              </p>
             {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-5 px-6 py-4.5 rounded-[1.5rem] font-black transition-all group relative overflow-hidden ${
+                className={`flex items-center gap-5 px-6 py-4.5 rounded-[1.25rem] font-bold transition-all group relative overflow-hidden ${
                   pathname === item.href 
-                    ? 'bg-slate-950 text-white shadow-2xl shadow-slate-950/20' 
-                    : 'text-slate-400 hover:text-slate-800 hover:bg-slate-50'
+                    ? 'bg-[#1ea05f] text-white shadow-xl shadow-emerald-500/20' 
+                    : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {pathname === item.href && (
-                  <motion.div layoutId="activeNav" className="absolute inset-0 bg-slate-950 -z-10" />
+                  <motion.div layoutId="activeNav" className="absolute inset-0 bg-[#1ea05f] -z-10" />
                 )}
-                <span className={`text-xl ${pathname === item.href ? 'text-[#1ea05f]' : 'group-hover:text-[#1ea05f]'} transition-colors shrink-0`}>{item.icon}</span>
+                <span className={`text-xl ${pathname === item.href ? 'text-white' : 'group-hover:text-[#1ea05f]'} transition-colors shrink-0`}>{item.icon}</span>
                 <span className={`text-[11px] uppercase tracking-[0.15em] italic flex-1 text-left ${isUrdu ? 'urdu-text' : ''}`}>{item.label}</span>
                 {pathname === item.href && (
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#1ea05f] shadow-[0_0_8px_#1ea05f] shrink-0"></div>
+                   <div className="w-1.5 h-1.5 rounded-full bg-white shrink-0"></div>
                 )}
               </Link>
             ))}

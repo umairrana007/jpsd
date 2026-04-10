@@ -91,33 +91,39 @@ export default function DonorDashboardClean() {
   ];
 
   return (
-    <div className="min-h-screen space-y-10 pb-20 bg-white">
-      {/* 🌿 Minimalist Header */}
-      <header className="flex flex-col md:flex-row justify-between items-center gap-6 px-4">
-         <div className="space-y-2 text-center md:text-left">
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+    <div className="min-h-screen space-y-12 pb-20 bg-white selection:bg-[#1ea05f]/10">
+      {/* 🌿 Precise Header Section */}
+      <header className="flex flex-col md:flex-row justify-between items-center gap-8 px-10 pt-16">
+         <div className="space-y-3 text-center md:text-left">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tightest leading-none">
                {isUrdu ? 'خوش آمدید، ' : 'Welcome, '} 
                <span className="text-[#1ea05f]">{currentUserData?.name || 'User'}</span>
             </h1>
-            <p className="text-slate-500 font-medium">{isUrdu ? 'آپ کی انسانی خدمت کا ریکارڈ یہاں محفوظ ہے۔' : 'Your humanitarian footprint is securely recorded.'}</p>
+            <p className="text-slate-400 font-medium text-base max-w-2xl leading-relaxed italic">
+               {isUrdu ? 'آپ کی انسانی خدمت کا ریکارڈ یہاں محفوظ ہے۔' : 'Your humanitarian footprint is securely recorded.'}
+            </p>
          </div>
          <div className="flex gap-4">
-            <Link href="/welfare" className="px-8 py-3.5 bg-[#1ea05f] text-white font-bold rounded-xl shadow-lg shadow-emerald-100 hover:opacity-90 transition-all flex items-center gap-2 text-sm">
+            <Link href="/welfare" className="px-10 py-5 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-emerald-500/5 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-[11px] uppercase tracking-widest leading-none">
                {isUrdu ? 'عطیہ دیں' : 'Donate Now'} <FiZap />
             </Link>
          </div>
       </header>
 
-      {/* 📊 Clean & Professional KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+      {/* 📊 High-Fidelity Horizontal KPI Matrix */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-10">
          {kpis.map((kpi, i) => (
-            <div key={i} className="bg-slate-50 p-8 rounded-3xl border border-slate-100 flex items-center gap-6 group hover:bg-white hover:shadow-xl transition-all">
-               <div className={`w-14 h-14 ${kpi.bg} ${kpi.color} rounded-2xl flex items-center justify-center text-2xl shrink-0`}>
+            <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 flex items-center gap-6 group hover:border-[#1ea05f]/10 hover:shadow-2xl hover:shadow-slate-200/40 transition-all min-h-[10rem]">
+               <div className={`w-20 h-20 ${kpi.bg.replace('bg-', 'bg-opacity-20 bg-')} ${kpi.color} rounded-[1.75rem] flex items-center justify-center text-3xl shrink-0 transition-transform group-hover:scale-105`}>
                   {kpi.icon}
                </div>
-               <div>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">{kpi.label}</p>
-                  <p className="text-2xl font-bold text-slate-800 tracking-tight">{kpi.val}</p>
+               <div className="flex flex-col gap-1 overflow-hidden">
+                  <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.25em] leading-[1.2] italic opacity-60">
+                     {kpi.label.split(' ').map((word, idx) => (
+                        <span key={idx} className="block">{word}</span>
+                     ))}
+                  </p>
+                  <p className="text-4xl font-black text-slate-900 tracking-tightest truncate">{kpi.val}</p>
                </div>
             </div>
          ))}
@@ -146,11 +152,17 @@ export default function DonorDashboardClean() {
          </div>
 
          {/* 🔔 Live Updates */}
-         <div className="bg-slate-900 rounded-3xl p-10 text-white space-y-8">
-            <h4 className="text-lg font-bold flex items-center gap-2">
-               <FiActivity className="text-[#1ea05f]" /> {isUrdu ? 'براہ راست اپڈیٹس' : 'Live Updates'}
-            </h4>
-            <div className="space-y-8">
+         <div className="bg-slate-900 rounded-3xl p-10 text-white space-y-8 flex flex-col">
+            <div className="flex justify-between items-center">
+               <h4 className="text-lg font-bold flex items-center gap-2">
+                  <FiActivity className="text-[#1ea05f]" /> {isUrdu ? 'براہ راست اپڈیٹس' : 'Live Updates'}
+               </h4>
+               <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_#ef4444]" />
+                  <span className="text-[8px] font-black uppercase tracking-widest text-red-500">Live</span>
+               </div>
+            </div>
+            <div className="space-y-8 flex-1 mt-6">
                {[
                   { t: isUrdu ? 'غزہ ریلیف' : 'Gaza Relief', d: isUrdu ? 'طبی سامان پہنچ گیا۔' : 'Medical supplies delivered.', s: 'Success' },
                   { t: isUrdu ? 'پروجیکٹ سیلاب' : 'Project Flood', d: isUrdu ? 'فلٹریشن پلانٹ فعال۔' : 'Filtration units active.', s: 'Ongoing' }
