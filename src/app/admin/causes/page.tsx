@@ -2,26 +2,24 @@
 
 import React, { useState } from 'react';
 import { 
-  FiPlus, FiSearch, FiFilter, FiEdit3, 
-  FiTrash2, FiExternalLink, FiBarChart, FiCheckCircle,
-  FiGlobe, FiX, FiCheck, FiDollarSign, FiUsers
+  FiPlus, FiSearch, FiEdit3, FiTrash2,
+  FiUsers, FiX, FiDollarSign
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/firebase';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole } from '@/types';
 import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  doc, 
-  deleteDoc, 
-  updateDoc, 
-  query, 
-  orderBy,
-  serverTimestamp,
-  Timestamp 
+  collection, doc, deleteDoc, updateDoc,
+  serverTimestamp, addDoc, getDocs, query, orderBy
 } from 'firebase/firestore';
+import useSWR from 'swr';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { causeSchema } from '@/lib/schemas/cmsSchemas';
+import { BilingualInput } from '@/components/admin/BilingualInput';
+import { logActivity, saveVersion } from '@/lib/firebaseUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Program {
   id: string;
@@ -33,130 +31,148 @@ interface Program {
   goalAmount: number;
   raisedAmount: number;
   active: boolean;
+  status: 'draft' | 'published';
   donors?: number;
 }
 
+const fetcher = async () => {
+  if (!db) return [];
+  const q = query(collection(db, 'causes'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    title: doc.data().title || doc.data().titleEn,
+  })) as Program[];
+};
+
 function AdminCausesPage() {
+  const { user } = useAuth();
+  const { data: programs, error, mutate, isLoading: loading } = useSWR<Program[]>('causes', fetcher);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [formData, setFormData] = useState<{
-    titleEn: string;
-    titleUr: string;
-    descEn: string;
-    descUr: string;
-    category: string;
-    target: string;
-    status: 'draft' | 'published';
-  }>({
-    titleEn: '',
-    titleUr: '',
-    descEn: '',
-    descUr: '',
-    category: '',
-    target: '',
-    status: 'draft'
-  });
-  const [translating, setTranslating] = useState<string | null>(null);
+  
+  // To keep track of old state for audit logging
+  const [editingProgram, setEditingProgram] = useState<Program | null>(null);
 
-  const fetchPrograms = async () => {
-    if (!db) return;
-    try {
-      const q = query(collection(db as any, 'causes'), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        title: doc.data().title || doc.data().titleEn, // Handle different schema names
-      })) as Program[];
-      setPrograms(items);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
+  const { control, handleSubmit, reset, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(causeSchema),
+    defaultValues: {
+      title: '',
+      titleUrdu: '',
+      description: '',
+      descriptionUrdu: '',
+      category: 'water',
+      location: 'Global',
+      goalAmount: 0,
+      raisedAmount: 0,
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days
+      urgency: 'medium',
+      active: false,
+      featured: false,
+      status: 'draft' as 'draft' | 'published',
+      image: '/images/jpsd_main.jpg'
     }
-  };
+  });
 
-  React.useEffect(() => {
-    fetchPrograms();
-  }, []);
-
-  const handleSave = async () => {
+  const onSubmit = async (data: any) => {
     if (!db) return;
     setSaving(true);
     try {
-      const programData: any = {
-        title: formData.titleEn,
-        titleUrdu: formData.titleUr,
-        description: formData.descEn,
-        descriptionUrdu: formData.descUr,
-        category: formData.category,
-        goalAmount: Number(formData.target),
-        raisedAmount: 0,
-        active: formData.status === 'published',
-        status: formData.status,
-        featured: false,
-        createdAt: serverTimestamp(),
-        image: '/images/jpsd_main.jpg' // Default image
+      const active = data.status === 'published';
+      const programData = {
+        ...data,
+        active,
+        updatedAt: serverTimestamp()
       };
 
-      if (formData.status === 'published') {
-        programData.publishedAt = serverTimestamp();
-      }
+      if (editingId && editingProgram) {
+        // Validation + Version History
+        await saveVersion('causes', editingId, editingProgram as unknown as Record<string, unknown>, user?.uid || 'unknown');
+        
+        // Audit log
+        await logActivity({
+          type: 'UPDATE_CAUSE',
+          message: `Cause "${data.title}" updated`,
+          collection: 'causes',
+          docId: editingId,
+          beforeState: editingProgram as any,
+          afterState: programData,
+          actorUid: user?.uid || 'unknown',
+          actorEmail: user?.email || undefined
+        });
 
-      if (editingId) {
-        await updateDoc(doc(db as any, 'causes', editingId), programData);
+        await updateDoc(doc(db, 'causes', editingId), programData);
       } else {
-        await addDoc(collection(db as any, 'causes'), programData);
+        programData.createdAt = serverTimestamp();
+        if (active) programData.publishedAt = serverTimestamp();
+        
+        const docRef = await addDoc(collection(db, 'causes'), programData);
+        
+        await logActivity({
+          type: 'CREATE_CAUSE',
+          message: `Cause "${data.title}" created`,
+          collection: 'causes',
+          docId: docRef.id,
+          afterState: programData,
+          actorUid: user?.uid || 'unknown',
+          actorEmail: user?.email || undefined
+        });
       }
 
       setIsModalOpen(false);
       setEditingId(null);
-      setFormData({ titleEn: '', titleUr: '', descEn: '', descUr: '', category: '', target: '', status: 'draft' });
-      fetchPrograms();
+      setEditingProgram(null);
+      reset();
+      mutate(); // Reload data
     } catch (err) {
       console.error("Save error:", err);
+      alert('Failed to save. Check the console.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleEdit = (p: any) => {
-    setFormData({
-      titleEn: p.title || '',
-      titleUr: p.titleUrdu || '',
-      descEn: p.description || '',
-      descUr: p.descriptionUrdu || '',
-      category: p.category || '',
-      target: String(p.goalAmount || 0),
-      status: p.status || (p.active ? 'published' : 'draft')
+    setEditingProgram(p);
+    reset({
+      title: p.title || '',
+      titleUrdu: p.titleUrdu || '',
+      description: p.description || '',
+      descriptionUrdu: p.descriptionUrdu || '',
+      category: p.category || 'water',
+      location: p.location || 'Global',
+      goalAmount: p.goalAmount || 0,
+      raisedAmount: p.raisedAmount || 0,
+      deadline: p.deadline?.toDate ? p.deadline.toDate().toISOString().split('T')[0] : p.deadline || new Date().toISOString().split('T')[0],
+      urgency: p.urgency || 'medium',
+      active: p.active || false,
+      featured: p.featured || false,
+      status: p.status || (p.active ? 'published' : 'draft'),
+      image: p.image || '/images/jpsd_main.jpg'
     });
     setEditingId(p.id);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, causeTitle: string) => {
     if (!db || !window.confirm('Are you sure you want to delete this mission?')) return;
     try {
-      await deleteDoc(doc(db as any, 'causes', id));
-      fetchPrograms();
+      await logActivity({
+        type: 'DELETE_CAUSE',
+        message: `Cause "${causeTitle}" deleted`,
+        collection: 'causes',
+        docId: id,
+        actorUid: user?.uid || 'unknown',
+        actorEmail: user?.email || undefined
+      });
+      await deleteDoc(doc(db, 'causes', id));
+      mutate();
     } catch (err) {
       console.error("Delete error:", err);
     }
-  };
-
-  const handleTranslate = async (field: 'title' | 'desc') => {
-    setTranslating(field);
-    setTimeout(() => {
-      if (field === 'title') {
-        setFormData(prev => ({ ...prev, titleUr: 'پینے کے صاف پانی کی فراہمی' }));
-      } else {
-        setFormData(prev => ({ ...prev, descUr: 'بیت السلام کے زیر اہتمام پینے کے صاف پانی کی فراہمی کا منصوبہ۔' }));
-      }
-      setTranslating(null);
-    }, 1500);
   };
 
   return (
@@ -167,7 +183,12 @@ function AdminCausesPage() {
           <p className="text-slate-500 font-medium tracking-tight">Design and monitor global charity campaigns and high-impact fundraising.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            reset();
+            setEditingId(null);
+            setEditingProgram(null);
+            setIsModalOpen(true);
+          }}
           className="px-8 py-4 bg-slate-950 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all flex items-center gap-2 uppercase text-xs tracking-widest"
         >
           <FiPlus strokeWidth={3} /> Launch Campaign
@@ -197,9 +218,11 @@ function AdminCausesPage() {
                 <tbody className="divide-y divide-slate-50/50">
                    {loading ? (
                      <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">Synchronizing Mission Ledger...</td></tr>
-                   ) : programs.length === 0 ? (
+                   ) : error ? (
+                     <tr><td colSpan={5} className="text-center py-20 font-bold text-red-500 italic">Failed to load missions</td></tr>
+                   ) : programs?.length === 0 ? (
                      <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400">No active missions found in the records.</td></tr>
-                   ) : programs.map((cause) => {
+                   ) : programs?.map((cause) => {
                     const percentage = Math.min(100, Math.round((cause.raisedAmount / cause.goalAmount) * 100) || 0);
                     return (
                       <tr key={cause.id} className="group hover:bg-slate-50/30 transition-all">
@@ -218,8 +241,8 @@ function AdminCausesPage() {
                         <td className="px-10 py-8">
                            <div className="space-y-3 max-w-[200px]">
                               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-600 italic">
-                                 <span>${cause.raisedAmount.toLocaleString()}</span>
-                                 <span className="text-slate-300">/ ${cause.goalAmount.toLocaleString()}</span>
+                                 <span>${cause.raisedAmount?.toLocaleString() || 0}</span>
+                                 <span className="text-slate-300">/ ${cause.goalAmount?.toLocaleString() || 0}</span>
                               </div>
                               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
                                  <div className="h-full bg-gradient-to-r from-[#1ea05f] to-[#15804a] rounded-full shadow-[0_0_8px_#10b98150]" style={{ width: `${percentage}%` }}></div>
@@ -235,7 +258,7 @@ function AdminCausesPage() {
                          <td className="px-10 py-8 text-right">
                             <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
                                <button onClick={() => handleEdit(cause)} className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
-                               <button onClick={() => handleDelete(cause.id)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
+                               <button onClick={() => handleDelete(cause.id, cause.title)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
                             </div>
                          </td>
                       </tr>
@@ -264,142 +287,144 @@ function AdminCausesPage() {
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white/20"
             >
-              <div className="p-10 space-y-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+              <form onSubmit={handleSubmit(onSubmit)} className="p-10 space-y-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-2xl font-black text-slate-800 italic uppercase">Initialize Campaign</h3>
+                    <h3 className="text-2xl font-black text-slate-800 italic uppercase">
+                      {editingId ? 'Edit Campaign' : 'Initialize Campaign'}
+                    </h3>
                     <p className="text-slate-500 font-medium tracking-tight">Construct a new fundraising objective for the network.</p>
                   </div>
-                  <button onClick={() => setIsModalOpen(false)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-2xl transition-colors">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-2xl transition-colors">
                     <FiX size={20} />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* English Section */}
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Title (English)</label>
-                      <input 
-                        type="text" 
-                        value={formData.titleEn}
-                        onChange={(e) => setFormData({...formData, titleEn: e.target.value})}
-                        className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none"
-                        placeholder="Clean Water Project"
+                <div className="space-y-6">
+                  {/* Bilingual Input for Title */}
+                  <Controller
+                    name="title"
+                    control={control}
+                    render={({ field: engField }) => (
+                      <Controller
+                        name="titleUrdu"
+                        control={control}
+                        render={({ field: urduField }) => (
+                          <BilingualInput 
+                            label="Campaign Title"
+                            name="title"
+                            valueEn={engField.value}
+                            valueUr={urduField.value as string}
+                            onChangeEn={engField.onChange}
+                            onChangeUr={urduField.onChange}
+                            placeholderEn="Clean Water Project"
+                            placeholderUr="صاف پانی کا منصوبہ"
+                            error={errors.title?.message as string}
+                          />
+                        )}
                       />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Context (English)</label>
-                      <textarea 
-                        rows={4}
-                        value={formData.descEn}
-                        onChange={(e) => setFormData({...formData, descEn: e.target.value})}
-                        className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none resize-none"
-                        placeholder="Define mission parameters..."
-                      />
-                    </div>
-                  </div>
+                    )}
+                  />
 
-                  {/* Urdu Section */}
-                  <div className="space-y-4">
+                  {/* Bilingual Input for Description */}
+                  <Controller
+                    name="description"
+                    control={control}
+                    render={({ field: engField }) => (
+                      <Controller
+                        name="descriptionUrdu"
+                        control={control}
+                        render={({ field: urduField }) => (
+                          <BilingualInput 
+                            label="Campaign Context"
+                            name="description"
+                            valueEn={engField.value}
+                            valueUr={urduField.value as string}
+                            onChangeEn={engField.onChange}
+                            onChangeUr={urduField.onChange}
+                            isTextArea
+                            placeholderEn="Define mission parameters..."
+                            placeholderUr="تفصیل درج کریں"
+                            error={errors.description?.message as string}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <div className="flex justify-between items-end mb-1 px-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Title (Urdu)</label>
-                        <button 
-                          onClick={() => handleTranslate('title')}
-                          disabled={!formData.titleEn || translating === 'title'}
-                          className="text-[9px] font-black text-[#1ea05f] uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-30"
-                        >
-                          {translating === 'title' ? 'Processing...' : <><FiGlobe /> Suggest Urdu</>}
-                        </button>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mission Classification</label>
+                      <Controller
+                        name="category"
+                        control={control}
+                        render={({ field }) => (
+                          <select 
+                            {...field}
+                            className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
+                          >
+                            <option value="water">Water Infrastructure</option>
+                            <option value="food">Emergency Nutrition</option>
+                            <option value="health">Medical Logistics</option>
+                            <option value="education">Human Capital</option>
+                            <option value="emergency">Emergency Relief</option>
+                          </select>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hard Funding Target (USD)</label>
+                      <div className="relative">
+                        <FiDollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Controller
+                          name="goalAmount"
+                          control={control}
+                          render={({ field }) => (
+                            <input 
+                              type="number" 
+                              value={field.value}
+                              onChange={e => field.onChange(Number(e.target.value))}
+                              className="w-full pl-12 pr-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none"
+                              placeholder="0.00"
+                            />
+                          )}
+                        />
+                        {errors.goalAmount && <p className="text-red-500 text-xs mt-1">{errors.goalAmount.message as string}</p>}
                       </div>
-                      <input 
-                        dir="rtl"
-                        type="text" 
-                        value={formData.titleUr}
-                        onChange={(e) => setFormData({...formData, titleUr: e.target.value})}
-                        className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none urdu-font text-right"
-                        placeholder="عنوان درج کریں"
-                      />
                     </div>
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-end mb-1 px-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Context (Urdu)</label>
-                        <button 
-                          onClick={() => handleTranslate('desc')}
-                          disabled={!formData.descEn || translating === 'desc'}
-                          className="text-[9px] font-black text-[#1ea05f] uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-30"
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Publishing Status</label>
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <select 
+                          {...field}
+                          className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
                         >
-                          {translating === 'desc' ? 'Processing...' : <><FiGlobe /> Suggest Urdu</>}
-                        </button>
-                      </div>
-                      <textarea 
-                        dir="rtl"
-                        rows={4}
-                        value={formData.descUr}
-                        onChange={(e) => setFormData({...formData, descUr: e.target.value})}
-                        className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none resize-none urdu-font text-right"
-                        placeholder="تفصیل درج کریں"
-                      />
-                    </div>
+                          <option value="draft">Draft (Hidden from public)</option>
+                          <option value="published">Published (Live on site)</option>
+                        </select>
+                      )}
+                    />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mission Classification</label>
-                    <select 
-                      value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
-                      className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Water">Water Infrastructure</option>
-                      <option value="Food">Emergency Nutrition</option>
-                      <option value="Health">Medical Logistics</option>
-                      <option value="Education">Human Capital</option>
-                    </select>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hard Funding Target (USD)</label>
-                    <div className="relative">
-                      <FiDollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input 
-                        type="number" 
-                        value={formData.target}
-                        onChange={(e) => setFormData({...formData, target: e.target.value})}
-                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none"
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Publishing Status</label>
-                  <select 
-                    value={formData.status}
-                    onChange={(e) => setFormData({...formData, status: e.target.value as 'draft' | 'published'})}
-                    className="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/20 transition-all outline-none appearance-none"
-                  >
-                    <option value="draft">Draft (Hidden from public)</option>
-                    <option value="published">Published (Live on site)</option>
-                  </select>
                 </div>
 
                 <div className="pt-6 flex gap-4">
                   <button 
-                    onClick={handleSave}
+                    type="submit"
                     disabled={saving}
                     className="flex-1 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all uppercase text-xs tracking-widest disabled:opacity-50"
                   >
-                    {saving ? 'Initializing...' : 'Confirm Mission'}
+                    {saving ? 'Processing...' : 'Confirm Mission'}
                   </button>
-                  <button onClick={() => setIsModalOpen(false)} className="px-10 py-4 bg-slate-50 text-slate-400 font-black rounded-2xl hover:bg-slate-100 transition-all uppercase text-xs tracking-widest">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-10 py-4 bg-slate-50 text-slate-400 font-black rounded-2xl hover:bg-slate-100 transition-all uppercase text-xs tracking-widest">
                     Abort
                   </button>
                 </div>
-              </div>
+              </form>
             </motion.div>
           </div>
         )}
@@ -407,6 +432,7 @@ function AdminCausesPage() {
     </div>
   );
 }
+
 export default withAuth(AdminCausesPage, { 
   allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VIEWER] 
 });
