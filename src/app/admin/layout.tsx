@@ -7,7 +7,7 @@ import {
   FiHome, FiDollarSign, FiUsers, FiUser, 
   FiBarChart2, FiSettings, FiMenu, FiLayout, 
   FiImage, FiFileText, FiPieChart, FiBriefcase, 
-  FiTarget, FiZap 
+  FiTarget, FiZap, FiMail, FiActivity, FiGlobe 
 } from 'react-icons/fi';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -90,6 +90,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <FiBarChart2 className="text-lg" />
               <span className="text-sm">Reports</span>
             </Link>
+            <Link href="/admin/analytics" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/analytics') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
+              <FiActivity className="text-lg" />
+              <span className="text-sm">Analytics</span>
+            </Link>
+            <Link href="/admin/webhooks" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/webhooks') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
+              <FiZap className="text-lg" />
+              <span className="text-sm">Webhooks</span>
+            </Link>
 
             <div className="pt-4 pb-2 px-4">
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Website Management</p>
@@ -128,6 +136,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/media" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/media') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
               <FiImage className="text-lg" />
               <span className="text-sm">Media Vault</span>
+            </Link>
+            <Link href="/admin/email-templates" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/email-templates') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>
+              <FiMail className="text-lg" />
+              <span className="text-sm">Email Templates</span>
             </Link>
 
             <Link href="/admin/settings" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${pathname?.startsWith('/admin/settings') ? 'bg-[#1ea05f]/10 text-[#1ea05f] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 font-medium'}`}>

@@ -17,9 +17,11 @@ import { siteConfigSchema } from '@/lib/schemas/cmsSchemas';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { HomepageSectionBuilder, HomepageSection } from '@/components/admin/HomepageSectionBuilder';
 import { BilingualInput } from '@/components/admin/BilingualInput';
+import { logCMSAnalytics } from '@/lib/cmsAnalytics';
+import { triggerWebhook } from '@/lib/webhookDispatcher';
 
 function AdminSettingsPage() {
-  const { setGlobalAlert } = useAuth();
+  const { setGlobalAlert, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -85,6 +87,21 @@ function AdminSettingsPage() {
     
     if (success) {
       setGlobalAlert('Global assets synchronized with HQ successfully.', 'success');
+      
+      // Log Analytics
+      await logCMSAnalytics({
+        docId: 'global_settings',
+        collection: 'settings',
+        action: 'edit',
+        actorUid: user?.uid || 'unknown'
+      });
+
+      // Trigger Webhook
+      await triggerWebhook({ url: process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL || '', isActive: true }, {
+        type: 'settings_modified',
+        data: { siteName: formData.foundationName },
+        actorUid: user?.uid
+      });
     } else {
       setGlobalAlert('Network error detected. Fallback protocols enabled.', 'error');
     }

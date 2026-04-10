@@ -20,6 +20,10 @@ import { causeSchema } from '@/lib/schemas/cmsSchemas';
 import { BilingualInput } from '@/components/admin/BilingualInput';
 import { logActivity, saveVersion } from '@/lib/firebaseUtils';
 import { useAuth } from '@/contexts/AuthContext';
+import { logCMSAnalytics } from '@/lib/cmsAnalytics';
+import { triggerWebhook } from '@/lib/webhookDispatcher';
+import { CMSAnalyticsDashboard } from '@/components/admin/CMSAnalyticsDashboard';
+import { FiActivity, FiZap, FiTarget as FiMissionTarget } from 'react-icons/fi';
 
 interface Program {
   id: string;
@@ -53,9 +57,8 @@ function AdminCausesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  
-  // To keep track of old state for audit logging
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
+  const [showIntelligenceId, setShowIntelligenceId] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, watch, formState: { errors } } = useForm({
     resolver: zodResolver(causeSchema),
@@ -105,6 +108,24 @@ function AdminCausesPage() {
         });
 
         await updateDoc(doc(db, 'causes', editingId), programData);
+
+        // Record high-level telemetry
+        await logCMSAnalytics({
+          docId: editingId,
+          collection: 'causes',
+          action: 'edit',
+          actorUid: user?.uid || 'unknown',
+          metadata: { fieldsChanged: Object.keys(data) }
+        });
+
+        // Trigger Webhook if published
+        if (data.status === 'published') {
+          await triggerWebhook({ url: process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL || '', isActive: true }, {
+            type: 'cause_published',
+            data: { id: editingId, ...data },
+            actorUid: user?.uid
+          });
+        }
       } else {
         programData.createdAt = serverTimestamp();
         if (active) programData.publishedAt = serverTimestamp();
@@ -119,6 +140,13 @@ function AdminCausesPage() {
           afterState: programData,
           actorUid: user?.uid || 'unknown',
           actorEmail: user?.email || undefined
+        });
+
+        await logCMSAnalytics({
+          docId: docRef.id,
+          collection: 'causes',
+          action: 'publish', // New document creation is treated as first publish if active
+          actorUid: user?.uid || 'unknown'
         });
       }
 
@@ -222,48 +250,66 @@ function AdminCausesPage() {
                      <tr><td colSpan={5} className="text-center py-20 font-bold text-red-500 italic">Failed to load missions</td></tr>
                    ) : programs?.length === 0 ? (
                      <tr><td colSpan={5} className="text-center py-20 font-bold text-slate-400">No active missions found in the records.</td></tr>
-                   ) : programs?.map((cause) => {
-                    const percentage = Math.min(100, Math.round((cause.raisedAmount / cause.goalAmount) * 100) || 0);
-                    return (
-                      <tr key={cause.id} className="group hover:bg-slate-50/30 transition-all">
-                        <td className="px-10 py-8">
-                           <div>
-                              <p className="text-base font-black text-slate-800 tracking-tightest italic">{cause.title}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                 <FiUsers size={12} className="text-slate-400" />
-                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">{cause.donors || 0} Patrons active</p>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-10 py-8">
-                           <span className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100 shadow-sm">{cause.category}</span>
-                        </td>
-                        <td className="px-10 py-8">
-                           <div className="space-y-3 max-w-[200px]">
-                              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-600 italic">
-                                 <span>${cause.raisedAmount?.toLocaleString() || 0}</span>
-                                 <span className="text-slate-300">/ ${cause.goalAmount?.toLocaleString() || 0}</span>
-                              </div>
-                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
-                                 <div className="h-full bg-gradient-to-r from-[#1ea05f] to-[#15804a] rounded-full shadow-[0_0_8px_#10b98150]" style={{ width: `${percentage}%` }}></div>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-10 py-8">
-                           <div className="flex items-center gap-3">
-                              <div className={`w-2 h-2 rounded-full ${cause.active ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : 'bg-slate-300'}`}></div>
-                              <span className={`text-[10px] font-black uppercase tracking-widest ${cause.active ? 'text-slate-800' : 'text-slate-400'}`}>{cause.active ? 'Active' : 'Draft'}</span>
-                           </div>
-                        </td>
-                         <td className="px-10 py-8 text-right">
-                            <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                               <button onClick={() => handleEdit(cause)} className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
-                               <button onClick={() => handleDelete(cause.id, cause.title)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
-                            </div>
-                         </td>
-                      </tr>
-                    )
-                   })}
+                   ) : (
+                     programs?.map((cause) => {
+                       const percentage = Math.min(100, Math.round((cause.raisedAmount / cause.goalAmount) * 100) || 0);
+                       return (
+                         <React.Fragment key={cause.id}>
+                           <tr className="group hover:bg-slate-50/30 transition-all">
+                             <td className="px-10 py-8">
+                                <div>
+                                   <p className="text-base font-black text-slate-800 tracking-tightest italic">{cause.title}</p>
+                                   <div className="flex items-center gap-2 mt-1">
+                                      <FiUsers size={12} className="text-slate-400" />
+                                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">{cause.donors || 0} Patrons active</p>
+                                   </div>
+                                </div>
+                             </td>
+                             <td className="px-10 py-8">
+                                <span className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100 shadow-sm">{cause.category}</span>
+                             </td>
+                             <td className="px-10 py-8">
+                                <div className="space-y-3 max-w-[200px]">
+                                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-600 italic">
+                                      <span>${cause.raisedAmount?.toLocaleString() || 0}</span>
+                                      <span className="text-slate-300">/ ${cause.goalAmount?.toLocaleString() || 0}</span>
+                                   </div>
+                                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
+                                      <div className="h-full bg-gradient-to-r from-[#1ea05f] to-[#15804a] rounded-full shadow-[0_0_8px_#10b98150]" style={{ width: `${percentage}%` }}></div>
+                                   </div>
+                                </div>
+                             </td>
+                             <td className="px-10 py-8">
+                                <div className="flex items-center gap-3">
+                                   <div className={`w-2 h-2 rounded-full ${cause.active ? 'bg-[#1ea05f] shadow-[0_0_10px_#10b981]' : 'bg-slate-300'}`}></div>
+                                   <span className={`text-[10px] font-black uppercase tracking-widest ${cause.active ? 'text-slate-800' : 'text-slate-400'}`}>{cause.active ? 'Active' : 'Draft'}</span>
+                                </div>
+                             </td>
+                              <td className="px-10 py-8 text-right">
+                                 <div className="flex justify-end gap-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                                    <button onClick={() => setShowIntelligenceId(showIntelligenceId === cause.id ? null : cause.id)} className={`p-3 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md ${showIntelligenceId === cause.id ? 'text-primary border-primary/20' : 'text-slate-400 hover:text-primary'}`}>
+                                      <FiActivity size={18} />
+                                    </button>
+                                    <button onClick={() => handleEdit(cause)} className="p-3 text-slate-400 hover:text-[#1ea05f] transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiEdit3 size={18} /></button>
+                                    <button onClick={() => handleDelete(cause.id, cause.title)} className="p-3 text-slate-400 hover:text-red-500 transition-all bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md"><FiTrash2 size={18} /></button>
+                                 </div>
+                              </td>
+                           </tr>
+                           {showIntelligenceId === cause.id && (
+                             <tr>
+                               <td colSpan={5} className="px-10 py-6 bg-slate-50/30">
+                                 <CMSAnalyticsDashboard 
+                                   collection="causes" 
+                                   docId={cause.id} 
+                                   title={cause.title} 
+                                 />
+                               </td>
+                             </tr>
+                           )}
+                         </React.Fragment>
+                       );
+                     })
+                   )}
                 </tbody>
             </table>
          </div>
