@@ -7,11 +7,15 @@ import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, Firestore } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
+import { BilingualInput } from '@/components/admin/BilingualInput';
+import { saveVersion, logActivity } from '@/lib/firebaseUtils';
 
 export default function PageEditor({ params }: { params: { id: string } }) {
-  const { setGlobalAlert } = useAuth();
+  const { user, setGlobalAlert } = useAuth();
   const [title, setTitle] = useState(params.id === '1' ? 'Home Page' : 'Humanitarian Cause Page');
+  const [titleUrdu, setTitleUrdu] = useState('');
   const [content, setContent] = useState('Welcome to Baitussalam. We are dedicated to serving humanity.');
+  const [contentUrdu, setContentUrdu] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
@@ -23,7 +27,9 @@ export default function PageEditor({ params }: { params: { id: string } }) {
           if (snap.exists()) {
             const data = snap.data();
             setTitle(data.title || '');
+            setTitleUrdu(data.titleUrdu || '');
             setContent(data.content || '');
+            setContentUrdu(data.contentUrdu || '');
           }
         } catch (error) {
           console.error('Failed to load page:', error);
@@ -41,7 +47,9 @@ export default function PageEditor({ params }: { params: { id: string } }) {
       const docRef = doc(db as Firestore, 'pages', params.id);
       const data: any = {
         title,
+        titleUrdu,
         content,
+        contentUrdu,
         updatedAt: serverTimestamp(),
         status
       };
@@ -50,7 +58,24 @@ export default function PageEditor({ params }: { params: { id: string } }) {
         data.publishedAt = serverTimestamp();
       }
       
+      // Save version before updating
+      if (params.id !== 'new') {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+           await saveVersion('pages', params.id, docSnap.data(), user?.uid || 'unknown');
+        }
+      }
+      
       await setDoc(docRef, data, { merge: true });
+      
+      await logActivity({
+        type: params.id === 'new' ? 'CREATE_PAGE' : 'UPDATE_PAGE',
+        message: `Page "${title}" was ${params.id === 'new' ? 'created' : 'updated'}`,
+        collection: 'pages',
+        docId: params.id,
+        actorUid: user?.uid || 'unknown',
+        actorEmail: user?.email || undefined
+      });
       
       setGlobalAlert(`Transmitted as ${status}!`, 'success');
     } catch (error: any) {
@@ -146,11 +171,16 @@ export default function PageEditor({ params }: { params: { id: string } }) {
               
               <div className="w-full h-px bg-slate-100 mb-8" />
               
-              <textarea 
-                 value={content}
-                 onChange={(e) => setContent(e.target.value)}
-                 className="w-full min-h-[400px] text-lg text-slate-600 border-none outline-none focus:ring-0 p-0 resize-none font-medium leading-relaxed"
-                 placeholder="Start composing your message..."
+              <BilingualInput 
+                label="Page Content"
+                name="content"
+                valueEn={content}
+                valueUr={contentUrdu}
+                onChangeEn={setContent}
+                onChangeUr={setContentUrdu}
+                isTextArea
+                placeholderEn="Start composing your message..."
+                placeholderUr="یہاں ٹائپ کریں..."
               />
            </div>
         </div>
