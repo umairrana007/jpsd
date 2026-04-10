@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: 
         <div className={`flex items-center justify-between ${isUrdu ? 'flex-row-reverse' : ''}`}>
           
           {/* Logo */}
-          <Link href="/" className="relative z-10 flex items-center gap-3 group">
+          <Link href="/" className={`relative z-10 flex items-center gap-3 group ${isUrdu ? 'flex-row-reverse' : 'flex-row'}`}>
             <div className="relative w-12 h-12 md:w-14 md:h-14 overflow-hidden rounded-2xl bg-white shadow-lg p-1.5 transition-transform group-hover:scale-105 active:scale-95 duration-500">
                 <img 
                  src={logoSource} 
@@ -105,12 +105,12 @@ export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: 
                  onError={(e) => { (e.target as any).src = '/logo.png' }}
                />
             </div>
-            <div className={`flex flex-col ${isUrdu ? 'items-end text-right' : 'items-start'}`}>
+            <div className={`flex flex-col ${isUrdu ? 'items-end text-right' : 'items-start text-left'}`}>
               <span className={`text-xl md:text-2xl font-black tracking-tighter leading-none ${scrolled ? 'text-slate-900' : 'text-slate-800'} ${isUrdu ? 'font-urdu' : ''}`}>
                 JPSD
               </span>
               <span className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1 text-[#1ea05f]`}>
-                Heritage of Service
+                {isUrdu ? 'خدمت کی روایت' : 'Heritage of Service'}
               </span>
             </div>
           </Link>
@@ -257,7 +257,7 @@ export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: 
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className={`lg:hidden p-3 rounded-2xl transition-all shadow-md active:scale-90 ${
-              scrolled ? 'bg-[#1ea05f] text-white' : 'bg-white/10 text-white backdrop-blur-md'
+              scrolled ? 'bg-[#1ea05f] text-white' : 'bg-slate-100/80 text-slate-700 backdrop-blur-md'
             }`}
           >
             {isOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}

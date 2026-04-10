@@ -91,10 +91,10 @@ export default function DonorDashboardClean() {
   ];
 
   return (
-    <div className="min-h-screen space-y-12 pb-20 bg-white selection:bg-[#1ea05f]/10">
+    <div className={`min-h-screen space-y-12 pb-20 bg-white selection:bg-[#1ea05f]/10 ${isUrdu ? 'rtl-mode' : ''}`} dir={isUrdu ? 'rtl' : 'ltr'}>
       {/* 🌿 Precise Header Section */}
       <header className="flex flex-col md:flex-row justify-between items-center gap-8 px-10 pt-16">
-         <div className="space-y-3 text-center md:text-left">
+         <div className={`space-y-3 text-center ${isUrdu ? 'md:text-right' : 'md:text-left'}`}>
             <h1 className="text-4xl font-black text-slate-900 tracking-tightest leading-none">
                {isUrdu ? 'خوش آمدید، ' : 'Welcome, '} 
                <span className="text-[#1ea05f]">{currentUserData?.name || 'User'}</span>
@@ -117,13 +117,13 @@ export default function DonorDashboardClean() {
                <div className={`w-20 h-20 ${kpi.bg.replace('bg-', 'bg-opacity-20 bg-')} ${kpi.color} rounded-[1.75rem] flex items-center justify-center text-3xl shrink-0 transition-transform group-hover:scale-105`}>
                   {kpi.icon}
                </div>
-               <div className="flex flex-col gap-1 overflow-hidden">
-                  <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.25em] leading-[1.2] italic opacity-60">
+               <div className="flex flex-col gap-1 min-w-0">
+                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] leading-[1.3] italic opacity-60">
                      {kpi.label.split(' ').map((word, idx) => (
-                        <span key={idx} className="block">{word}</span>
+                        <span key={idx} className="inline-block mr-1">{word}</span>
                      ))}
                   </p>
-                  <p className="text-4xl font-black text-slate-900 tracking-tightest truncate">{kpi.val}</p>
+                  <p className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tightest leading-tight">{kpi.val}</p>
                </div>
             </div>
          ))}

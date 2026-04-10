@@ -22,8 +22,13 @@ import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
 import { UserRole } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { language, t } = useLanguage();
+  const isUrdu = language === 'ur';
+
   const isWebsiteManagement = pathname?.startsWith('/admin/pages') || 
                                pathname?.startsWith('/admin/navigation') || 
                                pathname?.startsWith('/admin/media') || 
@@ -71,9 +76,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.VOLUNTEER]}>
-      <div className="flex min-h-screen bg-[#f9f9fb] font-sans text-slate-800" dir="ltr">
+      <div className={`flex min-h-screen bg-[#f9f9fb] font-sans text-slate-800 ${isUrdu ? 'flex-row-reverse' : ''}`} dir={isUrdu ? 'rtl' : 'ltr'}>
         {/* SideNavBar */}
-        <aside className="hidden md:flex flex-col w-64 border-r border-slate-200/50 bg-slate-50/80 backdrop-blur-xl h-screen p-4 sticky top-0 overflow-y-auto">
+        <aside className={`hidden md:flex flex-col w-64 border-slate-200/50 bg-slate-50/80 backdrop-blur-xl h-screen p-4 sticky top-0 overflow-y-auto ${isUrdu ? 'border-l' : 'border-r'}`}>
           <div className="mb-8 px-4 pt-6 flex flex-col items-center text-center">
             <div className="relative w-56 h-20 mb-6 transition-transform hover:scale-105 active:scale-95">
               <Image 
