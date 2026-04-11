@@ -26,7 +26,8 @@ export enum PaymentStatus {
   PENDING = 'pending',
   COMPLETED = 'completed',
   FAILED = 'failed',
-  REFUNDED = 'refunded'
+  REFUNDED = 'refunded',
+  VERIFIED = 'verified'
 }
 
 export enum CauseCategory {
@@ -111,6 +112,7 @@ export interface Donation {
   paymentMethod: 'jazzcash' | 'easypaisa' | 'stripe' | 'bank_transfer';
   frequency: 'one-time' | 'monthly' | 'yearly';
   status: PaymentStatus;
+  donor?: string;
   transactionId?: string;
   isZakat: boolean;
   isAnonymous: boolean;

@@ -1,13 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  FiUser, FiShield, FiUserCheck, FiFilter, 
-  FiEdit3, FiLock, FiSlash, FiSearch, 
-  FiMail, FiActivity, FiKey, FiCheck, FiX, FiRefreshCw
-} from 'react-icons/fi';
+import { FiSearch, FiFilter, FiDownload, FiRefreshCw, FiMoreVertical, FiUserCheck, FiShield, FiMail, FiTrash2, FiUserPlus, FiX, FiUser, FiActivity, FiKey, FiEdit3, FiLock, FiSlash, FiCheck } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getUsers, updateUserStatus, updateUserRole, logActivity } from '@/lib/firebaseUtils';
+import { getUsers, updateUserStatus, updateUserRole, logActivity, createUser } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole, User as AppUser } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +14,9 @@ function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
   const [searchQuery, setSearchQuery] = useState('');
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteData, setInviteData] = useState({ name: '', email: '', role: UserRole.DONOR });
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -97,6 +96,41 @@ function AdminUsersPage() {
     }
   };
 
+  const handleInviteUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActionLoading(true);
+    try {
+      // In a real app, this would send an invitation email or create a placeholder auth user
+      // For now, we'll create a Firestore profile
+      const tempId = `invited_${Date.now()}`;
+      await createUser({
+        id: tempId,
+        name: inviteData.name,
+        email: inviteData.email,
+        role: inviteData.role,
+        isActive: true,
+        status: 'approved',
+        createdAt: new Date(),
+      });
+      
+      setUsers([{
+        id: tempId,
+        ...inviteData,
+        isActive: true,
+        status: 'approved',
+        createdAt: new Date()
+      } as any, ...users]);
+      
+      setGlobalAlert(`Invitation protocol active. Placeholder profile created for ${inviteData.email}.`, 'success');
+      setShowInviteModal(false);
+      setInviteData({ name: '', email: '', role: UserRole.DONOR });
+    } catch (error) {
+      setGlobalAlert('Failed to initiate user invitation.', 'error');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
   const handleBulkAction = async (type: 'role' | 'activate' | 'deactivate') => {
     setActionLoading('bulk');
     try {
@@ -169,7 +203,10 @@ function AdminUsersPage() {
           >
             <FiRefreshCw size={20} className={loading ? 'animate-spin' : ''} />
           </button>
-          <button className="px-8 py-3 bg-slate-950 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all flex items-center gap-2 uppercase text-xs tracking-widest">
+          <button 
+            onClick={() => setShowInviteModal(true)}
+            className="px-8 py-3 bg-slate-950 text-white font-black rounded-2xl shadow-xl shadow-slate-900/20 hover:opacity-90 transition-all flex items-center gap-2 uppercase text-xs tracking-widest"
+          >
             <FiUserCheck /> Manual Invite
           </button>
         </div>
@@ -496,7 +533,73 @@ function AdminUsersPage() {
             </table>
          </div>
 
-         {/* Bulk Role Modal */}
+         {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl"
+          >
+            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 italic uppercase">Manual Deployment</h3>
+                <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-1">Add internal user to HQ Command</p>
+              </div>
+              <button onClick={() => setShowInviteModal(false)} className="w-10 h-10 rounded-xl hover:bg-white flex items-center justify-center text-slate-400 transition-all shadow-sm">
+                <FiX />
+              </button>
+            </div>
+            <form onSubmit={handleInviteUser} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={inviteData.name}
+                  onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
+                  placeholder="Enter Agent Name"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                <input 
+                  type="email" 
+                  required
+                  value={inviteData.email}
+                  onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                  placeholder="agent@jpsd.org"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Assigned Role</label>
+                <select 
+                  value={inviteData.role}
+                  onChange={(e) => setInviteData({ ...inviteData, role: e.target.value as UserRole })}
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none appearance-none"
+                >
+                  <option value={UserRole.DONOR}>Field Donor</option>
+                  <option value={UserRole.VOLUNTEER}>Field Agent (Volunteer)</option>
+                  <option value={UserRole.CONTENT_MANAGER}>HQ Analyst (Content)</option>
+                  <option value={UserRole.ADMIN}>Command Admin</option>
+                </select>
+              </div>
+              
+              <button 
+                type="submit"
+                disabled={isActionLoading}
+                className="w-full py-5 bg-slate-900 text-white font-black rounded-2xl flex items-center justify-center gap-3 uppercase text-xs tracking-widest hover:bg-primary transition-all shadow-xl shadow-slate-900/20 disabled:opacity-50"
+              >
+                {isActionLoading ? 'Processing...' : <><FiUserPlus /> Authorize & Invite</>}
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Bulk Role Modal */}
          <AnimatePresence>
             {showBulkModal && (
                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">

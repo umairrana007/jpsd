@@ -13,6 +13,7 @@ export interface SiteSettings {
   showHero: boolean;
   heroTitleEn?: string;
   heroTitleUr?: string;
+  heroImage?: string; // Phase 10: Dynamic Hero
   primaryColor?: string;
   secondaryColor?: string;
   logoUrl?: string; // Phase 10: Dynamic Logo
@@ -38,6 +39,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showHero: true,
   heroTitleEn: 'JPSD Foundation',
   heroTitleUr: 'جے پی ایس ڈی فاؤنڈیشن',
+  heroImage: '/images/jpsd_hero.png',
   primaryColor: '#1ea05f',
   secondaryColor: '#3b82f6',
   logoUrl: '/logo.png',
@@ -108,6 +110,7 @@ export const getGlobalConfig = cache(async (): Promise<SiteSettings> => {
       showHero: fields.showHero?.booleanValue ?? DEFAULT_SETTINGS.showHero,
       heroTitleEn: fields.heroTitleEn?.stringValue ?? DEFAULT_SETTINGS.heroTitleEn,
       heroTitleUr: fields.heroTitleUr?.stringValue ?? DEFAULT_SETTINGS.heroTitleUr,
+      heroImage: fields.heroImage?.stringValue || DEFAULT_SETTINGS.heroImage,
       primaryColor: fields.primaryColor?.stringValue ?? DEFAULT_SETTINGS.primaryColor,
       secondaryColor: fields.secondaryColor?.stringValue ?? DEFAULT_SETTINGS.secondaryColor,
       logoUrl: fields.logoUrl?.stringValue || DEFAULT_SETTINGS.logoUrl,

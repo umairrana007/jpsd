@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiHome, FiDollarSign, FiUsers, FiUser, FiBarChart2, FiSettings, FiPlus, FiActivity, FiShield, FiDatabase, FiCheck, FiX } from 'react-icons/fi';
-import { getSystemStats, getRecentActivity } from '@/lib/firebaseUtils';
+import { getSystemStats, getRecentActivity, getDonations } from '@/lib/firebaseUtils';
 import { useAuth } from '@/contexts/AuthContext';
 import GlobalSearch from '@/components/admin/GlobalSearch';
 import dynamic from 'next/dynamic';
@@ -24,8 +24,11 @@ import { UserRole } from '@/types';
 
 interface AdminStats {
   todayDonations: number;
+  totalDonations: number;
   totalDonors: number;
+  activeVolunteers: number;
   upcomingMissions: number;
+  systemHealth: string;
 }
 
 interface AdminActivity {
@@ -39,26 +42,24 @@ function AdminDashboardPage() {
   const { setGlobalAlert } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [activities, setActivities] = useState<AdminActivity[]>([]);
+  const [recentDonations, setRecentDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsData, activityData] = await Promise.all([
+        const [statsData, activityData, donationsData] = await Promise.all([
           getSystemStats(),
-          getRecentActivity()
+          getRecentActivity(),
+          getDonations() // Using properly imported function
         ]);
-        setStats((statsData as AdminStats) || { todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
-        setActivities((activityData && activityData.length > 0 ? activityData : [
-          { id: '1', message: 'New Volunteer Deployment Request: Korangi District', time: 'Just Now', icon: '🚨' },
-          { id: '2', message: 'Major Donation Deployment: Syrian Emergency Relief', time: '12 mins ago', icon: '💰' }
-        ]) as AdminActivity[]);
+        setStats((statsData as AdminStats) || { todayDonations: 0, totalDonations: 0, totalDonors: 0, activeVolunteers: 0, upcomingMissions: 0, systemHealth: 'Offline' });
+        setActivities((activityData || []) as AdminActivity[]);
+        setRecentDonations((donationsData || []).slice(0, 5));
       } catch (err) {
         console.warn('[HQ Intel] Data Fetch Calibration failed, using tactical defaults.');
-        setStats({ todayDonations: 12500, totalDonors: 1420, upcomingMissions: 8 });
-        setActivities([
-          { id: '1', message: 'System Override: Manual Data Calibration Active', time: 'Now', icon: '⚙️' }
-        ] as AdminActivity[]);
+        setStats({ todayDonations: 0, totalDonations: 0, totalDonors: 0, activeVolunteers: 0, upcomingMissions: 0, systemHealth: 'Offline' });
+        setActivities([]);
       } finally {
         setLoading(false);
       }
@@ -104,7 +105,7 @@ function AdminDashboardPage() {
             <span className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">Today</span>
           </div>
           <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Today's Donations</p>
-          <h3 className="text-3xl font-black mt-1 text-slate-800">${stats?.todayDonations.toLocaleString()}</h3>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">${stats?.todayDonations?.toLocaleString() || '0'}</h3>
         </div>
 
         <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
@@ -115,7 +116,7 @@ function AdminDashboardPage() {
             <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-3 py-1 rounded-full uppercase tracking-widest">Total</span>
           </div>
           <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Total Donors</p>
-          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.totalDonors.toLocaleString()}</h3>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.totalDonors?.toLocaleString() || '0'}</h3>
         </div>
 
         <div className="bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] border border-white shadow-sm relative overflow-hidden group">
@@ -125,8 +126,8 @@ function AdminDashboardPage() {
             </div>
             <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1 rounded-full uppercase tracking-widest">Deployments</span>
           </div>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Active Missions</p>
-          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.upcomingMissions}</h3>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Active Volunteers</p>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">{stats?.activeVolunteers || '0'}</h3>
         </div>
         
         {/* System Health Status (Requirement B - 8) */}
@@ -144,7 +145,7 @@ function AdminDashboardPage() {
                 <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]"></span>
                 <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Auth Service: Operational</span>
               </div>
-              <span className="ml-auto text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health: 100% Operational</span>
+              <span className="ml-auto text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health: {stats?.systemHealth || 'Critical'}</span>
            </div>
         </div>
       </section>
@@ -218,45 +219,33 @@ function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  <tr className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">SM</div>
-                        <span className="text-sm font-semibold text-slate-700">Sarah Mitchell</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-sm text-slate-600">Clean Water Initiative</td>
-                    <td className="py-4 text-sm font-bold text-slate-800">$250.00</td>
-                    <td className="py-4">
-                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
-                    </td>
-                  </tr>
-                  <tr className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">JH</div>
-                        <span className="text-sm font-semibold text-slate-700">James Hensen</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-sm text-slate-600">Mosque Construction</td>
-                    <td className="py-4 text-sm font-bold text-slate-800">$1,200.00</td>
-                    <td className="py-4">
-                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-tighter">Completed</span>
-                    </td>
-                  </tr>
-                  <tr className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-xs">LB</div>
-                        <span className="text-sm font-semibold text-slate-700">Lena Bourne</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-sm text-slate-600">Rural Education Fund</td>
-                    <td className="py-4 text-sm font-bold text-slate-800">$50.00</td>
-                    <td className="py-4">
-                      <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-amber-100 text-amber-700 uppercase tracking-tighter">Pending</span>
-                    </td>
-                  </tr>
+                  {recentDonations.length > 0 ? recentDonations.map((donation, idx) => (
+                    <tr key={donation.id || idx} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                            {donation.donorName?.[0] || 'D'}
+                          </div>
+                          <span className="text-sm font-semibold text-slate-700">{donation.donorName || 'Anonymous'}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 text-sm text-slate-600">{donation.causeName || 'General'}</td>
+                      <td className="py-4 text-sm font-bold text-slate-800">${donation.amount?.toLocaleString()}</td>
+                      <td className="py-4">
+                        <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-tighter ${
+                          donation.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {donation.status || 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={4} className="py-10 text-center text-slate-400 text-sm italic">
+                        No recent donations recorded tactical stream.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

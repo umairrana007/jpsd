@@ -21,7 +21,7 @@ import { trackDonationCompletion } from '@/lib/analyticsUtils';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendDonationReceipt } from '@/lib/emailService';
 
-import { getPaymentConfig, isSimulationMode } from '@/lib/config/paymentConfig';
+import { getPaymentConfig } from '@/lib/config/paymentConfig';
 
 function DonationForm() {
   const [step, setStep] = useState(1);
@@ -110,7 +110,7 @@ function DonationForm() {
         securityHash = await generatePaymentSecurityHash('jazzcash', formDataForHash as unknown as Record<string, string | number>, config.jazzcash.salt);
         console.log(`[Payment Stub] JazzCash Hash generated server-side: ${securityHash}`);
       } else if (formData.paymentMethod === 'easypaisa') {
-        securityHash = await generatePaymentSecurityHash('easypaisa', JSON.stringify(formDataForHash), config.easypaisa.apiKey);
+        securityHash = await generatePaymentSecurityHash('easypaisa', JSON.stringify(formDataForHash), config.easypaisa.hashKey);
         console.log(`[Payment Stub] EasyPaisa Signature generated server-side: ${securityHash}`);
       }
 
@@ -138,7 +138,7 @@ function DonationForm() {
         setLastPaymentResult(paymentResult);
         
         // 2.5 Webhook Simulation Integration (Phase 6 Fix)
-        if (isSimulated && paymentResult.success) {
+        if (!config.isProduction && paymentResult.success) {
           const donationAmount = amount;
           const selectedProvider = formData.paymentMethod;
           import('@/lib/payments/simulateWebhook').then(mod => {

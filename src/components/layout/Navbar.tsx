@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: 
   const getDashboardLink = () => {
     if (!currentUserData?.role) return '/dashboard';
     switch (currentUserData.role) {
-      case 'admin': return '/admin/dashboard';
+      case 'admin': return '/admin';
       case 'volunteer': return '/volunteer/dashboard';
       case 'donor': return '/donor/dashboard';
       default: return '/dashboard';

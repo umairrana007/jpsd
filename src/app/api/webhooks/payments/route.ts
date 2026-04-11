@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         const isValid = verifyWebhookSignature(
             JSON.stringify(payload),
             signature,
-            config.easypaisa.apiKey // Using EP key as example secret
+            config.easypaisa.hashKey // Using EP key as example secret
         );
 
         if (!isValid) {

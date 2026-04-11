@@ -7,7 +7,7 @@ import {
   FiHome, FiDollarSign, FiUsers, FiUser, 
   FiBarChart2, FiSettings, FiMenu, FiLayout, 
   FiImage, FiFileText, FiPieChart, FiBriefcase, 
-  FiTarget, FiZap, FiMail, FiActivity, FiGlobe 
+  FiTarget, FiZap, FiMail, FiActivity, FiGlobe, FiLayers 
 } from 'react-icons/fi';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -23,6 +23,15 @@ import { UserRole } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+
+interface AdminStats {
+  todayDonations: number;
+  totalDonations: number;
+  totalDonors: number;
+  activeVolunteers: number;
+  upcomingMissions: number;
+  systemHealth: string;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -46,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/missions', label: 'Mission Planning', icon: FiTarget, collection: 'events' },
     { href: '/admin/users', label: 'Users', icon: FiUser, role: [UserRole.ADMIN] },
     { href: '/admin/causes', label: 'Causes', icon: FiHome, collection: 'causes' },
+    { href: '/admin/categories', label: 'Asset Classes', icon: FiLayers, role: [UserRole.ADMIN, UserRole.CONTENT_MANAGER] },
     { href: '/admin/events', label: 'Events', icon: FiUser, collection: 'events' },
     { href: '/admin/reports', label: 'Reports', icon: FiBarChart2, role: [UserRole.ADMIN] },
     { href: '/admin/analytics', label: 'Analytics', icon: FiActivity, role: [UserRole.ADMIN] },

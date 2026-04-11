@@ -77,10 +77,18 @@ export const createDonation = async (donationData: Partial<Donation>) => {
   if (!isDBAvailable()) return null;
 
   try {
+    const { status: statusOverride, createdAt: createdAtInput, ...rest } = donationData;
+    let createdAt = Timestamp.now();
+    if (createdAtInput instanceof Timestamp) {
+      createdAt = createdAtInput;
+    } else if (createdAtInput instanceof Date) {
+      createdAt = Timestamp.fromDate(createdAtInput);
+    }
+
     const donationRef = await addDoc(collection(getDb() as Firestore, 'donations'), {
-      ...donationData,
-      createdAt: Timestamp.now(),
-      status: 'pending'
+      ...rest,
+      createdAt,
+      status: statusOverride ?? 'pending',
     });
     
     return donationRef.id;
@@ -871,8 +879,10 @@ export type AuditLogData = {
 
 export const logActivity = async (data: AuditLogData) => {
   if (!isDBAvailable()) return;
+  const actorUid = data.actorUid ?? data.adminUid;
   await addDoc(collection(getDb() as Firestore, 'activity_logs'), {
     ...data,
+    ...(actorUid ? { actorUid } : {}),
     timestamp: data.timestamp || serverTimestamp()
   });
 };

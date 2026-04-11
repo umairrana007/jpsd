@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   FiDollarSign, FiFilter, FiDownload, FiPlus, 
   FiSearch, FiCheckCircle, FiClock, FiCreditCard, 
@@ -8,33 +8,75 @@ import {
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { withAuth } from '@/components/admin/withAuth';
-import { UserRole } from '@/types';
-
-const initialDonationsData = [
-  { id: 'TRX-94821', donor: 'Haris Khan', cause: 'Clean Water', amount: 2500, date: '12 Oct, 2026', method: 'JazzCash', status: 'Verified' },
-  { id: 'TRX-82133', donor: 'Sarah Ahmed', cause: 'Education', amount: 450, date: '14 Oct, 2026', method: 'Visa Card', status: 'Pending' },
-  { id: 'TRX-77210', donor: 'Zain Malik', cause: 'Food Security', amount: 1200, date: '15 Oct, 2026', method: 'EasyPaisa', status: 'Verified' },
-  { id: 'TRX-65412', donor: 'Ali Raza', cause: 'Healthcare', amount: 3000, date: '18 Oct, 2026', method: 'Bank Transfer', status: 'Verified' },
-];
+import { UserRole, Donation, PaymentStatus } from '@/types';
+import { getDonations, createDonation } from '@/lib/firebaseUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 function AdminDonationsPage() {
+  const { setGlobalAlert } = useAuth();
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const [newDonation, setNewDonation] = useState<Partial<Donation>>({
+    donorName: '',
+    amount: 0,
+    causeName: '',
+    paymentMethod: 'bank_transfer' as Donation['paymentMethod'],
+    isZakat: false
+  });
+
+  useEffect(() => {
+    fetchDonations();
+  }, []);
+
+  const fetchDonations = async () => {
+    try {
+      const data = await getDonations();
+      setDonations(data as Donation[]);
+    } catch (error) {
+      setGlobalAlert('Failed to synchronize donation stream.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createDonation({
+        ...newDonation,
+        status: PaymentStatus.VERIFIED,
+        createdAt: new Date(),
+        donorEmail: 'manual-entry@jpsd.org', // Required field
+        donorPhone: '0000-0000000', // Required field
+        userId: 'admin-manual', // Required field
+        causeId: 'manual', // Required field
+        frequency: 'one-time' // Required field
+      } as any); // Cast for manual bypass of specific missing fields in newDonation state
+      setGlobalAlert('Manual transaction successfully recorded in ledger.', 'success');
+      setShowManualEntry(false);
+      fetchDonations();
+    } catch (error) {
+      setGlobalAlert('Failed to record transaction.', 'error');
+    }
+  };
 
   const filteredData = useMemo(() => {
-    return initialDonationsData.filter(trx => {
+    return donations.filter(trx => {
       const matchesFilter = activeFilter === 'All' || trx.status === activeFilter;
-      const matchesSearch = trx.donor.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           trx.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           trx.cause.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = 
+        trx.donorName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        trx.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        trx.causeName?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, searchQuery, donations]);
 
   const exportToCSV = () => {
     const headers = ['ID', 'Donor', 'Cause', 'Amount', 'Date', 'Method', 'Status'];
-    const rows = filteredData.map(d => [d.id, d.donor, d.cause, `$${d.amount}`, d.date, d.method, d.status]);
+    const rows = filteredData.map(d => [d.id, d.donorName, d.causeName, `$${d.amount}`, d.createdAt, d.paymentMethod, d.status]);
     const csvContent = "data:text/csv;charset=utf-8," 
       + [headers, ...rows].map(e => e.join(",")).join("\n");
     
@@ -135,25 +177,25 @@ function AdminDonationsPage() {
                          <tr key={idx} className="group hover:bg-slate-50/50 transition-all cursor-pointer">
                             <td className="px-8 py-6">
                                <div className="flex items-center gap-4">
-                                  <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-[#1ea05f] font-black text-xs shadow-sm">{trx.donor.charAt(0)}</div>
+                                  <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-[#1ea05f] font-black text-xs shadow-sm">{trx.donorName?.charAt(0) || 'D'}</div>
                                   <div>
-                                     <p className="text-sm font-black text-slate-800">{trx.donor}</p>
+                                     <p className="text-sm font-black text-slate-800">{trx.donorName}</p>
                                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{trx.id}</p>
                                   </div>
                                </div>
                             </td>
                             <td className="px-8 py-6">
                                <span className="px-3 py-1 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-100">
-                                  {trx.cause}
+                                  {trx.causeName}
                                </span>
                             </td>
                             <td className="px-8 py-6 text-right">
-                               <p className="text-base font-black text-slate-800 tracking-tighter italic">${trx.amount.toLocaleString()}</p>
-                               <p className="text-[10px] text-slate-400 font-bold">{trx.date}</p>
+                               <p className="text-base font-black text-slate-800 tracking-tighter italic">${trx.amount?.toLocaleString()}</p>
+                               <p className="text-[10px] text-slate-400 font-bold">{new Date(trx.createdAt as any).toLocaleDateString()}</p>
                             </td>
                             <td className="px-8 py-6">
-                               <div className={`flex items-center gap-2 font-black text-[10px] uppercase tracking-widest ${trx.status === 'Verified' ? 'text-[#1ea05f]' : 'text-amber-500'}`}>
-                                  <span className={`w-2 h-2 rounded-full ${trx.status === 'Verified' ? 'bg-[#1ea05f]' : 'bg-amber-500 animate-pulse'}`}></span>
+                               <div className={`flex items-center gap-2 font-black text-[10px] uppercase tracking-widest ${(trx.status as string) === 'verified' ? 'text-[#1ea05f]' : 'text-amber-500'}`}>
+                                  <span className={`w-2 h-2 rounded-full ${(trx.status as string) === 'verified' ? 'bg-[#1ea05f]' : 'bg-amber-500 animate-pulse'}`}></span>
                                   {trx.status}
                                </div>
                             </td>
@@ -207,25 +249,53 @@ function AdminDonationsPage() {
                <h3 className="text-2xl font-black text-slate-800 mb-2 italic uppercase tracking-tighter">Manual Donation Log</h3>
                <p className="text-slate-500 mb-8 font-medium">Record a cash or walk-in donation into the system.</p>
                
-               <div className="space-y-6">
+                <form onSubmit={handleManualSubmit} className="space-y-6">
                   <div>
                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Donor Full Name</label>
-                     <input type="text" placeholder="e.g. Ahmad Abdullah" className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20" />
+                     <input 
+                       required
+                       value={newDonation.donorName}
+                       onChange={(e) => setNewDonation({ ...newDonation, donorName: e.target.value })}
+                       type="text" placeholder="e.g. Ahmad Abdullah" 
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20 outline-none" 
+                     />
+                  </div>
+                  <div>
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Mission / Cause</label>
+                     <input 
+                       required
+                       value={newDonation.causeName}
+                       onChange={(e) => setNewDonation({ ...newDonation, causeName: e.target.value })}
+                       type="text" placeholder="e.g. Clean Water Initiative" 
+                       className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20 outline-none" 
+                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                      <div>
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Amount ($)</label>
-                        <input type="number" placeholder="0.00" className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20" />
+                        <input 
+                          required
+                          value={newDonation.amount}
+                          onChange={(e) => setNewDonation({ ...newDonation, amount: Number(e.target.value) })}
+                          type="number" placeholder="0.00" 
+                          className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20 outline-none" 
+                        />
                      </div>
-                     <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Reference</label>
-                        <input type="text" placeholder="Manual-ID" className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#1ea05f]/20" />
+                     <div className="flex items-center gap-3 bg-slate-50 px-6 rounded-2xl">
+                        <input 
+                          type="checkbox"
+                          id="isZakat"
+                          checked={newDonation.isZakat}
+                          onChange={(e) => setNewDonation({ ...newDonation, isZakat: e.target.checked })}
+                          className="w-5 h-5 accent-primary"
+                        />
+                        <label htmlFor="isZakat" className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Is Zakat?</label>
                      </div>
                   </div>
-                  <button className="w-full py-5 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 uppercase tracking-widest text-xs hover:opacity-90 transition-all">
+                  <button type="submit" className="w-full py-5 bg-[#1ea05f] text-white font-black rounded-2xl shadow-xl shadow-[#1ea05f]/20 uppercase tracking-widest text-xs hover:opacity-90 transition-all">
                      Confirm and Record
                   </button>
-               </div>
+               </form>
             </motion.div>
           </div>
         )}

@@ -18,6 +18,7 @@ import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
 import { UserRole, User as AppUser } from '@/types';
+import { createSession, destroySession } from '@/app/login/actions';
 import { GlobalAlert } from '@/components/ui/GlobalAlert';
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
@@ -169,6 +170,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await updateDoc(userRef, { lastLogin: new Date() });
         await logLoginActivity(result.user.uid, email);
       }
+      
+      // Synchronize with server session using secure ID Token
+      const idToken = await result.user.getIdToken();
+      await createSession(idToken);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to login';
       setGlobalAlert(msg, 'error');
@@ -211,6 +216,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await signOut(auth as Auth);
           throw new Error('Selection committed. Identity verification pending Super Admin review.');
         }
+        await updateDoc(userRef, { lastLogin: new Date() });
       } else {
         const data = userSnap.data();
         if (data.isActive === false && !isSuperAdminEmail) {
@@ -219,6 +225,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         await updateDoc(userRef, { lastLogin: new Date() });
       }
+
+      // Synchronize with server session using secure ID Token
+      const idToken = await result.user.getIdToken();
+      await createSession(idToken);
       await logLoginActivity(result.user.uid, result.user.email || 'google-user');
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'code' in error && error.code === 'auth/popup-closed-by-user') return;
@@ -254,6 +264,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         ...extraData,
       });
+      const idToken = await result.user.getIdToken();
+      await createSession(idToken);
       await sendEmailVerification(result.user);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to register';
@@ -266,6 +278,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!auth) return;
     try {
       await signOut(auth as Auth);
+      await destroySession();
       setCurrentUserData(null);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to logout';

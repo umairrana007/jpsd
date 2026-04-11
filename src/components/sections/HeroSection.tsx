@@ -14,6 +14,7 @@ interface HeroSectionProps {
   settings?: {
     heroTitleEn?: string;
     heroTitleUr?: string;
+    heroImage?: string;
   }
 }
 
@@ -124,7 +125,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           >
             <div className="relative z-10 rounded-[4rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)] aspect-[4/5] border-[12px] border-white/80 backdrop-blur-3xl">
               <Image
-                src="/images/jpsd_hero.png"
+                src={settings?.heroImage || "/images/jpsd_hero.png"}
                 alt="JPSD Hero Banner"
                 width={1200}
                 height={1500}
