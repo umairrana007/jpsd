@@ -51,6 +51,24 @@ export const invalidateCache = (prefix?: string) => {
   }
 };
 
+/**
+ * Global helper to safely convert Firestore Timestamp or string to Date
+ * Handles: Firebase Timestamp, Date object, ISO string, or null/undefined
+ */
+export const toDateSafe = (value: any): Date | undefined => {
+  if (!value) return undefined;
+  // If it's a Firebase Timestamp
+  if (typeof value.toDate === 'function') return value.toDate();
+  // If it's already a Date object
+  if (value instanceof Date) return value;
+  // If it's a string, parse it
+  if (typeof value === 'string') {
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+  return undefined;
+};
+
 // Helper to get non-null db reference (throws if not configured)
 const getDb = (): Firestore => {
   if (!db) {
@@ -140,14 +158,14 @@ export const getUserDonations = async (userId: string, status?: string): Promise
         paymentMethod: data.paymentMethod || 'jazzcash',
         frequency: data.frequency || 'one-time',
         status: data.status || 'pending',
-        timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
+        timestamp: toDateSafe(data.timestamp) || new Date(),
         receiptConsent: data.receiptConsent || false,
         isZakat: data.isZakat || false,
         isAnonymous: data.isAnonymous || false,
         transactionId: data.transactionId,
         securityHash: data.securityHash,
         receiptSent: data.receiptSent || false,
-        createdAt: (data.createdAt as Timestamp)?.toDate()
+        createdAt: toDateSafe(data.createdAt)
       } as Donation;
     });
   } catch (error) {
@@ -188,9 +206,9 @@ export const getCauses = async (): Promise<Cause[]> => {
         ...data,
         id: doc.id,
         image: getSafeImageUrl(data.image),
-        deadline: data.deadline?.toDate(),
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        deadline: toDateSafe(data.deadline),
+        createdAt: toDateSafe(data.createdAt),
+        updatedAt: toDateSafe(data.updatedAt),
       } as Cause;
     });
     setCachedData(cacheKey, data);
@@ -211,9 +229,9 @@ export const getCauseById = async (id: string): Promise<Cause | null> => {
         ...data,
         id: causeSnap.id,
         image: getSafeImageUrl(data.image),
-        deadline: data.deadline?.toDate(),
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        deadline: toDateSafe(data.deadline),
+        createdAt: toDateSafe(data.createdAt),
+        updatedAt: toDateSafe(data.updatedAt),
       } as Cause;
     }
   } catch (error) {
@@ -243,10 +261,10 @@ export const getEvents = async (): Promise<Event[]> => {
         ...data,
         id: doc.id,
         image: getSafeImageUrl(data.image),
-        startDate: data.startDate?.toDate(),
-        endDate: data.endDate?.toDate(),
-        registrationDeadline: data.registrationDeadline?.toDate(),
-        createdAt: data.createdAt?.toDate(),
+        startDate: toDateSafe(data.startDate),
+        endDate: toDateSafe(data.endDate),
+        registrationDeadline: toDateSafe(data.registrationDeadline),
+        createdAt: toDateSafe(data.createdAt),
       } as Event;
     });
     setCachedData(cacheKey, data);
@@ -267,10 +285,10 @@ export const getEventById = async (id: string): Promise<Event | null> => {
         ...data,
         id: eventSnap.id,
         image: getSafeImageUrl(data.image),
-        startDate: data.startDate?.toDate(),
-        endDate: data.endDate?.toDate(),
-        registrationDeadline: data.registrationDeadline?.toDate(),
-        createdAt: data.createdAt?.toDate(),
+        startDate: toDateSafe(data.startDate),
+        endDate: toDateSafe(data.endDate),
+        registrationDeadline: toDateSafe(data.registrationDeadline),
+        createdAt: toDateSafe(data.createdAt),
       } as Event;
     }
   } catch (error) {
@@ -301,9 +319,9 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
         ...data,
         id: doc.id,
         image: getSafeImageUrl(data.image),
-        publishedAt: data.publishedAt?.toDate(),
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        publishedAt: toDateSafe(data.publishedAt),
+        createdAt: toDateSafe(data.createdAt),
+        updatedAt: toDateSafe(data.updatedAt),
       } as BlogPost;
     });
     setCachedData(cacheKey, data);
@@ -324,9 +342,9 @@ export const getBlogPostById = async (id: string): Promise<BlogPost | null> => {
         ...data,
         id: postSnap.id,
         image: getSafeImageUrl(data.image),
-        publishedAt: postSnap.data().publishedAt?.toDate(),
-        createdAt: postSnap.data().createdAt?.toDate(),
-        updatedAt: postSnap.data().updatedAt?.toDate(),
+        publishedAt: toDateSafe(postSnap.data().publishedAt),
+        createdAt: toDateSafe(postSnap.data().createdAt),
+        updatedAt: toDateSafe(postSnap.data().updatedAt),
       } as BlogPost;
     }
   } catch (error) {
@@ -367,8 +385,8 @@ export const getVolunteers = async (): Promise<Volunteer[]> => {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      joinedAt: (doc.data().joinedAt as Timestamp)?.toDate(),
-      dob: (doc.data().dob as Timestamp)?.toDate(),
+      joinedAt: toDateSafe(doc.data().joinedAt),
+      dob: toDateSafe(doc.data().dob),
     })) as Volunteer[];
   } catch (error) {
     console.error('Error getting volunteers:', error);
@@ -428,9 +446,9 @@ export const getDeployments = async (volunteerId?: string) => {
     return snapshot.docs.map(doc => ({ 
       id: doc.id, 
       ...doc.data(),
-      checkInTime: (doc.data().checkInTime as Timestamp)?.toDate(),
-      checkOutTime: (doc.data().checkOutTime as Timestamp)?.toDate(),
-      updatedAt: (doc.data().updatedAt as Timestamp)?.toDate(),
+      checkInTime: toDateSafe(doc.data().checkInTime),
+      checkOutTime: toDateSafe(doc.data().checkOutTime),
+      updatedAt: toDateSafe(doc.data().updatedAt),
     }));
   } catch (error) {
     console.error('Error getting deployments:', error);
@@ -679,7 +697,7 @@ export const getSystemStats = async () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayDonations = donationsSnap.docs
-      .filter(doc => (doc.data().createdAt as Timestamp)?.toDate() >= today)
+      .filter(doc => toDateSafe(doc.data().createdAt) && toDateSafe(doc.data().createdAt)! >= today)
       .reduce((acc, doc) => acc + (doc.data().amount || 0), 0);
 
     return {
@@ -780,9 +798,9 @@ export const getUserRecurringDonations = async (userId: string): Promise<Subscri
           amount: data.amount || 0,
           frequency: data.frequency || 'monthly',
           status: data.status || 'active',
-          nextBillingAt: (data.nextBillingAt as Timestamp)?.toDate() || new Date(),
-          nextDate: (data.nextDate as Timestamp)?.toDate(),
-          createdAt: (data.createdAt as Timestamp)?.toDate() || new Date()
+          nextBillingAt: toDateSafe(data.nextBillingAt) || new Date(),
+          nextDate: toDateSafe(data.nextDate),
+          createdAt: toDateSafe(data.createdAt) || new Date()
         } as Subscription;
       });
    } catch (error) {
@@ -850,10 +868,10 @@ export const getActivityLogs = async (limitCount: number = 100): Promise<AuditLo
         message: data.message,
         adminUid: data.adminUid,
         type: data.type,
-        timestamp: (data.timestamp as Timestamp)?.toDate(),
+        timestamp: toDateSafe(data.timestamp),
         affectedUserId: data.affectedUserId,
         affectedUserIds: data.affectedUserIds,
-        createdAt: (data.createdAt as Timestamp)?.toDate() || (data.timestamp as Timestamp)?.toDate() || new Date()
+        createdAt: toDateSafe(data.createdAt) || toDateSafe(data.timestamp) || new Date()
       } as AuditLog;
     });
   } catch (error) {

@@ -1,0 +1,159 @@
+{
+  "version": "1.1",
+  "exportDate": "2024-11-20T10:00:00.000Z",
+  "system": "Baitussalam Master Portal",
+  "data": {
+    "global_config": [
+      {
+        "_id": "site-settings",
+        "siteName": "Baitussalam Welfare Trust",
+        "siteDescription": "Serving Humanity, Transforming Lives",
+        "heroTitleEn": "Empowering Communities, Restoring Hope",
+        "heroTitleUr": "کمیونٹیز کو بااختیار بنانا، امیدوں کو بحال کرنا",
+        "heroImage": "/assets/demo/hero.png",
+        "showHero": true,
+        "primaryColor": "#1ea05f",
+        "secondaryColor": "#0f172a",
+        "logoUrl": "/assets/demo/hero.png",
+        "contactEmail": "info@baitussalam.org",
+        "contactPhone": "+92 21 111 222 333",
+        "address": "Baitussalam HQ, Plot 123, Block 4, Clifton, Karachi, Pakistan",
+        "livesServed": 750000,
+        "donationsReceived": 2500000,
+        "volunteersCount": 3500,
+        "programsCount": 55,
+        "homepageSections": ["hero", "stats", "programs", "events", "testimonials", "partners", "newsletter"],
+        "programsTitleEn": "Our Core Initiatives",
+        "programsTitleUr": "ہمارے بنیادی اقدامات",
+        "programsSubtitleEn": "Strategic welfare programs designed for maximum social impact",
+        "programsSubtitleUr": "زیادہ سے زیادہ سماجی اثرات کے لیے تیار کردہ فلاحی پروگرام",
+        "eventsTitleEn": "Inside Baitussalam",
+        "eventsTitleUr": "بیت السلام کے اندر",
+        "eventsSubtitleEn": "Stay updated with our latest field activities and emergency responses",
+        "eventsSubtitleUr": "ہماری تازہ ترین فیلڈ سرگرمیوں اور ہنگامی ردعمل سے باخبر رہیں",
+        "testimonialsTitleEn": "Voices of Impact",
+        "testimonialsTitleUr": "اثرات کی آوازیں",
+        "testimonialsSubtitleEn": "Real stories from the people we serve and the donors who make it possible",
+        "testimonialsSubtitleUr": "ان لوگوں کی کہانیاں جن کی ہم خدمت کرتے ہیں اور وہ ڈونرز جو اسے ممکن بناتے ہیں",
+        "newsletterTitleEn": "Join Our Mission",
+        "newsletterTitleUr": "ہمارے مشن میں شامل ہوں",
+        "newsletterSubtitleEn": "Subscribe for weekly updates on our humanitarian journey",
+        "newsletterSubtitleUr": "ہمارے انسانی سفر پر ہفتہ وار اپ ڈیٹس کے لیے سبسکرائب کریں"
+      }
+    ],
+    "navigation": [
+      { "_id": "home", "label": "Home", "labelUrdu": "ہوم", "href": "/", "order": 1, "isActive": true },
+      { "_id": "causes", "label": "Our Causes", "labelUrdu": "ہمارے مقاصد", "href": "/causes", "order": 2, "isActive": true },
+      { "_id": "events", "label": "Events", "labelUrdu": "ایونٹس", "href": "/events", "order": 3, "isActive": true },
+      { "_id": "about", "label": "About Us", "labelUrdu": "ہمارے بارے میں", "href": "/about", "order": 4, "isActive": true }
+    ],
+    "categories": [
+      { "_id": "education", "name": "Education", "slug": "education", "description": "Scholarships and school construction", "icon": "FiBookOpen", "color": "#f59e0b", "active": true, "order": 1 },
+      { "_id": "health", "name": "Health", "slug": "health", "description": "Medical camps and hospital support", "icon": "FiActivity", "color": "#ef4444", "active": true, "order": 2 },
+      { "_id": "water", "name": "Water", "slug": "water", "description": "Clean water initiatives and hand pumps", "icon": "FiDroplet", "color": "#3b82f6", "active": true, "order": 3 },
+      { "_id": "emergency", "name": "Emergency", "slug": "emergency", "description": "Urgent relief for disasters", "icon": "FiShield", "color": "#1ea05f", "active": true, "order": 4 }
+    ],
+    "causes": [
+      {
+        "_id": "winter-relief-2024",
+        "title": "Winter Emergency Response",
+        "titleUrdu": "سرمائی ہنگامی امداد",
+        "description": "Provide blankets and warm clothing to families in North Pakistan.",
+        "descriptionUrdu": "شمالی پاکستان میں خاندانوں کو کمبل اور گرم کپڑے فراہم کریں۔",
+        "image": "/assets/demo/winter-relief.png",
+        "category": "emergency",
+        "location": "Murree & Azad Kashmir",
+        "goalAmount": 5000000,
+        "raisedAmount": 1250000,
+        "percentage": 25,
+        "active": true,
+        "featured": true,
+        "status": "published",
+        "reviewStatus": "approved",
+        "createdAt": "2024-11-20T10:00:00.000Z",
+        "updatedAt": "2024-11-20T10:00:00.000Z"
+      },
+      {
+        "_id": "medical-mission",
+        "title": "Free Medical Clinics",
+        "titleUrdu": "مفت طبی کلینک",
+        "description": "Support our mobile medical units providing healthcare to remote villages.",
+        "descriptionUrdu": "دور دراز علاقوں میں صحت کی سہولیات فراہم کرنے والے ہمارے موبائل میڈیکل یونٹس کی مدد کریں۔",
+        "image": "/assets/demo/medical-camp.png",
+        "category": "health",
+        "location": "Sindh & Balochistan",
+        "goalAmount": 10000000,
+        "raisedAmount": 3500000,
+        "percentage": 35,
+        "active": true,
+        "featured": true,
+        "status": "published",
+        "createdAt": "2024-11-20T10:00:00.000Z",
+        "updatedAt": "2024-11-20T10:00:00.000Z"
+      },
+      {
+        "_id": "orphan-education",
+        "title": "Nurturing Future Leaders",
+        "titleUrdu": "مستقبل کے لیڈروں کی پرورش",
+        "description": "Full educational sponsorship for orphan children in Karachi.",
+        "descriptionUrdu": "کراچی میں یتیم بچوں کے لیے مکمل تعلیمی اسپانسرشپ۔",
+        "image": "/assets/demo/orphan-school.png",
+        "category": "education",
+        "location": "Karachi",
+        "goalAmount": 2000000,
+        "raisedAmount": 1800000,
+        "percentage": 90,
+        "active": true,
+        "featured": true,
+        "status": "published",
+        "createdAt": "2024-11-20T10:00:00.000Z",
+        "updatedAt": "2024-11-20T10:00:00.000Z"
+      }
+    ],
+    "testimonials": [
+      {
+        "_id": "t1",
+        "name": "Ahmed Khan",
+        "nameUrdu": "احمد خان",
+        "role": "Major Donor",
+        "roleUrdu": "میجر ڈونر",
+        "text": "Baitussalam transparency is unmatched. I feel my charity is in safe hands.",
+        "textUrdu": "بیت السلام کی شفافیت بے مثال ہے۔ مجھے محسوس ہوتا ہے کہ میرا صدقہ محفوظ ہاتھوں میں ہے۔",
+        "image": "/assets/demo/hero.png",
+        "isPublished": true,
+        "rating": 5,
+        "createdAt": "2024-11-20T10:00:00.000Z"
+      }
+    ],
+    "partners": [
+      { "_id": "p1", "name": "Global Giving", "logo": "/assets/demo/hero.png", "order": 1, "isPublished": true, "createdAt": "2024-11-20T10:00:00.000Z" }
+    ],
+    "pages": [
+      {
+        "_id": "about-us",
+        "slug": "about-us",
+        "title": "About Us",
+        "titleUr": "ہمارے بارے میں",
+        "content": "Baitussalam is a trust dedicated to humanity.",
+        "blocks": [
+          { "id": "b1", "type": "heading", "content": "Our Mission", "contentUr": "ہمارا مشن" },
+          { "id": "b2", "type": "text", "content": "To provide selfless service to humanity without discrimination.", "contentUr": "بغیر کسی امتیاز کے انسانیت کی بے لوث خدمت کرنا۔" }
+        ],
+        "status": "published",
+        "createdAt": "2024-11-20T10:00:00.000Z",
+        "updatedAt": "2024-11-20T10:00:00.000Z"
+      }
+    ],
+    "users": [
+      {
+        "_id": "ADMIN_TEMP",
+        "name": "Baitussalam Admin",
+        "email": "m.umairrana007@gmail.com",
+        "role": "admin",
+        "status": "active",
+        "isActive": true,
+        "createdAt": "2024-11-20T10:00:00.000Z"
+      }
+    ]
+  }
+}

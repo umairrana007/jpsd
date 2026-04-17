@@ -27,7 +27,11 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ logoUrl }) => {
   const { language, t } = useLanguage();
+  const pathname = usePathname();
   const logoSource = logoUrl || '/logo.png';
+
+  const isPortal = pathname?.startsWith('/donor') || pathname?.startsWith('/admin') || pathname?.startsWith('/volunteer');
+  if (isPortal) return null;
 
   return (
     <motion.footer

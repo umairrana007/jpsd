@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Montserrat, Inter } from "next/font/google";
+import { Montserrat, Inter, Noto_Nastaliq_Urdu } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { FontLoader } from "@/components/ui/FontLoader";
+
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import ClientMetadataUpdater from "@/components/ui/ClientMetadataUpdater";
 import { getGlobalConfig } from "@/lib/settings";
 import React from "react";
 import BilingualChatbot from "@/components/BilingualChatbot";
-import { SiteConfigProvider } from "@/context/SiteConfigContext";
+import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -21,6 +21,13 @@ const montserrat = Montserrat({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const notoUrdu = Noto_Nastaliq_Urdu({
+  subsets: ["arabic"],
+  weight: ["400", "700"],
+  variable: "--font-noto-urdu",
   display: "swap",
 });
 
@@ -42,7 +49,8 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${inter.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${inter.variable} ${notoUrdu.variable} h-full antialiased`}
+      suppressHydrationWarning
       style={{ 
         '--font-family': fontFamily, 
         '--border-radius': `${borderRadius}px`,
@@ -50,13 +58,11 @@ export default async function RootLayout({
         '--secondary-color': config.secondaryColor || '#3b82f6',
         '--logo-url': `url(${config.logoUrl || '/logo.png'})`
       } as React.CSSProperties}
-      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-inter">
         <AuthProvider>
           <SiteConfigProvider>
             <LanguageProvider>
-              <FontLoader />
               <ClientMetadataUpdater />
               <Navbar navMenu={config.navMenu} logoUrl={config.logoUrl} />
               <main className="flex-grow pt-24">{children}</main>

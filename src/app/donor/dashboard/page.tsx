@@ -2,421 +2,183 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  FiClock, FiHeart, FiFileText, FiArrowRight, 
-  FiDownload, FiShare2, FiStar, FiZap,
-  FiUser, FiBell, FiShield, FiGlobe,
-  FiMinus, FiPlus, FiGrid, FiActivity, FiSearch, FiRefreshCw,
-  FiTrendingUp, FiLayers, FiCalendar, FiArrowDown
+  FiZap, FiSettings, FiBell, FiShield, FiGlobe, FiUsers, FiBarChart2, FiCheck
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateTaxReceipt, generateBulkReceipts } from '@/lib/pdfUtils';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserDonations, getUserImpactMetrics, getUserRecurringDonations, ImpactMetrics } from '@/lib/firebaseUtils';
-import { format, addMonths } from 'date-fns';
-import dynamic from 'next/dynamic';
-import { Donation, Subscription } from '@/types';
+import { getUserImpactMetrics, ImpactMetrics } from '@/lib/firebaseUtils';
 
-const AreaChart = dynamic(() => import('recharts').then(mod => mod.AreaChart), { ssr: false, loading: () => <div className="h-64 bg-slate-100 animate-pulse rounded"/> });
-const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
-const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false });
-const Area = dynamic(() => import('recharts').then(mod => mod.Area), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
+type MainTab = 'overview' | 'preferences';
+type PrefTab = 'general' | 'alerts' | 'security' | 'language';
 
 export default function DonorDashboardPage() {
-  const { user, currentUserData, setGlobalAlert } = useAuth();
-  const [activeTab, setActiveTab] = useState<'profile' | 'notifications'>('profile');
-  const [donations, setDonations] = useState<Donation[]>([]);
+  const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [impactData, setImpactData] = useState<ImpactMetrics | null>(null);
-  const [recurringSubscriptions, setRecurringSubscriptions] = useState<Subscription[]>([]);
-  const [loading, setLoading] = useState(true);
   
-  // UI States
-  const [recurringActive, setRecurringActive] = useState(true);
-  const [frequency, setFrequency] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
+  const [mainTab, setMainTab] = useState<MainTab>('overview');
+  const [prefTab, setPrefTab] = useState<PrefTab>('general');
+  const [tacticalMode, setTacticalMode] = useState(true);
+  const [alerts, setAlerts] = useState({
+    success: true,
+    payment: true,
+    weekly: false
+  });
 
   useEffect(() => {
+    setMounted(true);
     if (user) {
-      loadDashboardData();
+      getUserImpactMetrics(user.uid).then(setImpactData);
     }
   }, [user]);
 
-  const loadDashboardData = async () => {
-    setLoading(true);
-    try {
-      const [donationData, metrics, subscriptions] = await Promise.all([
-        getUserDonations(user!.uid),
-        getUserImpactMetrics(user!.uid),
-        getUserRecurringDonations(user!.uid)
-      ]);
-      setDonations(donationData);
-      setImpactData(metrics);
-      setRecurringSubscriptions(subscriptions.length > 0 ? subscriptions : [
-         // Mock for demonstration if none exist yet
-         { id: 'REC-001', userId: user!.uid, causeId: 'food-crisis', cause: 'Global Food Crisis', amount: 5000, frequency: 'monthly' as const, status: 'Active' as const, nextBillingAt: addMonths(new Date(), 1), nextDate: addMonths(new Date(), 1), createdAt: new Date() }
-      ]);
-    } catch (error) {
-      console.error('Dashboard Data Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDownloadReceipt = (txn: any) => {
-    generateTaxReceipt({
-      id: txn.id?.substring(0, 8).toUpperCase() || 'TXN-TEMP',
-      donorName: currentUserData?.name || user?.displayName || 'Donor',
-      email: user?.email || '',
-      phone: currentUserData?.phone || '',
-      amount: txn.amount,
-      causeName: txn.causeTitle || 'General Fund'
-    });
-  };
-
-  const totals = donations.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-  
-  // Mock data for impact chart
-  const chartData = [
-    { name: 'Jan', amount: 4000 },
-    { name: 'Feb', amount: 3000 },
-    { name: 'Mar', amount: 2000 },
-    { name: 'Apr', amount: 2780 },
-    { name: 'May', amount: 1890 },
-    { name: 'Jun', amount: 2390 },
-    { name: 'Jul', amount: totals || 3490 },
-  ];
+  if (!mounted) return <div className="p-10 animate-pulse bg-slate-50 min-h-[400px] rounded-[3rem]" />;
 
   return (
-    <div className="space-y-10 pb-20">
-      {/* 🚀 Tactical Welcome Header */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#0f172a] p-10 md:p-14 rounded-[4rem] text-white overflow-hidden relative shadow-2xl border border-white/5">
-         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#1ea05f]/10 rounded-full blur-[140px] -mr-64 -mt-64" />
-         <div className="relative z-10 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">Aura of <span className="text-[#1ea05f]">Giving.</span></h2>
-            <p className="text-slate-400 font-medium max-w-lg leading-relaxed text-sm">
-               Directing resources to the most critical global flashpoints. Your legacy of compassion is active and growing.
-            </p>
-         </div>
-         <div className="relative z-10 flex gap-6">
-          <div className="relative z-10 flex gap-6">
-             <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[3rem] min-w-[140px] shadow-2xl group hover:border-[#1ea05f]/40 transition-all">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#1ea05f] mb-3 border-b border-[#1ea05f]/20 pb-2">Impact Score</p>
-                <div className="relative">
-                   <p className="text-4xl font-black italic leading-none">{impactData?.impactScore || 0}</p>
-                   <motion.div 
-                     initial={{ scale: 0 }}
-                     animate={{ scale: 1 }}
-                     className="absolute -top-4 -right-4 w-8 h-8 bg-[#1ea05f] rounded-full flex items-center justify-center text-[10px] shadow-lg shadow-[#1ea05f]/40"
-                   >
-                     <FiStar />
-                   </motion.div>
-                </div>
-             </div>
-             <div className="text-center bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[3rem] min-w-[140px] shadow-2xl group hover:border-blue-400/40 transition-all">
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-3 border-b border-blue-400/20 pb-2">Lives Impacted</p>
-                <p className="text-4xl font-black italic leading-none">{impactData?.livesImpacted || 0}</p>
-             </div>
-          </div>
-         </div>
-      </header>
+    <div className="space-y-12 pb-20">
+      {/* Tab Switcher */}
+      <div className="flex items-center gap-4 relative z-50">
+        <button 
+          onClick={() => setMainTab('overview')}
+          className={`px-10 py-3.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${mainTab === 'overview' ? 'bg-[#1ea05f] text-white shadow-xl' : 'bg-white text-slate-800 border border-slate-200'}`}
+        >
+          Overview
+        </button>
+        <button 
+          onClick={() => setMainTab('preferences')}
+          className={`px-10 py-3.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${mainTab === 'preferences' ? 'bg-[#1ea05f] text-white shadow-xl' : 'bg-white text-slate-800 border border-slate-200'}`}
+        >
+          Preferences
+        </button>
+      </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        
-        {/* 📊 Intelligence Column */}
-        <div className="xl:col-span-8 space-y-10">
-           
-           {/* Giving Analytics Chart */}
-           <motion.section 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             className="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-sm space-y-8"
-           >
-              <div className="flex justify-between items-end">
+      {mainTab === 'overview' ? (
+        <div className="space-y-10">
+          <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Aura of Giving</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { label: 'Impact Score', val: impactData?.impactScore || '8,420', icon: <FiZap />, color: 'text-amber-500' },
+              { label: 'Lives Affected', val: impactData?.livesImpacted || '1,240', icon: <FiUsers />, color: 'text-blue-500' },
+              { label: 'Total Contribution', val: `$${impactData?.totalDonated || '42,500'}`, icon: <FiBarChart2 />, color: 'text-[#1ea05f]' }
+            ].map((m, i) => (
+              <div key={i} className="bg-white rounded-[3.5rem] border border-slate-200 p-12 flex justify-between items-center shadow-sm">
                 <div>
-                   <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Giving Trajectory</h3>
-                   <p className="text-sm font-bold text-slate-400 mt-1">Real-time analysis of your financial deployments over time.</p>
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">{m.label}</p>
+                  <p className="text-5xl font-black italic tracking-tighter text-slate-900">{m.val}</p>
                 </div>
-                <div className="flex bg-slate-50 p-1 rounded-2xl border border-slate-100">
-                   {['6M', '1Y', 'ALL'].map(t => (
-                      <button key={t} className={`px-5 py-2 rounded-xl text-[9px] font-black transition-all ${t === '1Y' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
-                   ))}
-                </div>
+                <div className={`w-20 h-20 bg-slate-50 rounded-[2.5rem] flex items-center justify-center ${m.color} text-3xl`}>{m.icon}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Calibration</h2>
+          <div className="bg-white rounded-[4rem] border border-slate-200 p-10 flex flex-col md:flex-row gap-10 shadow-sm">
+            {/* Sidebar Buttons - No Animations to prevent click blocking */}
+            <div className="md:w-[350px] flex flex-col gap-4 relative z-[100]">
+              {[
+                { id: 'general', label: 'General Protocol', icon: <FiSettings /> },
+                { id: 'alerts', label: 'Alert Feedback', icon: <FiBell /> },
+                { id: 'security', label: 'Security Layer', icon: <FiShield /> },
+                { id: 'language', label: 'Global Localization', icon: <FiGlobe /> }
+              ].map(item => (
+                <button 
+                  key={item.id}
+                  onClick={() => setPrefTab(item.id as PrefTab)}
+                  className={`flex items-center gap-6 px-10 py-8 rounded-[3rem] text-[12px] font-black uppercase tracking-widest transition-all w-full text-left border-2 ${
+                    prefTab === item.id 
+                      ? 'bg-[#1ea05f] text-white border-[#1ea05f] shadow-2xl translate-x-3' 
+                      : 'bg-white text-slate-800 border-slate-50 hover:border-slate-200'
+                  }`}
+                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                >
+                  <span className="text-2xl">{item.icon}</span>
+                  <span>{item.label}</span>
+                  {prefTab === item.id && <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse" />}
+                </button>
+              ))}
+            </div>
 
-              <div className="h-[300px] w-full mt-4">
-                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData}>
-                       <defs>
-                          <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="5%" stopColor="#1ea05f" stopOpacity={0.1}/>
-                             <stop offset="95%" stopColor="#1ea05f" stopOpacity={0}/>
-                          </linearGradient>
-                       </defs>
-                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                       <XAxis 
-                          dataKey="name" 
-                          axisLine={false} 
-                          tickLine={false} 
-                          tick={{ fontSize: 10, fontWeight: 900, fill: '#64748b' }} 
-                          dy={10}
-                       />
-                       <YAxis hide domain={[0, 'auto']} />
-                       <Tooltip 
-                          contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', color: '#fff' }}
-                          itemStyle={{ color: '#1ea05f', fontWeight: 900, fontSize: '12px' }}
-                       />
-                       <Area type="monotone" dataKey="amount" stroke="#1ea05f" strokeWidth={4} fillOpacity={1} fill="url(#colorAmt)" />
-                    </AreaChart>
-                 </ResponsiveContainer>
-              </div>
-           </motion.section>
-
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <section className="bg-white/70 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-sm space-y-8 group transition-all relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-2 h-full bg-[#1ea05f]" />
-                  <div className="flex justify-between items-start">
-                     <div className="w-12 h-12 bg-[#1ea05f]/10 rounded-2xl flex items-center justify-center text-[#1ea05f]">
-                        <FiRefreshCw size={24} className={recurringActive ? 'animate-spin-slow' : ''} />
-                     </div>
-                     <div 
-                       onClick={() => setRecurringActive(!recurringActive)}
-                       className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors ${recurringActive ? 'bg-[#1ea05f]' : 'bg-slate-200'}`}
-                     >
-                       <motion.div 
-                         initial={false}
-                         animate={{ x: recurringActive ? 24 : 4 }}
-                         className="absolute top-1.5 w-5 h-5 bg-white rounded-full shadow-lg"
-                       />
-                     </div>
-                  </div>
-                  <div className="space-y-4">
-                     <div>
-                        <h4 className="text-xl font-black italic uppercase tracking-widest text-slate-800">Recurring Units</h4>
-                        <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">Active Plans: <span className="text-[#1ea05f]">{recurringSubscriptions.filter(s => s.status === 'Active' || s.status === 'active').length} missions</span></p>
-                     </div>
-                     
-                     <div className="space-y-3 max-h-[140px] overflow-y-auto pr-2 scrollbar-hide">
-                        {recurringSubscriptions.map((sub) => (
-                          <div key={sub.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group/sub">
-                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-tighter text-slate-800">{sub.cause}</p>
-                                <p className="text-[8px] font-bold text-slate-400">Next: {sub.nextDate ? format(sub.nextDate, 'dd MMM') : 'N/A'}</p>
+            {/* Content Area */}
+            <div className="flex-1 bg-slate-50/50 rounded-[3.5rem] p-16 border border-slate-100 min-h-[500px]">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={prefTab} 
+                  initial={{ opacity: 0, y: 10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {prefTab === 'general' && (
+                    <div className="space-y-10">
+                       <h4 className="text-3xl font-black italic uppercase text-slate-900 leading-none">General Interface</h4>
+                       <div className="space-y-6">
+                          <div className="p-10 bg-white rounded-[3rem] flex justify-between items-center shadow-sm">
+                             <div className="max-w-[70%]">
+                                <span className="text-sm font-black uppercase text-slate-800 italic">Tactical Mode</span>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Focus exclusively on high-urgency emergency missions.</p>
                              </div>
-                             <div className="text-right">
-                                <p className="text-xs font-black text-slate-900">Rs. {sub.amount.toLocaleString()}</p>
-                                <button className="text-[8px] font-black text-red-400 uppercase tracking-widest hover:underline opacity-0 group-hover/sub:opacity-100 transition-opacity">Cancel</button>
+                             <div 
+                                onClick={() => setTacticalMode(!tacticalMode)}
+                                className={`w-14 h-7 rounded-full relative p-1.5 cursor-pointer transition-all ${tacticalMode ? 'bg-[#1ea05f]' : 'bg-slate-200'}`}
+                             >
+                                <div className={`w-4 h-4 bg-white rounded-full transition-all ${tacticalMode ? 'translate-x-7' : 'translate-x-0'}`} />
                              </div>
                           </div>
-                        ))}
-                     </div>
-
-                     <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100">
-                        {['monthly', 'quarterly', 'yearly'].map(f => (
-                           <button 
-                              key={f}
-                              onClick={() => setFrequency(f as any)}
-                              className={`flex-1 py-3 px-1 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all ${frequency === f ? 'bg-white text-[#1ea05f] shadow-md' : 'text-slate-400'}`}
-                           >
-                              {f}
-                           </button>
-                        ))}
-                     </div>
-                  </div>
-               </section>
-
-              <section className="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 rounded-[3rem] text-white space-y-8 shadow-xl shadow-blue-200 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-150 transition-transform duration-700" />
-                  <div className="flex justify-between items-start relative z-10">
-                     <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                        <FiLayers size={24} />
-                     </div>
-                     <button 
-                       onClick={() => setGlobalAlert('Impact visualization compiled. Ready for sharing!', 'info')}
-                       className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-4 py-2 rounded-full backdrop-blur-md flex items-center gap-2 hover:bg-white/40 transition-all"
-                     >
-                       <FiShare2 /> Share Impact
-                     </button>
-                  </div>
-                  <div className="relative z-10">
-                     <h4 className="text-2xl font-black italic uppercase tracking-tighter">Impact Portfolio</h4>
-                     <p className="text-sm opacity-80 font-medium leading-tight mt-2">Your resources are currently enabling {donations.length} active missions.</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 relative z-10 px-1">
-                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/10">
-                        <div className="flex items-center gap-2 mb-2">
-                           <FiHeart className="text-red-400" />
-                           <p className="text-[8px] font-black uppercase tracking-widest opacity-60">Causes Supported</p>
-                        </div>
-                        <p className="text-xl font-black">{impactData?.causesCount || 0}</p>
-                     </div>
-                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/10">
-                        <div className="flex items-center gap-2 mb-2">
-                           <FiTrendingUp className="text-yellow-400" />
-                           <p className="text-[8px] font-black uppercase tracking-widest opacity-60">Impact Growth</p>
-                        </div>
-                        <p className="text-xl font-black">+14.2%</p>
-                     </div>
-                  </div>
-               </section>
-           </div>
-
-           <section className="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-sm space-y-10">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                 <div>
-                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800">Signal Archive</h3>
-                    <p className="text-sm font-bold text-slate-400 mt-1">Immutable financial receipts and transaction telemetry.</p>
-                 </div>
-                  <div className="flex gap-4">
-                     <button 
-                       onClick={() => console.log('Initiating bulk download for', donations.length, 'receipts...')}
-                       className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl"
-                     >
-                        <FiDownload /> Bulk Download (ZIP)
-                     </button>
-                  </div>
-              </div>
-
-              <div className="space-y-4">
-                 {loading ? (
-                   <div className="py-20 text-center animate-pulse">
-                     <FiRefreshCw className="mx-auto mb-4 animate-spin text-[#1ea05f]" size={32} />
-                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Syncing Ledger...</p>
-                   </div>
-                 ) : donations.map((txn, i) => (
-                    <div key={txn.id || i} className="group flex items-center gap-8 p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 hover:bg-white hover:border-[#1ea05f]/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all">
-                       <div className="w-14 h-14 rounded-[1.5rem] bg-white border border-slate-100 flex items-center justify-center text-[#1ea05f] shadow-sm font-black italic">
-                          {txn.type === 'Zakat' ? 'Z' : 'S'}
-                       </div>
-                       <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                             <h5 className="text-md font-black text-slate-800 uppercase tracking-tighter italic">{txn.causeTitle || 'Global Fund'}</h5>
-                             <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                             <span className="text-[9px] font-black text-[#1ea05f] uppercase tracking-widest">{txn.status}</span>
-                          </div>
-                          <div className="flex items-center gap-6 mt-1">
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2"><FiCalendar size={12} /> {txn.createdAt ? format(txn.createdAt, 'dd MMM yyyy') : 'Recent'}</p>
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2"><FiActivity size={12} /> ID: {txn.id?.substring(0, 10).toUpperCase() || 'TXN-TEMP'}</p>
-                          </div>
-                       </div>
-                       <div className="text-right">
-                          <p className="text-2xl font-black text-slate-900 italic tracking-tighter">PKR {txn.amount?.toLocaleString()}</p>
-                          <button 
-                             onClick={() => handleDownloadReceipt(txn)}
-                             className="text-[9px] font-black text-[#1ea05f] uppercase tracking-widest flex items-center gap-2 justify-end mt-1 hover:underline group-hover:translate-x-1 transition-transform"
-                          >
-                             Generate Receipt <FiArrowRight />
-                          </button>
                        </div>
                     </div>
-                 ))}
-              </div>
-           </section>
-        </div>
-
-        {/* 👤 Identity & Protocol Column */}
-        <div className="xl:col-span-4 space-y-10">
-           
-           {/* Profile Management */}
-           <section className="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-sm space-y-10">
-              <div className="flex bg-slate-100 p-2 rounded-[2rem] border border-slate-200">
-                 {['Identity', 'Protocol'].map(t => (
-                    <button 
-                      key={t}
-                      onClick={() => setActiveTab(t.toLowerCase() as any)}
-                      className={`flex-1 py-4 px-6 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${
-                        activeTab === t.toLowerCase() ? 'bg-white text-slate-800 shadow-md' : 'text-slate-400'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                 ))}
-              </div>
-
-              <AnimatePresence mode="wait">
-                 {activeTab === 'profile' ? (
-                   <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-10">
-                      <div className="relative group">
-                         <div className="w-32 h-32 mx-auto rounded-[3rem] bg-slate-100 overflow-hidden shadow-2xl border-4 border-white">
-                            <img src={user?.photoURL || "/images/jpsd_ambulance.jpg"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Identity" />
-                         </div>
-                         <button className="absolute bottom-0 right-1/2 translate-x-14 bg-slate-900 text-white p-3 rounded-2xl shadow-xl hover:bg-[#1ea05f] transition-all">
-                            <FiActivity size={14} />
-                         </button>
-                      </div>
-
-                      <div className="text-center space-y-1">
-                         <h4 className="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">{currentUserData?.name || 'Authorized Member'}</h4>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{user?.email}</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4">
-                         {[
-                            { label: 'Member Rank', val: currentUserData?.role || 'DONOR', icon: <FiShield /> },
-                            { label: 'Active Region', val: 'Karachi, PK', icon: <FiGlobe /> },
-                            { label: 'Frequency', val: frequency.toUpperCase(), icon: <FiClock /> }
-                         ].map((item, i) => (
-                            <div key={i} className="flex items-center gap-5 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100">
-                               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm">
-                                  {item.icon}
-                               </div>
-                               <div>
-                                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
-                                  <p className="text-xs font-black text-slate-800 italic">{item.val}</p>
-                               </div>
-                            </div>
-                         ))}
-                      </div>
-                   </motion.div>
-                 ) : (
-                   <motion.div key="notifications" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
-                       <div className="space-y-4">
+                  )}
+                  {prefTab === 'alerts' && (
+                    <div className="space-y-10">
+                       <h4 className="text-3xl font-black italic uppercase text-slate-900 leading-none">Alert Feedback</h4>
+                       <div className="space-y-5">
                           {[
-                            { title: 'Project Updates', desc: 'Secure cause milestones.', icon: <FiTrendingUp /> },
-                            { title: 'Security Alerts', desc: 'Auth & billing protocols.', icon: <FiShield /> },
-                            { title: 'Official feed', desc: 'HQ correspondence.', icon: <FiArrowDown /> },
-                          ].map((item, i) => (
-                             <div key={i} className="flex items-center gap-5 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 group cursor-pointer hover:bg-white transition-all">
-                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#1ea05f] shadow-sm">
-                                   {item.icon}
+                             { id: 'success' as const, title: 'Project Success Flashes', desc: 'Instant alerts when a cause hits 100% goal.' },
+                             { id: 'payment' as const, title: 'Tactical Payment Alerts', desc: 'Secure confirmation for every donation.' },
+                             { id: 'weekly' as const, title: 'Weekly Mission Digest', desc: 'Consolidated report of your global deeds.' },
+                          ].map((pref) => (
+                             <div key={pref.id} className="p-10 bg-white rounded-[3rem] border border-slate-100 flex items-center justify-between shadow-sm">
+                                <div className="max-w-[70%]">
+                                   <p className="text-sm font-black uppercase text-slate-800 italic">{pref.title}</p>
+                                   <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 leading-relaxed">{pref.desc}</p>
                                 </div>
-                                <div className="flex-1">
-                                   <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">{item.title}</p>
-                                   <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{item.desc}</p>
-                                </div>
-                                <div className="w-8 h-4 rounded-full bg-[#1ea05f] relative">
-                                   <div className="absolute right-1 top-1 w-2 h-2 bg-white rounded-full" />
+                                <div 
+                                   onClick={() => setAlerts(prev => ({ ...prev, [pref.id]: !prev[pref.id] }))}
+                                   className={`w-14 h-7 rounded-full relative p-1.5 cursor-pointer transition-all ${alerts[pref.id] ? 'bg-[#1ea05f]' : 'bg-slate-200'}`}
+                                >
+                                   <div className={`w-4 h-4 bg-white rounded-full transition-all ${alerts[pref.id] ? 'translate-x-7' : 'translate-x-0'}`} />
                                 </div>
                              </div>
                           ))}
                        </div>
-                   </motion.div>
-                 )}
+                    </div>
+                  )}
+                  {prefTab === 'security' && (
+                    <div>
+                       <h4 className="text-3xl font-black italic uppercase text-slate-900 mb-8">Security Layer</h4>
+                       <div className="p-10 bg-white rounded-[3rem] flex items-center gap-6 shadow-sm border border-blue-50">
+                          <FiShield className="text-blue-500" size={32} />
+                          <span className="text-xs font-black uppercase">Encryption Protocol v4.0 Active</span>
+                       </div>
+                    </div>
+                  )}
+                  {prefTab === 'language' && (
+                    <div className="grid grid-cols-1 gap-4">
+                       <h4 className="text-3xl font-black italic uppercase text-slate-900 mb-6">Localization</h4>
+                       {['English', 'Urdu', 'Arabic'].map(lang => (
+                          <div key={lang} className="p-8 bg-white rounded-[2rem] border border-slate-100 flex items-center justify-between font-black text-[10px] uppercase">
+                             {lang} {lang === 'English' && <FiCheck className="text-[#1ea05f]" />}
+                          </div>
+                       ))}
+                    </div>
+                  )}
+                </motion.div>
               </AnimatePresence>
-
-              <button className="w-full py-6 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl hover:scale-105 transition-all text-[11px] uppercase tracking-widest italic">Sync Digital Identity</button>
-           </section>
-
-           {/* Deployment Center */}
-           <section className="bg-gradient-to-br from-[#1ea05f] to-green-700 p-12 rounded-[4rem] text-white space-y-8 shadow-2xl shadow-[#1ea05f]/20 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-white/20 rounded-full blur-3xl -mr-24 -mt-24 group-hover:scale-110 transition-transform duration-1000" />
-              <div className="space-y-4 relative z-10">
-                 <div className="w-14 h-14 bg-white/20 rounded-[1.5rem] flex items-center justify-center backdrop-blur-md">
-                    <FiActivity size={28} className="animate-pulse" />
-                 </div>
-                 <h3 className="text-3xl font-black italic uppercase tracking-tighter">Emergency Hub</h3>
-                 <p className="text-sm font-medium opacity-90 leading-relaxed italic">
-                    Critical flashpoints detected. Deploy immediate tactical relief assets to active humanitarian zones.
-                 </p>
-              </div>
-              <button className="w-full py-6 bg-white text-[#1ea05f] font-black rounded-[2rem] shadow-xl text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
-                 Initiate Deployment <FiArrowRight />
-              </button>
-           </section>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

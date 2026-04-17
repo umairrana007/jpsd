@@ -85,7 +85,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-32 md:pt-40 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-32 md:pt-40 pb-20 md:pb-32 p-6 relative overflow-hidden">
       {/* Animated Background Orbs */}
       <div className="absolute top-0 -left-20 w-96 h-96 bg-[#1ea05f]/10 rounded-full blur-[120px] animate-pulse"></div>
       <div className="absolute bottom-0 -right-20 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px]"></div>

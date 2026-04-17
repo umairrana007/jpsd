@@ -5,6 +5,7 @@ export enum UserRole {
   DONOR = 'donor',
   VOLUNTEER = 'volunteer',
   PROFESSIONAL = 'professional',
+  EXPERT = 'expert',
   YOUTH = 'youth',
   ADMIN = 'admin',
   CONTENT_MANAGER = 'content_manager',

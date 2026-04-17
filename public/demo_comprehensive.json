@@ -1,0 +1,176 @@
+{
+  "version": "2.0",
+  "exportDate": "2026-04-16T07:30:24.052Z",
+  "system": "JPSD Master Portal",
+  "data": {
+    "causes": [
+      {
+        "_id": "demo-cause-healthcare",
+        "title": "Swift-Response Medical Mission",
+        "titleUrdu": "تیزی سے طبی مشن",
+        "description": "Equipping our mobile clinics with advanced life-saving technology to reach the underserved communities. Your support fuels our fleet's expansion.",
+        "descriptionUrdu": "کم سہولیات والے علاقوں تک پہنچنے کے لیے ہماری موبائل کلینکس کو جدید ترین زندگی بچانے والی ٹیکنالوجی سے لیس کرنا۔",
+        "image": "/images/demo/ambulance.png",
+        "category": "health",
+        "location": "Khyber Pakhtunkhwa",
+        "goalAmount": 5000000,
+        "raisedAmount": 1250000,
+        "percentage": 25,
+        "deadline": "2026-12-31T00:00:00Z",
+        "urgency": "critical",
+        "active": true,
+        "featured": true,
+        "status": "published",
+        "reviewStatus": "approved",
+        "createdAt": "2026-04-16T00:00:00Z",
+        "updatedAt": "2026-04-16T00:00:00Z"
+      },
+      {
+        "_id": "demo-cause-food",
+        "title": "Strategic Nutrition Pipeline",
+        "titleUrdu": "غذائی حکمت عملی",
+        "description": "A centralized supply chain to distribute high-grade ration packs to 10,000+ families monthly. Ensuring food security with dignity and precision.",
+        "descriptionUrdu": "ماہانہ 10,000+ خاندانوں میں اعلیٰ درجے کے راشن پیک تقسیم کرنے کے لیے ایک مرکزی سپلائی چین۔",
+        "image": "/images/demo/food.png",
+        "category": "food",
+        "location": "South Karachi Slums",
+        "goalAmount": 3000000,
+        "raisedAmount": 1500000,
+        "percentage": 50,
+        "deadline": "2026-08-15T00:00:00Z",
+        "urgency": "high",
+        "active": true,
+        "featured": true,
+        "status": "published",
+        "reviewStatus": "approved",
+        "createdAt": "2026-04-16T00:00:00Z",
+        "updatedAt": "2026-04-16T00:00:00Z"
+      },
+      {
+        "_id": "demo-cause-water",
+        "title": "Deep-Well Aquifer Project",
+        "titleUrdu": "پانی کا گہرا کنواں منصوبہ",
+        "description": "Drilling solar-powered deep-well aquifers in drought-prone areas to provide immediate and sustainable clean water access to rural hubs.",
+        "descriptionUrdu": "خشک سالی والے علاقوں میں شمسی توانائی سے چلنے والے گہرے پانی کے کنویں کھودنا تاکہ دیہی علاقوں کو صاف پانی فراہم کیا جا سکے۔",
+        "image": "/images/demo/water.png",
+        "category": "water",
+        "location": "Tharparkar, Sindh",
+        "goalAmount": 2000000,
+        "raisedAmount": 1800000,
+        "percentage": 90,
+        "deadline": "2026-06-30T00:00:00Z",
+        "urgency": "medium",
+        "active": true,
+        "featured": false,
+        "status": "published",
+        "reviewStatus": "approved",
+        "createdAt": "2026-04-16T00:00:00Z",
+        "updatedAt": "2026-04-16T00:00:00Z"
+      }
+    ],
+    "events": [
+      {
+        "_id": "demo-event-gala",
+        "title": "Tactical Philanthropy Summit",
+        "titleUrdu": "حکمت عملی پر مبنی فلاحی اجلاس",
+        "description": "Join international experts and local leaders to discuss the future of digital-first humanitarian logistics in Pakistan.",
+        "image": "/images/demo/expert.png",
+        "type": "education",
+        "location": "Pearl Continental, Karachi",
+        "address": "Club Road, Karachi",
+        "startDate": "2026-05-20T18:00:00Z",
+        "endDate": "2026-05-20T22:00:00Z",
+        "maxParticipants": 500,
+        "currentParticipants": 342,
+        "registrationDeadline": "2026-05-15T00:00:00Z",
+        "status": "upcoming",
+        "createdAt": "2026-04-16T00:00:00Z"
+      }
+    ],
+    "blog_posts": [
+      {
+        "_id": "demo-blog-1",
+        "title": "The Future of Direct Giving",
+        "content": "Our new digital-first portal ensures that every rupee you donate is tracked and accounted for with total transparency...",
+        "excerpt": "Exploring how blockchain and real-time tracking are changing the landscape of charity in Pakistan.",
+        "featuredImage": "/images/demo/expert.png",
+        "category": "Technology",
+        "authorId": "admin-uid",
+        "readTimeMinutes": 5,
+        "featured": true,
+        "views": 1250,
+        "status": "published",
+        "reviewStatus": "approved",
+        "createdAt": "2026-04-15T00:00:00Z",
+        "updatedAt": "2026-04-16T00:00:00Z"
+      }
+    ],
+    "testimonials": [
+      {
+        "_id": "demo-test-1",
+        "name": "Abid Khan",
+        "role": "Community Leader",
+        "text": "The JPSD water project saved our village. We no longer walk miles for a drop of water.",
+        "rating": 5,
+        "image": "/images/demo/water.png",
+        "isPublished": true
+      }
+    ],
+    "users": [
+      {
+        "_id": "demo-user-donor",
+        "name": "JPSD Demo Donor",
+        "email": "demo_donor@jpsd.org",
+        "role": "donor",
+        "isActive": true,
+        "status": "active",
+        "createdAt": "2026-04-16T00:00:00Z"
+      },
+      {
+        "_id": "demo-user-professional",
+        "name": "Dr. Sarah Ahmed",
+        "email": "demo_professional@jpsd.org",
+        "role": "expert",
+        "isActive": true,
+        "status": "active",
+        "createdAt": "2026-04-16T00:00:00Z",
+        "photoURL": "/images/demo/expert.png"
+      },
+      {
+        "_id": "demo-user-volunteer",
+        "name": "Arsalan Raza",
+        "email": "demo_volunteer@jpsd.org",
+        "role": "volunteer",
+        "isActive": true,
+        "status": "active",
+        "createdAt": "2026-04-16T00:00:00Z"
+      },
+      {
+        "_id": "demo-user-youth",
+        "name": "Zainab Malik",
+        "email": "demo_youth@jpsd.org",
+        "role": "youth",
+        "isActive": true,
+        "status": "active",
+        "createdAt": "2026-04-16T00:00:00Z",
+        "photoURL": "/images/demo/youth.png"
+      }
+    ],
+    "donations": [
+      {
+        "_id": "demo-don-1",
+        "donorName": "JPSD Demo Donor",
+        "donorEmail": "demo_donor@jpsd.org",
+        "amount": 25000,
+        "causeId": "demo-cause-healthcare",
+        "causeName": "Swift-Response Medical Mission",
+        "paymentMethod": "stripe",
+        "frequency": "one-time",
+        "status": "completed",
+        "isZakat": false,
+        "isAnonymous": false,
+        "createdAt": "2026-04-16T10:30:00Z"
+      }
+    ]
+  }
+}

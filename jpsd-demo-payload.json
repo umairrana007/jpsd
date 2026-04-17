@@ -1,0 +1,93 @@
+{
+  "version": "1.1",
+  "exportDate": "2026-04-14T10:10:00Z",
+  "system": "JPSD Corrected Demo Payload",
+  "data": {
+    "causes": [
+      {
+        "_id": "demo-cause-1",
+        "title": "Clean Water Initiative 2026",
+        "titleUrdu": "صاف پانی کا منصوبہ 2026",
+        "description": "Providing safe drinking water to remote villages in Sindh. This project aims to install 100 deep-well hand pumps.",
+        "descriptionUrdu": "سندھ کے دور افتادہ دیہاتوں میں پینے کا صاف پانی فراہم کرنا۔ اس منصوبے کا مقصد 100 ہینڈ پمپ نصب کرنا ہے۔",
+        "goalAmount": 25000,
+        "raisedAmount": 12450,
+        "featured": true,
+        "category": "water",
+        "image": "/images/jpsd_ambulance.jpg",
+        "status": "published",
+        "location": "Sindh, Pakistan",
+        "deadline": "2026-12-31",
+        "urgency": "high",
+        "active": true,
+        "createdAt": "2026-01-10T10:00:00Z"
+      },
+      {
+        "_id": "demo-cause-2",
+        "title": "Emergency Food Relief",
+        "titleUrdu": "ہنگامی غذائی امداد",
+        "description": "Distribution of monthly ration packs to low-income families in urban slums.",
+        "descriptionUrdu": "شہری کچی آبادیوں میں کم آمدنی والے خاندانوں میں ماہانہ راشن پیک کی تقسیم۔",
+        "goalAmount": 15000,
+        "raisedAmount": 5200,
+        "featured": false,
+        "category": "food",
+        "image": "/images/jpsd_food.jpg",
+        "status": "published",
+        "location": "Karachi",
+        "deadline": "2026-06-30",
+        "urgency": "critical",
+        "active": true,
+        "createdAt": "2026-02-15T10:00:00Z"
+      }
+    ],
+    "testimonials": [
+      {
+        "_id": "demo-test-1",
+        "name": "Ahmed Raza",
+        "nameUrdu": "احمد رضا",
+        "text": "JPSD has completely changed the way I think about charity. Their transparency is unmatched.",
+        "textUrdu": "جے پی ایس ڈی نے صدقہ و خیرات کے بارے میں میرے سوچنے کا انداز بالکل بدل دیا ہے۔ ان کی شفافیت بے مثال ہے۔",
+        "role": "Regular Donor",
+        "roleUrdu": "مستقل عطیہ دہندہ",
+        "rating": 5,
+        "isPublished": true,
+        "image": "/images/unsplash_1.jpg",
+        "createdAt": "2026-03-20T10:00:00Z"
+      }
+    ],
+    "events": [
+      {
+        "_id": "demo-event-1",
+        "title": "Annual Charity Gala 2026",
+        "date": "2026-05-15T19:00:00Z",
+        "location": "JPSD Community Hall, Karachi",
+        "description": "A night of fundraising and awareness for our upcoming healthcare missions.",
+        "status": "upcoming",
+        "createdAt": "2026-03-01T10:00:00Z"
+      }
+    ],
+    "partners": [
+      {
+        "_id": "demo-partner-1",
+        "name": "Global Health NGO",
+        "logoUrl": "/images/unsplash_4.jpg",
+        "website": "https://example.com",
+        "createdAt": "2026-01-01T10:00:00Z"
+      }
+    ],
+    "volunteers": [
+      {
+        "_id": "demo-vol-1",
+        "name": "Sarah Khan",
+        "skills": [
+          "Medical Aid",
+          "Translation"
+        ],
+        "status": "active",
+        "joinedAt": "2026-02-15T10:00:00Z",
+        "createdAt": "2026-02-15T10:00:00Z"
+      }
+    ]
+  }
+}

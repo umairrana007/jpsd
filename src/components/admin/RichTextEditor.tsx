@@ -15,6 +15,7 @@ interface Props {
 
 export const RichTextEditor = ({ value, onChange, placeholder = 'Start typing...', name }: Props) => {
   const editor = useEditor({
+    immediatelyRender: false, // Prevent SSR hydration mismatch
     extensions: [
       StarterKit,
       Link.configure({

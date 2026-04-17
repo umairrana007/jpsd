@@ -15,7 +15,7 @@ import {
   FiMoreHorizontal
 } from 'react-icons/fi';
 import { NavItemConfig } from '@/lib/settings';
-import { useSiteConfig } from '@/context/SiteConfigContext';
+import { useSiteConfig } from '@/contexts/SiteConfigContext';
 
 interface NavbarProps {
   navMenu?: NavItemConfig[];
@@ -85,6 +85,9 @@ export const Navbar: React.FC<NavbarProps> = ({ navMenu: propsNavMenu, logoUrl: 
       default: return '/dashboard';
     }
   };
+
+  const isPortal = pathname?.startsWith('/donor') || pathname?.startsWith('/admin') || pathname?.startsWith('/volunteer');
+  if (isPortal) return null;
 
   return (
     <nav 

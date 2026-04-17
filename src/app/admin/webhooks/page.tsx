@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { triggerWebhook } from '@/lib/webhookDispatcher';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface WebhookConfig {
   id: string;

@@ -78,7 +78,7 @@ export default function BilingualChatbot() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[200]">
+    <div className="fixed bottom-6 right-6 z-[200] flex items-center justify-center pointer-events-none">
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -86,10 +86,10 @@ export default function BilingualChatbot() {
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 45 }}
             onClick={() => setIsOpen(true)}
-            className="w-16 h-16 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all group border-4 border-white"
+            className="pointer-events-auto w-14 h-14 md:w-16 md:h-16 bg-primary rounded-full shadow-[0_10px_30px_rgba(30,160,95,0.3)] flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all group border-[4px] border-white relative"
           >
-            <FiMessageSquare size={24} />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+            <FiMessageSquare className="w-5 h-5 md:w-6 md:h-6" />
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-[2px] border-white shadow-lg shadow-red-500/50" />
           </motion.button>
         )}
  

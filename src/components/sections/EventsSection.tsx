@@ -31,7 +31,19 @@ const sampleEvents = [
   },
 ];
 
-export const EventsSection: React.FC = () => {
+interface EventsSectionProps {
+  titleEn?: string;
+  titleUr?: string;
+  subtitleEn?: string;
+  subtitleUr?: string;
+}
+
+export const EventsSection: React.FC<EventsSectionProps> = ({
+  titleEn,
+  titleUr,
+  subtitleEn,
+  subtitleUr
+}) => {
   const { language, t } = useLanguage();
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +64,14 @@ export const EventsSection: React.FC = () => {
     fetchEvents();
   }, []);
 
+  // Use CMS titles if available, fallback to hardcoded
+  const sectionTitle = language === 'ur' 
+    ? (titleUr || 'حالیہ ایونٹس اور سرگرمیاں') 
+    : (titleEn || 'Recent Events & Activities');
+  const sectionSubtitle = language === 'ur'
+    ? (subtitleUr || 'دیکھیں کہ ہم پاکستان بھر کی کمیونٹیز میں کس طرح مثبت تبدیلی لا رہے ہیں')
+    : (subtitleEn || 'See how we\'re making a difference in communities across Pakistan');
+
   return (
     <section className="py-20 bg-white overflow-hidden">
       <div className="container mx-auto px-4" dir={language === 'ur' ? 'rtl' : 'ltr'}>
@@ -63,16 +83,16 @@ export const EventsSection: React.FC = () => {
           className="text-center mb-16"
         >
           <h2 className={`text-4xl md:text-5xl font-bold text-[#2c3e50] mb-8 ${language === 'ur' ? 'urdu-text !leading-[2.2] py-4' : ''}`}>
-            {language === 'ur' ? 'حالیہ ایونٹس اور سرگرمیاں' : 'Recent Events & Activities'}
+            {sectionTitle}
           </h2>
           <p className={`text-xl text-gray-600 max-w-3xl mx-auto ${language === 'ur' ? 'urdu-text !leading-[1.8]' : ''}`}>
-            {language === 'ur' ? 'دیکھیں کہ ہم پاکستان بھر کی کمیونٹیز میں کس طرح مثبت تبدیلی لا رہے ہیں' : "See how we're making a difference in communities across Pakistan"}
+            {sectionSubtitle}
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-[#27ae60] to-[#f39c12] mx-auto mt-6 rounded-full" />
         </motion.div>
 
         {/* Events Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {loading ? (
              <div className="col-span-full text-center py-10 font-bold text-gray-400">Loading Events...</div>
           ) : events.map((event, index) => (
@@ -114,7 +134,7 @@ export const EventsSection: React.FC = () => {
                     {language === 'ur' ? (event.locationUrdu || event.location) : event.location}
                   </div>
                   
-                  <p className={`text-gray-500 text-sm line-clamp-3 mb-6 flex-grow ${language === 'ur' ? 'urdu-text opacity-90 leading-relaxed' : 'leading-relaxed'}`}>
+                  <p className={`text-gray-500 text-sm mb-6 flex-grow ${language === 'ur' ? 'urdu-text opacity-90 leading-relaxed' : 'leading-relaxed'} line-clamp-3 md:line-clamp-4`}>
                     {language === 'ur' ? (event.descriptionUrdu || event.description) : event.description}
                   </p>
 

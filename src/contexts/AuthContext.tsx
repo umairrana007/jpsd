@@ -106,12 +106,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Force timeout to prevent infinite loading
+    const forceTimeout = setTimeout(() => {
+      console.warn('[Auth] Force timeout - setting loading to false');
+      setLoading(false);
+    }, 5000); // 5 second max wait
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user && db) {
         try {
+          // Add timeout to prevent hanging
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Auth timeout')), 3000)
+          );
+          
           const userRef = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userRef);
+          const userSnap = await Promise.race([
+            getDoc(userRef),
+            timeoutPromise
+          ]) as any;
+          
           if (userSnap.exists()) {
             setCurrentUserData({ id: userSnap.id, ...userSnap.data() } as AppUser);
           } else {
@@ -136,16 +151,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (error: unknown) {
           const msg = error instanceof Error ? error.message : 'Authentication data synchronization failed';
-          console.error(msg);
-          setGlobalAlert(msg, 'error');
+          console.warn('[Auth] Using fallback:', msg);
+          // Don't block loading on auth errors
         }
       } else {
         setCurrentUserData(null);
       }
       setLoading(false);
+      clearTimeout(forceTimeout);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearTimeout(forceTimeout);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -155,20 +174,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const result = await signInWithEmailAndPassword(auth as Auth, email, password);
-      const userRef = doc(db as Firestore, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
       
-      const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
-      const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email || '');
+      // Attempt user data fetch, but don't crash if it fails (permissions propagation sync)
+      try {
+        const userRef = doc(db as Firestore, 'users', result.user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
+        const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email || '');
 
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        if (data.isActive === false && !isSuperAdminEmail) {
-          await signOut(auth as Auth);
-          throw new Error('Your account is currently pending approval by an administrator.');
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.isActive === false && !isSuperAdminEmail) {
+            await signOut(auth as Auth);
+            throw new Error('Your account is currently pending approval by an administrator.');
+          }
+          await updateDoc(userRef, { lastLogin: new Date() }).catch(e => console.warn('Activity sync failed', e));
+          await logLoginActivity(result.user.uid, email).catch(e => console.warn('Login audit failed', e));
         }
-        await updateDoc(userRef, { lastLogin: new Date() });
-        await logLoginActivity(result.user.uid, email);
+      } catch (e) {
+        console.warn('[Auth] Post-login sync warning:', e);
       }
       
       // Synchronize with server session using secure ID Token
@@ -176,7 +201,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await createSession(idToken);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to login';
-      setGlobalAlert(msg, 'error');
+      // Only show error if it's the main login failing
+      if (msg.toLowerCase().includes('password') || msg.toLowerCase().includes('user') || msg.toLowerCase().includes('approval')) {
+        setGlobalAlert(msg, 'error');
+      }
       throw error;
     }
   };
@@ -328,7 +356,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org'];
+  const SUPER_ADMIN_EMAILS = ['m.umairrana007@gmail.com', 'admin@jpsd.org', 'webadmin@jpsd.org'];
   const isSuperAdmin = user ? (SUPER_ADMIN_EMAILS.includes(user.email || '') || currentUserData?.role === UserRole.ADMIN) : false;
   const isAdmin = currentUserData?.role === UserRole.ADMIN || isSuperAdmin;
   const isContentManager = currentUserData?.role === UserRole.CONTENT_MANAGER;

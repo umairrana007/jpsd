@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getUsers, updateUserStatus, updateUserRole, logActivity, createUser } from '@/lib/firebaseUtils';
 import { withAuth } from '@/components/admin/withAuth';
 import { UserRole, User as AppUser } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 function AdminUsersPage() {
   const { user: authUser, setGlobalAlert } = useAuth();

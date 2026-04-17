@@ -86,7 +86,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
                 <Button
                   variant="primary"
                   size="lg"
-                  className={`!px-12 !py-8 text-xl !rounded-[2rem] shadow-2xl shadow-[#1ea05f]/20 hover:scale-[1.03] transition-all bg-[#1ea05f] hover:bg-[#168a50] ${language === 'ur' ? 'urdu-text' : ''}`}
+                  className={`!px-8 md:!px-12 !py-5 md:!py-8 text-lg md:text-xl !rounded-[2rem] shadow-2xl shadow-[#1ea05f]/20 hover:scale-[1.03] transition-all bg-[#1ea05f] hover:bg-[#168a50] ${language === 'ur' ? 'urdu-text' : ''}`}
                 >
                   {t('home.hero.cta.donate')}
                 </Button>
@@ -95,7 +95,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className={`!px-12 !py-8 text-xl !rounded-[2rem] border-slate-200 text-slate-600 hover:border-[#1ea05f] hover:text-[#1ea05f] glass-card ${language === 'ur' ? 'urdu-text' : ''}`}
+                  className={`!px-8 md:!px-12 !py-5 md:!py-8 text-lg md:text-xl !rounded-[2rem] border-slate-200 text-slate-600 hover:border-[#1ea05f] hover:text-[#1ea05f] glass-card ${language === 'ur' ? 'urdu-text' : ''}`}
                 >
                   {t('home.hero.cta.programs')}
                 </Button>

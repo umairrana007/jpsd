@@ -7,7 +7,19 @@ import { Input } from '@/components/ui/Input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { subscribeToNewsletter } from '@/lib/firebaseUtils';
 
-export const NewsletterSection: React.FC = () => {
+interface NewsletterSectionProps {
+  titleEn?: string;
+  titleUr?: string;
+  subtitleEn?: string;
+  subtitleUr?: string;
+}
+
+export const NewsletterSection: React.FC<NewsletterSectionProps> = ({
+  titleEn,
+  titleUr,
+  subtitleEn,
+  subtitleUr
+}) => {
   const { language } = useLanguage();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -24,6 +36,14 @@ export const NewsletterSection: React.FC = () => {
     }, 3000);
   };
 
+  // Use CMS titles if available, fallback to hardcoded
+  const sectionTitle = language === 'ur'
+    ? (titleUr || 'ہماری سرگرمیوں سے باخبر رہیں')
+    : (titleEn || 'Stay Updated with Our Work');
+  const sectionSubtitle = language === 'ur'
+    ? (subtitleUr || 'تازہ ترین اپڈیٹس اور اثرات کی رپورٹس کے لیے ہمارے نیوز لیٹر کو سبسکرائب کریں')
+    : (subtitleEn || 'Subscribe to our newsletter for the latest updates, success stories, and impact reports');
+
   return (
     <section className="py-20 bg-gradient-to-br from-primary-green/10 to-primary-blue/10">
       <div className="container mx-auto px-4">
@@ -35,12 +55,10 @@ export const NewsletterSection: React.FC = () => {
           className="max-w-4xl mx-auto text-center"
         >
           <h2 className={`text-4xl font-bold text-[#2c3e50] mb-4 ${language === 'ur' ? 'urdu-text' : ''}`}>
-            {language === 'ur' ? 'ہماری سرگرمیوں سے باخبر رہیں' : 'Stay Updated with Our Work'}
+            {sectionTitle}
           </h2>
           <p className={`text-xl text-gray-600 mb-8 ${language === 'ur' ? 'urdu-text' : ''}`}>
-            {language === 'ur' 
-              ? 'تازہ ترین اپڈیٹس اور اثرات کی رپورٹس کے لیے ہمارے نیوز لیٹر کو سبسکرائب کریں' 
-              : 'Subscribe to our newsletter for the latest updates, success stories, and impact reports'}
+            {sectionSubtitle}
           </p>
 
           {subscribed ? (
@@ -64,7 +82,7 @@ export const NewsletterSection: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="flex-1"
+                className="flex-1 bg-white border-slate-200 text-slate-800 focus:border-[#1ea05f] focus:ring-[#1ea05f]/20 shadow-sm"
                 id="newsletter-email"
                 label=""
               />

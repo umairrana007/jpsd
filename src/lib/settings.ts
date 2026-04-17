@@ -33,6 +33,25 @@ export interface SiteSettings {
   borderRadius?: number;
   // Navigation
   navMenu?: NavItemConfig[]; // Phase 10: Dynamic Navigation
+  // Homepage Sections
+  homepageSections?: string[]; // ['hero', 'stats', 'programs', 'events', 'testimonials', 'partners', 'newsletter']
+  // Section Titles (Bilingual)
+  programsTitleEn?: string;
+  programsTitleUr?: string;
+  programsSubtitleEn?: string;
+  programsSubtitleUr?: string;
+  eventsTitleEn?: string;
+  eventsTitleUr?: string;
+  eventsSubtitleEn?: string;
+  eventsSubtitleUr?: string;
+  testimonialsTitleEn?: string;
+  testimonialsTitleUr?: string;
+  testimonialsSubtitleEn?: string;
+  testimonialsSubtitleUr?: string;
+  newsletterTitleEn?: string;
+  newsletterTitleUr?: string;
+  newsletterSubtitleEn?: string;
+  newsletterSubtitleUr?: string;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -60,75 +79,109 @@ const DEFAULT_SETTINGS: SiteSettings = {
     { label: 'Welfare', labelUrdu: 'فلاح و بہبود', href: '/welfare' },
     { label: 'Education', labelUrdu: 'تعلیم', href: '/education' },
     { label: 'Causes', labelUrdu: 'مقاصد', href: '/causes' },
-  ]
+  ],
+  // Homepage Sections (default order)
+  homepageSections: ['hero', 'stats', 'programs', 'events', 'testimonials', 'partners', 'newsletter'],
+  // Section Titles - Programs
+  programsTitleEn: 'Our Programs & Initiatives',
+  programsTitleUr: 'ہمارے پروگرام اور اقدامات',
+  programsSubtitleEn: 'Discover how we are transforming communities through targeted welfare programs',
+  programsSubtitleUr: 'دیکھیں کہ ہم کس طرح ہدف والے فلاحی پروگراموں کے ذریعے کمیونٹیز کو تبدیل کر رہے ہیں',
+  // Section Titles - Events
+  eventsTitleEn: 'Recent Events & Activities',
+  eventsTitleUr: 'حالیہ ایونٹس اور سرگرمیاں',
+  eventsSubtitleEn: 'See how we\'re making a difference in communities across Pakistan',
+  eventsSubtitleUr: 'دیکھیں کہ ہم پاکستان بھر کی کمیونٹیز میں کس طرح مثبت تبدیلی لا رہے ہیں',
+  // Section Titles - Testimonials
+  testimonialsTitleEn: 'Success Stories & Trust',
+  testimonialsTitleUr: 'کامیابی کی کہانیاں اور اعتماد',
+  testimonialsSubtitleEn: 'Hear from our global community of donors, volunteers, and the lives we\'ve touched together.',
+  testimonialsSubtitleUr: 'ہمارے ڈونرز، رضاکاروں اور ان لوگوں کی کہانیاں سنیں جن کی ہم نے مل کر مدد کی ہے۔',
+  // Section Titles - Newsletter
+  newsletterTitleEn: 'Stay Connected',
+  newsletterTitleUr: 'جڑے رہیں',
+  newsletterSubtitleEn: 'Subscribe to receive updates on our mission and impact stories',
+  newsletterSubtitleUr: 'ہمارے مشن اور اثر کی کہانیوں پر اپ ڈیٹس وصول کرنے کے لیے سبسکرائب کریں',
 };
 
 /**
  * Fetches global site settings from Firestore using standard fetch for Next.js caching.
- * Included graceful fallback if Firebase is unreachable.
+ * Falls back to defaults if Firebase is unreachable.
  */
 export const getGlobalConfig = cache(async (): Promise<SiteSettings> => {
-  // During static generation/build, immediately return default settings to prevent hanging
-  if (!PROJECT_ID || process.env.npm_lifecycle_event === 'build' || process.env.NEXT_PHASE === 'phase-production-build') {
+  if (!PROJECT_ID) {
     return DEFAULT_SETTINGS;
   }
 
   try {
+    // 3-second timeout to prevent hanging
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     const response = await fetch(FIRESTORE_URL, {
       signal: controller.signal,
       next: { 
         tags: ['global-config'],
-        revalidate: 60 // Lowered for more reactive portal updates
-      },
-      cache: 'no-store' // Ensure fresh data for portal users
+        revalidate: 60 // Cache for 1 minute, admin updates will revalidate
+      }
     });
-    
+
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      if (response.status === 404 || response.status === 403) {
-        return DEFAULT_SETTINGS;
-      }
       return DEFAULT_SETTINGS;
     }
 
     const data = await response.json();
+    
+    // Parse Firestore response format
     const fields = data.fields || {};
     
-    // Parse navigation menu
-    const navMenuRaw = fields.navMenu?.arrayValue?.values || [];
-    const navMenu = navMenuRaw.map((v: any) => ({
-      label: v.mapValue?.fields?.label?.stringValue || 'Link',
-      labelUrdu: v.mapValue?.fields?.labelUrdu?.stringValue || '',
-      href: v.mapValue?.fields?.href?.stringValue || '#'
-    }));
-
     return {
       showHero: fields.showHero?.booleanValue ?? DEFAULT_SETTINGS.showHero,
       heroTitleEn: fields.heroTitleEn?.stringValue ?? DEFAULT_SETTINGS.heroTitleEn,
       heroTitleUr: fields.heroTitleUr?.stringValue ?? DEFAULT_SETTINGS.heroTitleUr,
-      heroImage: fields.heroImage?.stringValue || DEFAULT_SETTINGS.heroImage,
+      heroImage: fields.heroImage?.stringValue ?? DEFAULT_SETTINGS.heroImage,
       primaryColor: fields.primaryColor?.stringValue ?? DEFAULT_SETTINGS.primaryColor,
       secondaryColor: fields.secondaryColor?.stringValue ?? DEFAULT_SETTINGS.secondaryColor,
-      logoUrl: fields.logoUrl?.stringValue || DEFAULT_SETTINGS.logoUrl,
-      livesServed: Number(fields.livesServed?.integerValue || fields.livesServed?.doubleValue || DEFAULT_SETTINGS.livesServed),
-      donationsReceived: Number(fields.donationsReceived?.integerValue || fields.donationsReceived?.doubleValue || DEFAULT_SETTINGS.donationsReceived),
-      volunteersCount: Number(fields.volunteersCount?.integerValue || fields.volunteersCount?.doubleValue || DEFAULT_SETTINGS.volunteersCount),
-      programsCount: Number(fields.programsCount?.integerValue || fields.programsCount?.doubleValue || DEFAULT_SETTINGS.programsCount),
-      lastUpdated: fields.lastUpdated?.timestampValue,
-      siteName: fields.siteName?.stringValue || DEFAULT_SETTINGS.siteName,
-      siteDescription: fields.siteDescription?.stringValue || DEFAULT_SETTINGS.siteDescription,
-      contactEmail: fields.contactEmail?.stringValue || DEFAULT_SETTINGS.contactEmail,
-      contactPhone: fields.contactPhone?.stringValue || DEFAULT_SETTINGS.contactPhone,
-      address: fields.address?.stringValue || DEFAULT_SETTINGS.address,
-      fontFamily: fields.fontFamily?.stringValue || DEFAULT_SETTINGS.fontFamily,
-      borderRadius: Number(fields.borderRadius?.integerValue || fields.borderRadius?.doubleValue || DEFAULT_SETTINGS.borderRadius),
-      navMenu: navMenu.length > 0 ? navMenu : DEFAULT_SETTINGS.navMenu,
+      logoUrl: fields.logoUrl?.stringValue ?? DEFAULT_SETTINGS.logoUrl,
+      livesServed: fields.livesServed?.integerValue ? Number(fields.livesServed.integerValue) : DEFAULT_SETTINGS.livesServed,
+      donationsReceived: fields.donationsReceived?.integerValue ? Number(fields.donationsReceived.integerValue) : DEFAULT_SETTINGS.donationsReceived,
+      volunteersCount: fields.volunteersCount?.integerValue ? Number(fields.volunteersCount.integerValue) : DEFAULT_SETTINGS.volunteersCount,
+      programsCount: fields.programsCount?.integerValue ? Number(fields.programsCount.integerValue) : DEFAULT_SETTINGS.programsCount,
+      siteName: fields.siteName?.stringValue ?? DEFAULT_SETTINGS.siteName,
+      siteDescription: fields.siteDescription?.stringValue ?? DEFAULT_SETTINGS.siteDescription,
+      contactEmail: fields.contactEmail?.stringValue ?? DEFAULT_SETTINGS.contactEmail,
+      contactPhone: fields.contactPhone?.stringValue ?? DEFAULT_SETTINGS.contactPhone,
+      address: fields.address?.stringValue ?? DEFAULT_SETTINGS.address,
+      fontFamily: fields.fontFamily?.stringValue ?? DEFAULT_SETTINGS.fontFamily,
+      borderRadius: fields.borderRadius?.integerValue ? Number(fields.borderRadius.integerValue) : DEFAULT_SETTINGS.borderRadius,
+      navMenu: fields.navMenu?.arrayValue?.values?.map((item: any) => ({
+        label: item.mapValue?.fields?.label?.stringValue || '',
+        labelUrdu: item.mapValue?.fields?.labelUrdu?.stringValue || '',
+        href: item.mapValue?.fields?.href?.stringValue || ''
+      })) ?? DEFAULT_SETTINGS.navMenu,
+      homepageSections: fields.homepageSections?.arrayValue?.values?.map((item: any) => item.stringValue) ?? DEFAULT_SETTINGS.homepageSections,
+      programsTitleEn: fields.programsTitleEn?.stringValue ?? DEFAULT_SETTINGS.programsTitleEn,
+      programsTitleUr: fields.programsTitleUr?.stringValue ?? DEFAULT_SETTINGS.programsTitleUr,
+      programsSubtitleEn: fields.programsSubtitleEn?.stringValue ?? DEFAULT_SETTINGS.programsSubtitleEn,
+      programsSubtitleUr: fields.programsSubtitleUr?.stringValue ?? DEFAULT_SETTINGS.programsSubtitleUr,
+      eventsTitleEn: fields.eventsTitleEn?.stringValue ?? DEFAULT_SETTINGS.eventsTitleEn,
+      eventsTitleUr: fields.eventsTitleUr?.stringValue ?? DEFAULT_SETTINGS.eventsTitleUr,
+      eventsSubtitleEn: fields.eventsSubtitleEn?.stringValue ?? DEFAULT_SETTINGS.eventsSubtitleEn,
+      eventsSubtitleUr: fields.eventsSubtitleUr?.stringValue ?? DEFAULT_SETTINGS.eventsSubtitleUr,
+      testimonialsTitleEn: fields.testimonialsTitleEn?.stringValue ?? DEFAULT_SETTINGS.testimonialsTitleEn,
+      testimonialsTitleUr: fields.testimonialsTitleUr?.stringValue ?? DEFAULT_SETTINGS.testimonialsTitleUr,
+      testimonialsSubtitleEn: fields.testimonialsSubtitleEn?.stringValue ?? DEFAULT_SETTINGS.testimonialsSubtitleEn,
+      testimonialsSubtitleUr: fields.testimonialsSubtitleUr?.stringValue ?? DEFAULT_SETTINGS.testimonialsSubtitleUr,
+      newsletterTitleEn: fields.newsletterTitleEn?.stringValue ?? DEFAULT_SETTINGS.newsletterTitleEn,
+      newsletterTitleUr: fields.newsletterTitleUr?.stringValue ?? DEFAULT_SETTINGS.newsletterTitleUr,
+      newsletterSubtitleEn: fields.newsletterSubtitleEn?.stringValue ?? DEFAULT_SETTINGS.newsletterSubtitleEn,
+      newsletterSubtitleUr: fields.newsletterSubtitleUr?.stringValue ?? DEFAULT_SETTINGS.newsletterSubtitleUr,
+      lastUpdated: new Date().toISOString(),
     };
-  } catch (error: any) {
+  } catch (error) {
+    // Silently fall back to defaults (Firestore not configured yet)
     return DEFAULT_SETTINGS;
   }
 });

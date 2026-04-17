@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { verifySession } from '@/app/login/actions';
-import { adminDb } from '@/lib/firebaseAdmin';
 
 /**
  * Retrieves the user information from the secure session cookie.
@@ -10,22 +9,32 @@ export async function getUserFromCookie(request: NextRequest) {
   const session = request.cookies.get('session');
   if (!session) return null;
   
-  const claims = await verifySession(session.value);
-  if (!claims) return null;
-  
   try {
-    // Fetch the user's role and latest profile data from Firestore
-    // This ensures permissions are based on the latest database state, not stale token data
-    const userDoc = await adminDb.collection('users').doc(claims.uid).get();
-    const userData = userDoc.data();
+    const claims = await verifySession(session.value);
+    if (!claims) return null;
     
-    return { 
-      ...claims,
-      role: userData?.role || 'donor',
-      isActive: userData?.isActive !== false,
-    };
+    // Try to fetch user role from Firestore (requires Firebase Admin)
+    try {
+      const { adminDb } = await import('@/lib/firebaseAdmin');
+      const userDoc = await adminDb.collection('users').doc(claims.uid).get();
+      const userData = userDoc.data();
+      
+      return { 
+        ...claims,
+        role: userData?.role || 'donor',
+        isActive: userData?.isActive !== false,
+      };
+    } catch (firestoreError) {
+      // If Firestore access fails, return basic claims with default role
+      console.warn('[Auth Lib] Firestore access failed, using session claims only:', firestoreError);
+      return {
+        ...claims,
+        role: 'donor', // Default role if Firestore is unavailable
+        isActive: true,
+      };
+    }
   } catch (error) {
-    console.error('[Auth Lib] Firestore verification failed:', error);
+    console.error('[Auth Lib] Session verification failed:', error);
     return null;
   }
 }

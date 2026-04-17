@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { UserRole } from '@/types';
 
 export default function UserDashboardLayout({
   children,
@@ -38,11 +39,15 @@ export default function UserDashboardLayout({
   const menuItems = [...baseMenuItems];
 
   // Specific Role Visibility
-  if (currentUserData?.role === 'volunteer') {
+  if (currentUserData?.role === UserRole.VOLUNTEER) {
     menuItems.splice(3, 0, { label: isUrdu ? 'رضاکارانہ پورٹل' : 'Volunteer Force', icon: <FiUser />, href: '/dashboard/volunteer' });
   }
 
-  if (currentUserData?.role === 'admin') {
+  if (currentUserData?.role === UserRole.PROFESSIONAL || currentUserData?.role === UserRole.EXPERT) {
+    menuItems.splice(3, 0, { label: isUrdu ? 'پروفیشنل پورٹل' : 'Expert Portal', icon: <FiZap />, href: '/dashboard/professional' });
+  }
+
+  if (currentUserData?.role === UserRole.ADMIN) {
     menuItems.push({ label: isUrdu ? 'ایڈمن پینل' : 'Admin Panel', icon: <FiShield />, href: '/dashboard/admin' });
   }
 

@@ -7,7 +7,7 @@ import {
   FiHome, FiDollarSign, FiUsers, FiUser, 
   FiBarChart2, FiSettings, FiMenu, FiLayout, 
   FiImage, FiFileText, FiPieChart, FiBriefcase, 
-  FiTarget, FiZap, FiMail, FiActivity, FiGlobe, FiLayers 
+  FiTarget, FiZap, FiMail, FiActivity, FiGlobe, FiLayers, FiDatabase, FiLogOut
 } from 'react-icons/fi';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -34,6 +34,7 @@ interface AdminStats {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const pathname = usePathname();
   const { language, t } = useLanguage();
   const isUrdu = language === 'ur';
@@ -44,8 +45,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                pathname?.startsWith('/admin/theme');
   
   const portalName = isWebsiteManagement ? "Website Management" : "Administration Portal";
+  
+  const { currentUserData, logout } = useAuth();
 
-  const { currentUserData } = useAuth();
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = '/login';
+  };
 
   const mainNavItems = [
     { href: '/admin', label: 'Dashboard', icon: FiHome },
@@ -63,6 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   const managementNavItems = [
+    { href: '/admin/homepage-builder', label: 'Homepage Builder', icon: FiLayout, role: [UserRole.ADMIN, UserRole.CONTENT_MANAGER] },
     { href: '/admin/pages', label: 'Page Manager', icon: FiFileText, collection: 'pages' },
     { href: '/admin/testimonials', label: 'Testimonials', icon: FiUsers, collection: 'testimonials' },
     { href: '/admin/partners', label: 'Partners', icon: FiBriefcase, collection: 'partners' },
@@ -72,6 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/media', label: 'Media Vault', icon: FiImage, collection: 'media' },
     { href: '/admin/email-templates', label: 'Email Templates', icon: FiMail, role: [UserRole.ADMIN] },
     { href: '/admin/settings', label: 'Foundation Identity', icon: FiSettings, role: [UserRole.ADMIN] },
+    { href: '/admin/data-management', label: 'Data Management', icon: FiDatabase, role: [UserRole.ADMIN] },
   ];
 
   const hasAccess = (item: any) => {
@@ -145,7 +153,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </>
             )}
           </nav>
-          <div className="mt-auto pt-6 border-t border-slate-200/50 px-4 flex items-center gap-3 pb-4">
+          <div className="mt-auto pt-6 border-t border-slate-200/50 px-4 flex items-center gap-3 pb-4 group relative">
             <div className="w-10 h-10 rounded-full bg-[#1ea05f]/20 flex items-center justify-center overflow-hidden flex-shrink-0">
               <div className="w-full h-full bg-[#1ea05f] text-white flex items-center justify-center font-bold">
                 {currentUserData?.name?.charAt(0) || 'M'}
@@ -155,6 +163,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <p className="text-sm font-bold text-slate-800 truncate">{currentUserData?.name || 'Management'}</p>
               <p className="text-xs text-slate-400 truncate">{currentUserData?.role?.replace('_', ' ') || 'Super Admin'}</p>
             </div>
+            <button 
+              onClick={() => setShowLogoutConfirm(true)}
+              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+              title="Logout"
+            >
+              <FiLogOut className="text-lg" />
+            </button>
+
+            {/* Logout Confirmation Prompt */}
+            {showLogoutConfirm && (
+              <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <p className="text-xs font-bold text-slate-800 mb-3">Terminate Secure Session?</p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={handleLogout}
+                    className="flex-1 py-2 bg-red-500 text-white text-[10px] font-black uppercase rounded-xl hover:bg-red-600 transition-colors"
+                  >
+                    Confirm
+                  </button>
+                  <button 
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className="flex-1 py-2 bg-slate-100 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -181,7 +217,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="text-[10px] font-medium mt-1">{item.label.split(' ')[0]}</span>
             </Link>
           ))}
+          <button 
+            onClick={() => setShowLogoutConfirm(true)}
+            className="flex flex-col items-center justify-center px-3 py-1 rounded-2xl text-slate-400 hover:text-red-500"
+          >
+            <FiLogOut className="text-xl" />
+            <span className="text-[10px] font-medium mt-1">Logout</span>
+          </button>
         </nav>
+
+        {/* Global Logout Confirmation Overlay */}
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <div 
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity"
+              onClick={() => setShowLogoutConfirm(false)}
+            />
+            <div className="relative bg-white w-full max-w-[320px] rounded-[2rem] shadow-2xl border border-slate-200 p-8 pt-10 transform transition-all animate-in zoom-in-95 duration-200">
+              <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 mx-auto mb-6">
+                <FiLogOut size={32} />
+              </div>
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase mb-2">Secure Logout</h3>
+                <p className="text-sm text-slate-500 font-medium">Are you sure you want to terminate your current session?</p>
+              </div>
+              <div className="space-y-3">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full py-4 bg-red-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-red-600 shadow-xl shadow-red-500/20 transition-all active:scale-95"
+                >
+                  Confirm Logout
+                </button>
+                <button 
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="w-full py-4 bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </ProtectedRoute>
   );

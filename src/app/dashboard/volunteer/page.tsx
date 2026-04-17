@@ -84,11 +84,14 @@ export default function VolunteerPortalClean() {
         joinedAt: new Date().toISOString(),
         hours: 124
       });
-      const url = URL.createObjectURL(blob as Blob);
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `JPSD_Merit_Accreditation.pdf`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
       setAlert({ message: 'Commencing Certificate Download. Protocol Complete.', type: 'success' });
     } catch (e) {
       setAlert({ message: 'PDF Generation Failed. System Error.', type: 'error' });

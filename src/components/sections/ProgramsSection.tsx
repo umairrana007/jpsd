@@ -71,7 +71,19 @@ const samplePrograms: ProgramType[] = [
   },
 ];
 
-export const ProgramsSection: React.FC = () => {
+interface ProgramsSectionProps {
+  titleEn?: string;
+  titleUr?: string;
+  subtitleEn?: string;
+  subtitleUr?: string;
+}
+
+export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ 
+  titleEn, 
+  titleUr, 
+  subtitleEn, 
+  subtitleUr 
+}) => {
   const { language, t } = useLanguage();
   const [programs, setPrograms] = useState<ProgramType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +112,10 @@ export const ProgramsSection: React.FC = () => {
 
   const categories = ['all', 'education', 'health', 'food', 'water'];
 
+  // Use CMS titles if available, fallback to translation system
+  const sectionTitle = language === 'ur' ? (titleUr || t('programs.title')) : (titleEn || t('programs.title'));
+  const sectionSubtitle = language === 'ur' ? (subtitleUr || t('programs.subtitle')) : (subtitleEn || t('programs.subtitle'));
+
   return (
     <section className="py-32 bg-[#f8fafc] relative">
       {/* Background Pattern */}
@@ -119,10 +135,10 @@ export const ProgramsSection: React.FC = () => {
               {t('programs.badge')}
             </span>
             <h2 className={`text-4xl md:text-5xl font-black text-[#1e293b] leading-tight tracking-tight ${language === 'ur' ? 'urdu-text !leading-[2.0] py-4' : 'english-text'}`}>
-              {t('programs.title')}
+              {sectionTitle}
             </h2>
             <p className={`text-gray-500 text-xl font-light ${language === 'ur' ? 'urdu-text' : 'english-text'}`}>
-              {t('programs.subtitle')}
+              {sectionSubtitle}
             </p>
           </motion.div>
 

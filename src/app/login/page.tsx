@@ -1,5 +1,7 @@
 'use client';
 
+// Authentication page for JPSD Portal
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
@@ -25,7 +27,13 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push('/dashboard'); 
+      // Instead of hardcoded emails, we'll let the role-based logic handle it.
+      // We'll redirect to a generic /redirect path or handle it here by watching currentUserData.
+      // For now, let's use a small delay and then check the role if available, 
+      // otherwise default to dashboard which will handle its own redirection.
+      
+      router.push('/dashboard');
+      router.refresh();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -38,7 +46,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      router.push('/dashboard');
+      // Role detection happens after login
+      router.push('/donor/dashboard');
+      setTimeout(() => router.refresh(), 100);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -47,7 +57,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-32 md:pt-40 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-32 md:pt-40 pb-20 md:pb-32 p-6 relative overflow-hidden">
       {/* Animated Background Orbs */}
       <div className="absolute top-0 -left-20 w-96 h-96 bg-[#1ea05f]/20 rounded-full blur-[120px] animate-pulse"></div>
       <div className="absolute bottom-0 -right-20 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px]"></div>

@@ -1,203 +1,519 @@
 'use client';
 
-import React, { useState } from 'react';
-import { 
-  FiFilePlus, FiEdit3, FiEye, FiTrash2, 
-  FiLayout, FiSearch, FiFilter, FiMoreVertical,
-  FiCheckCircle, FiClock, FiAlertCircle, FiSettings,
-  FiGlobe, FiShare2, FiLayers
-} from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { 
+  FiPlus, FiEdit2, FiTrash2, FiEye, FiSave, 
+  FiCheck, FiX, FiType, FiImage, FiSettings,
+  FiArrowUp, FiArrowDown, FiRefreshCw
+} from 'react-icons/fi';
+import { useAuth } from '@/contexts/AuthContext';
+import { withAuth } from '@/components/admin/withAuth';
+import { UserRole } from '@/types';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
+import { db } from '@/lib/firebase';
+import { 
+  collection, 
+  getDocs, 
+  doc, 
+  setDoc, 
+  deleteDoc, 
+  serverTimestamp,
+  Firestore 
+} from 'firebase/firestore';
 
-interface PageItem {
+interface PageBlock {
   id: string;
-  title: string;
-  slug: string;
-  status: 'published' | 'draft' | 'scheduled';
-  template: string;
-  lastModified: string;
-  author: string;
-  seoScore: number;
+  type: 'heading' | 'text' | 'image' | 'divider' | 'columns' | 'button' | 'spacer';
+  content: string;
+  contentUr?: string;
+  config?: Record<string, any>;
 }
 
-export default function PageManagerPage() {
-  const [pages, setPages] = useState<PageItem[]>([
-    { id: '1', title: 'Home Page', slug: '/', status: 'published', template: 'Hero Template', lastModified: '2 hours ago', author: 'Admin Main', seoScore: 94 },
-    { id: '2', title: 'Humanitarian Causes', slug: '/causes', status: 'published', template: 'Grid Template', lastModified: '1 day ago', author: 'Content Lead', seoScore: 88 },
-    { id: '3', title: 'Annual Zakat Guide', slug: '/zakat-guide', status: 'draft', template: 'Article Template', lastModified: '3 days ago', author: 'Shariah Board', seoScore: 45 },
-    { id: '4', title: 'Emergency Relief 2026', slug: '/emergency-relief', status: 'scheduled', template: 'Landing Page', lastModified: '5 days ago', author: 'Field Ops', seoScore: 78 },
-  ]);
+interface Page {
+  id: string;
+  slug: string;
+  title: string;
+  titleUr?: string;
+  content: string;
+  blocks: PageBlock[];
+  status: 'draft' | 'published';
+  createdAt: Date | any;
+  updatedAt: Date | any;
+  metaTitle?: string;
+  metaDescription?: string;
+  featuredImage?: string;
+}
 
-  const [searchQuery, setSearchQuery] = useState('');
+function PageManagerPage() {
+  const { setGlobalAlert } = useAuth();
+  const [pages, setPages] = useState<Page[]>([]);
+  const [selectedPage, setSelectedPage] = useState<Page | null>(null);
+  const [editingBlock, setEditingBlock] = useState<PageBlock | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const statusColors = {
-    published: 'bg-green-100 text-green-700',
-    draft: 'bg-amber-100 text-amber-700',
-    scheduled: 'bg-blue-100 text-blue-700'
+  useEffect(() => {
+    const fetchPages = async () => {
+      if (!db) return;
+      setLoading(true);
+      try {
+        const querySnapshot = await getDocs(collection(db as Firestore, 'pages'));
+        const docs = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        })) as Page[];
+        
+        if (docs.length > 0) {
+          setPages(docs);
+        } else {
+          // Default pages if none exist
+          const defaultPage: Page = {
+            id: 'about-us',
+            slug: 'about-us',
+            title: 'About Us',
+            titleUr: 'ہمارے بارے میں',
+            content: '',
+            blocks: [
+              { id: 'b1', type: 'heading', content: 'About Baitussalam', contentUr: 'بیت السلام کے بارے میں' },
+              { id: 'b2', type: 'text', content: 'We are dedicated to serving humanity...' },
+            ],
+            status: 'published',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          setPages([defaultPage]);
+          await setDoc(doc(db as Firestore, 'pages', defaultPage.id), defaultPage);
+        }
+      } catch (error) {
+        console.error('Error fetching pages:', error);
+        setGlobalAlert('Failed to synchronize pages with database.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPages();
+  }, [db, setGlobalAlert]);
+
+  const savePageToDb = async (page: Page) => {
+    if (!db) return;
+    setSaving(true);
+    try {
+      await setDoc(doc(db as Firestore, 'pages', page.id), {
+        ...page,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      // Update local state to reflect the change
+      setPages(prev => prev.map(p => p.id === page.id ? page : p));
+    } catch (error) {
+      console.error('Error saving page:', error);
+      setGlobalAlert('Failed to sync page to cloud storage.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const getSeoColor = (score: number) => {
-    if (score >= 90) return 'text-green-500 bg-green-500/10';
-    if (score >= 70) return 'text-blue-500 bg-blue-500/10';
-    return 'text-amber-500 bg-amber-500/10';
+  const handleCreatePage = async () => {
+    const id = Date.now().toString();
+    const newPage: Page = {
+      id,
+      slug: 'new-page-' + id,
+      title: 'New Page',
+      titleUr: 'نیا صفحہ',
+      content: '',
+      blocks: [],
+      status: 'draft',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    setPages([...pages, newPage]);
+    setSelectedPage(newPage);
+    await savePageToDb(newPage);
   };
+
+  const handleDeletePage = async (id: string) => {
+    if (!db) return;
+    if (confirm('Are you sure you want to delete this page?')) {
+      try {
+        await deleteDoc(doc(db as Firestore, 'pages', id));
+        setPages(pages.filter(p => p.id !== id));
+        if (selectedPage?.id === id) setSelectedPage(null);
+        setGlobalAlert('Page deleted from database.', 'success');
+      } catch (error) {
+        setGlobalAlert('Failed to delete page.', 'error');
+      }
+    }
+  };
+
+  const handlePublishPage = async () => {
+    if (!selectedPage || !db) return;
+    
+    setSaving(true);
+    try {
+      const updatedPage = {
+        ...selectedPage,
+        status: 'published' as const,
+        updatedAt: new Date(),
+      };
+      
+      await savePageToDb(updatedPage);
+      setSelectedPage(updatedPage);
+      setGlobalAlert('Page published successfully!', 'success');
+    } catch (e) {
+      setGlobalAlert('Publishing failed.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddBlock = async (type: PageBlock['type']) => {
+    if (!selectedPage || !db) return;
+    
+    const newBlock: PageBlock = {
+      id: `block-${Date.now()}`,
+      type,
+      content: type === 'heading' ? 'New Heading' : type === 'text' ? 'Add your content here...' : '',
+      contentUr: type === 'heading' ? 'نیا ہیڈنگ' : '',
+    };
+    
+    const updatedPage = {
+      ...selectedPage,
+      blocks: [...selectedPage.blocks, newBlock],
+      updatedAt: new Date(),
+    };
+    
+    setSelectedPage(updatedPage);
+    setEditingBlock(newBlock);
+    await savePageToDb(updatedPage);
+  };
+
+  const handleUpdateBlock = async (blockId: string, updates: Partial<PageBlock>) => {
+    if (!selectedPage || !db) return;
+    
+    const updatedBlocks = selectedPage.blocks.map(b => 
+      b.id === blockId ? { ...b, ...updates } : b
+    );
+    
+    const updatedPage = {
+      ...selectedPage,
+      blocks: updatedBlocks,
+      updatedAt: new Date(),
+    };
+    
+    setSelectedPage(updatedPage);
+    const updatedEditingBlock = updatedBlocks.find(b => b.id === blockId);
+    if (updatedEditingBlock) setEditingBlock(updatedEditingBlock);
+    
+    await savePageToDb(updatedPage);
+  };
+
+  const handleDeleteBlock = async (blockId: string) => {
+    if (!selectedPage || !db) return;
+    
+    const updatedPage = {
+      ...selectedPage,
+      blocks: selectedPage.blocks.filter(b => b.id !== blockId),
+      updatedAt: new Date(),
+    };
+    
+    setSelectedPage(updatedPage);
+    if (editingBlock?.id === blockId) setEditingBlock(null);
+    await savePageToDb(updatedPage);
+  };
+
+  const handleMoveBlock = async (blockId: string, direction: 'up' | 'down') => {
+    if (!selectedPage || !db) return;
+    
+    const index = selectedPage.blocks.findIndex(b => b.id === blockId);
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === selectedPage.blocks.length - 1)) return;
+    
+    const newBlocks = [...selectedPage.blocks];
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    [newBlocks[index], newBlocks[swapIndex]] = [newBlocks[swapIndex], newBlocks[index]];
+    
+    const updatedPage = {
+      ...selectedPage,
+      blocks: newBlocks,
+      updatedAt: new Date(),
+    };
+    
+    setSelectedPage(updatedPage);
+    await savePageToDb(updatedPage);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f9f9fb]">
+        <div className="w-16 h-16 border-4 border-[#1ea05f] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 pb-20">
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+    <div className="space-y-8 pb-20">
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Humanitarian Page Orchestrator</h2>
-          <p className="text-slate-500 font-medium">Manage global digital touchpoints and narrative flow.</p>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight italic uppercase">
+            Page Manager
+          </h1>
+          <p className="text-slate-500 mt-2">Create and manage website pages</p>
         </div>
-        <Link 
-          href="/admin/pages/create"
-          className="px-8 py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl hover:bg-slate-800 transition-all flex items-center gap-2 group"
+        <button
+          onClick={handleCreatePage}
+          className="px-6 py-3 bg-[#1ea05f] text-white font-bold rounded-2xl hover:bg-[#1ea05f]/90 transition-all flex items-center gap-2"
         >
-          <FiFilePlus className="group-hover:scale-110 transition-transform" />
-          <span>Genesis New Page</span>
-        </Link>
-      </header>
-
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/50 backdrop-blur-md p-6 rounded-[2.5rem] border border-white">
-        <div className="flex gap-2">
-          {['All Entities', 'Published', 'Drafts', 'Scheduled'].map((tab) => (
-            <button key={tab} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-              tab === 'All Entities' ? 'bg-[#1ea05f] text-white shadow-lg shadow-[#1ea05f]/20' : 'text-slate-400 hover:bg-white hover:text-slate-800'
-            }`}>
-              {tab}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative group flex-1 md:w-64">
-             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1ea05f] transition-colors" />
-             <input 
-              type="text" 
-              placeholder="Search by title or slug..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-[#1ea05f]/20 outline-none transition-all"
-             />
-          </div>
-          <button className="flex items-center gap-2 px-4 py-4 border border-slate-200 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all">
-             <FiFilter /> Filter
-          </button>
-        </div>
+          <FiPlus size={18} />
+          New Page
+        </button>
       </div>
 
-      <div className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden shadow-sm">
-         <table className="w-full text-left">
-            <thead className="bg-slate-50/50 border-b border-slate-100">
-              <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                <th className="px-10 py-8">Page Entity</th>
-                <th className="px-10 py-8">Status Protocol</th>
-                <th className="px-10 py-8">Architecture</th>
-                <th className="px-10 py-8">SEO Intelligence</th>
-                <th className="px-10 py-8">Foundation Registry</th>
-                <th className="px-10 py-8"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-1 space-y-4">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-black text-slate-800 mb-4 italic uppercase">All Pages</h2>
+            <div className="space-y-2">
               {pages.map((page) => (
-                <tr key={page.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer">
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#1ea05f]/10 flex items-center justify-center text-[#1ea05f] font-black italic">
-                        <FiGlobe />
-                      </div>
-                      <div>
-                        <p className="text-sm font-black text-slate-800 italic uppercase truncate max-w-[200px]">{page.title}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
-                           <FiShare2 className="text-blue-400" /> jpsd.org.pk{page.slug}
-                        </p>
-                      </div>
+                <div
+                  key={page.id}
+                  onClick={() => setSelectedPage(page)}
+                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                    selectedPage?.id === page.id
+                      ? 'border-[#1ea05f] bg-[#1ea05f]/5'
+                      : 'border-slate-100 hover:border-slate-200'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-slate-800">{page.title}</h3>
+                      <p className="text-sm text-slate-500">/{page.slug}</p>
                     </div>
-                  </td>
-                  <td className="px-10 py-6">
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${statusColors[page.status]}`}>
-                       {page.status}
-                    </span>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                       <FiLayers className="text-[#1ea05f]" /> {page.template}
+                    <div className="flex gap-2">
+                      <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
+                        page.status === 'published' 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-yellow-100 text-yellow-700'
+                      }`}>
+                        {page.status.toUpperCase()}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePage(page.id); }}
+                        className="p-1 hover:bg-red-50 text-red-500 rounded transition-all"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
                     </div>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-2">
-                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs ${getSeoColor(page.seoScore)}`}>
-                          {page.seoScore}
-                       </div>
-                       <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${page.seoScore >= 90 ? 'bg-green-500' : 'bg-amber-500'}`} style={{ width: `${page.seoScore}%` }} />
-                       </div>
-                    </div>
-                  </td>
-                  <td className="px-10 py-6">
-                     <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">{page.author}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{page.lastModified}</p>
-                  </td>
-                  <td className="px-10 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <Link href={`/admin/pages/editor/${page.id}`} className="w-10 h-10 border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all">
-                          <FiEdit3 />
-                       </Link>
-                       <button className="w-10 h-10 border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:bg-[#1ea05f] hover:text-white transition-all">
-                          <FiEye />
-                       </button>
-                       <button className="w-10 h-10 border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-                          <FiTrash2 />
-                       </button>
-                    </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-         </table>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         <div className="bg-slate-900 p-10 rounded-[3.5rem] text-white shadow-2xl relative overflow-hidden group border border-white/5">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1ea05f]/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-125 transition-transform" />
-            <FiLayout className="text-[#1ea05f] text-4xl mb-6 opacity-80" />
-            <h4 className="text-xl font-black italic uppercase tracking-widest mb-4">Template Engine</h4>
-            <p className="text-sm font-medium text-slate-400 leading-relaxed mb-8">Deploy standardized foundation landing pages with zero configuration.</p>
-            <button className="w-full py-4 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">Configure Factory Templates</button>
-         </div>
-
-         <div className="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm space-y-6">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
-               <FiGlobe size={24} />
             </div>
-            <h4 className="text-xl font-black text-slate-800 italic uppercase tracking-widest">SEO Outreach Core</h4>
-            <div className="space-y-4">
-               {[
-                 { label: 'Search Visibility', val: '88%' },
-                 { label: 'Keyword Velocity', val: '72%' },
-                 { label: 'Backlink Authority', val: '64%' },
-               ].map((stat, i) => (
-                 <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                    <span className="text-slate-400">{stat.label}</span>
-                    <span className="text-slate-800 italic">{stat.val}</span>
-                 </div>
-               ))}
-            </div>
-            <button className="w-full py-4 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-white transition-all">Deep Optimization Analysis</button>
-         </div>
+          </div>
+        </div>
 
-         <div className="bg-gradient-to-br from-[#1ea05f] to-[#15804a] p-10 rounded-[3.5rem] text-white shadow-2xl shadow-[#1ea05f]/20 flex flex-col justify-between">
-            <div className="space-y-4">
-              <FiSettings size={32} className="opacity-50" />
-              <h4 className="text-2xl font-black italic uppercase italic tracking-tighter">Genesis Protocol</h4>
-              <p className="text-sm font-medium opacity-80 leading-relaxed">
-                 Create dynamic sub-domains and hidden campaign landing pages for rapid disaster relief efforts.
-              </p>
+        <div className="xl:col-span-2">
+          {selectedPage ? (
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800 mb-6 italic uppercase">Page Settings</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-500 mb-2">
+                      Title (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedPage.title}
+                      onChange={(e) => {
+                        const updated = { ...selectedPage, title: e.target.value };
+                        setSelectedPage(updated);
+                        savePageToDb(updated);
+                      }}
+                      className="w-full px-4 py-3 border-2 border-slate-100 rounded-xl focus:border-[#1ea05f] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-500 mb-2">
+                      Title (Urdu)
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedPage.titleUr || ''}
+                      onChange={(e) => {
+                        const updated = { ...selectedPage, titleUr: e.target.value };
+                        setSelectedPage(updated);
+                        savePageToDb(updated);
+                      }}
+                      className="w-full px-4 py-3 border-2 border-slate-100 rounded-xl focus:border-[#1ea05f] outline-none urdu-text"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-500 mb-2">
+                      URL Slug
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedPage.slug}
+                      onChange={(e) => {
+                        const updated = { ...selectedPage, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') };
+                        setSelectedPage(updated);
+                        savePageToDb(updated);
+                      }}
+                      className="w-full px-4 py-3 border-2 border-slate-100 rounded-xl focus:border-[#1ea05f] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-black text-slate-800 italic uppercase">Content Blocks</h2>
+                  <button
+                    onClick={handlePublishPage}
+                    disabled={saving}
+                    className="px-6 py-3 bg-[#1ea05f] text-white font-bold rounded-xl hover:bg-[#1ea05f]/90 transition-all flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {saving ? <FiRefreshCw className="animate-spin" /> : <FiCheck />}
+                    {saving ? 'Publishing...' : 'Publish Page'}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-4 md:grid-cols-7 gap-2 mb-6">
+                  {[
+                    { type: 'heading', label: 'Heading', icon: <FiType /> },
+                    { type: 'text', label: 'Text', icon: <FiType /> },
+                    { type: 'image', label: 'Image', icon: <FiImage /> },
+                    { type: 'button', label: 'Button', icon: <FiSettings /> },
+                    { type: 'divider', label: 'Divider', icon: <FiSettings /> },
+                    { type: 'columns', label: 'Columns', icon: <FiSettings /> },
+                    { type: 'spacer', label: 'Spacer', icon: <FiSettings /> },
+                  ].map((block) => (
+                    <button
+                      key={block.type}
+                      onClick={() => handleAddBlock(block.type as PageBlock['type'])}
+                      className="p-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-[#1ea05f] hover:bg-[#1ea05f]/5 transition-all text-center"
+                    >
+                      <div className="text-xl mb-1">{block.icon}</div>
+                      <span className="text-xs font-bold">{block.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="space-y-3">
+                  <AnimatePresence>
+                    {selectedPage.blocks.map((block, index) => (
+                      <motion.div
+                        key={block.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`p-4 rounded-2xl border-2 transition-all ${
+                          editingBlock?.id === block.id
+                            ? 'border-[#1ea05f] bg-[#1ea05f]/5'
+                            : 'border-slate-100'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black uppercase text-slate-500">#{index + 1}</span>
+                            <span className="px-2 py-1 bg-slate-100 rounded text-xs font-bold uppercase">
+                              {block.type}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => handleMoveBlock(block.id, 'up')}
+                              disabled={index === 0}
+                              className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                            >
+                              <FiArrowUp size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleMoveBlock(block.id, 'down')}
+                              disabled={index === selectedPage.blocks.length - 1}
+                              className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                            >
+                              <FiArrowDown size={14} />
+                            </button>
+                            <button
+                              onClick={() => setEditingBlock(editingBlock?.id === block.id ? null : block)}
+                              className="p-1 hover:bg-blue-50 text-blue-500 rounded"
+                            >
+                              <FiEdit2 size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteBlock(block.id)}
+                              className="p-1 hover:bg-red-50 text-red-500 rounded"
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {block.type === 'heading' && (
+                          <h3 className="text-lg font-bold text-slate-800">{block.content}</h3>
+                        )}
+                        {block.type === 'text' && (
+                          <div className="text-sm text-slate-600 line-clamp-2" dangerouslySetInnerHTML={{ __html: block.content }} />
+                        )}
+
+                        {editingBlock?.id === block.id && (
+                          <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
+                            <div>
+                              <label className="block text-xs font-black uppercase text-slate-500 mb-1">
+                                Content (English)
+                              </label>
+                              {block.type === 'text' ? (
+                                <RichTextEditor
+                                  value={block.content}
+                                  onChange={(value) => handleUpdateBlock(block.id, { content: value })}
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={block.content}
+                                  onChange={(e) => handleUpdateBlock(block.id, { content: e.target.value })}
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+                                />
+                              )}
+                            </div>
+                            {(block.type === 'heading' || block.type === 'text') && (
+                              <div>
+                                <label className="block text-xs font-black uppercase text-slate-500 mb-1">
+                                  Content (Urdu)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={block.contentUr || ''}
+                                  onChange={(e) => handleUpdateBlock(block.id, { contentUr: e.target.value })}
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg urdu-text"
+                                  dir="rtl"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
-            <button className="w-full py-5 bg-white text-[#1ea05f] font-black rounded-[2rem] shadow-xl text-xs uppercase tracking-widest hover:scale-105 transition-all mt-8">Launch Dark Campaign</button>
-         </div>
+          ) : (
+            <div className="bg-white rounded-3xl p-12 shadow-sm border border-slate-100 text-center">
+              <FiEdit2 size={48} className="mx-auto mb-4 text-slate-300" />
+              <h3 className="text-xl font-bold text-slate-700 mb-2">Select or Create a Page</h3>
+              <p className="text-slate-500">Choose a page from the list or create a new one</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+export default withAuth(PageManagerPage, { 
+  allowedRoles: [UserRole.ADMIN, UserRole.CONTENT_MANAGER] 
+});

@@ -425,6 +425,93 @@ function AdminCausesPage() {
                     )}
                   />
 
+                  {/* Image Upload Section */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Campaign Visual</label>
+                    <Controller
+                      name="image"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="space-y-4">
+                          {/* Image Preview */}
+                          {field.value && (
+                            <div className="relative w-full h-48 rounded-2xl overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200">
+                              <img 
+                                src={field.value} 
+                                alt="Campaign preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => field.onChange('')}
+                                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                              >
+                                <FiX size={16} />
+                              </button>
+                            </div>
+                          )}
+                          
+                          {/* Upload Options */}
+                          <div className="grid grid-cols-1 gap-3">
+                            {/* Option 1: Upload from Computer */}
+                            <label className="flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl cursor-pointer transition-colors border-2 border-dashed border-slate-200 hover:border-[#1ea05f]/30">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  
+                                  // Validate file
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    alert('Image size must be less than 5MB');
+                                    return;
+                                  }
+                                  
+                                  // Convert to base64 and store locally
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    const base64String = reader.result as string;
+                                    field.onChange(base64String);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }}
+                              />
+                              <div className="flex items-center gap-3">
+                                <div className="p-3 bg-[#1ea05f]/10 text-[#1ea05f] rounded-xl">
+                                  <FiPlus size={20} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-slate-700">Upload from Computer</p>
+                                  <p className="text-xs text-slate-500">JPG, PNG up to 5MB</p>
+                                </div>
+                              </div>
+                            </label>
+                            
+                            {/* Option 2: Use Public URL */}
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="Or paste image URL (https://...)"
+                                value={field.value.startsWith('data:') ? '' : field.value}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                className="w-full px-6 py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-[#1ea05f]/5 focus:bg-white focus:border-[#1ea05f]/30 transition-all outline-none"
+                              />
+                            </div>
+                          </div>
+                          
+                          {errors.image && (
+                            <p className="text-xs text-red-500 font-bold flex items-center gap-1">
+                              <FiAlertCircle size={12} />
+                              {errors.image.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mission Classification</label>

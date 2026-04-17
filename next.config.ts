@@ -4,7 +4,6 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 const config: NextConfig = {
   images: {
     remotePatterns: [
-      /* Unsplash removed to force local images */
       {
         protocol: 'https',
         hostname: 'prod-bwt.s3.us-east-2.amazonaws.com',

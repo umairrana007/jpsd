@@ -42,7 +42,7 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
           cleanupRef.current = () => clearInterval(timer);
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.1 }
     );
 
     if (ref.current) {
@@ -62,10 +62,10 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, icon, delay = 0, ...p
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className="text-center p-8 glass rounded-2xl border border-white/20 shadow-xl hover-lift bg-white/40"
+      className="text-center p-8 glass rounded-2xl border border-white/20 shadow-xl hover-lift bg-white/40 min-h-[160px] flex flex-col justify-center"
     >
       {icon && <div className="text-[#f39c12] text-5xl mb-4 flex justify-center">{icon}</div>}
-      <h3 dir="ltr" className="text-4xl md:text-5xl font-black bg-gradient-to-r from-[#27ae60] to-[#2980b9] bg-clip-text text-transparent mb-3 English-text text-center">
+      <h3 dir="ltr" className="text-4xl md:text-5xl font-black bg-gradient-to-r from-[#27ae60] to-[#2980b9] bg-clip-text text-transparent mb-3 English-text text-center leading-none">
         {count.toLocaleString()}+
       </h3>
       <p className={`text-[#2c3e50] font-bold ${props.lang === 'ur' ? 'urdu-text text-[1rem]' : 'text-lg tracking-wide uppercase'}`}>
@@ -79,10 +79,10 @@ export const StatsSection: React.FC<{ settings?: SiteSettings }> = ({ settings }
   const { language } = useLanguage();
   
   const stats = {
-    totalLivesServed: settings?.livesServed ?? 542000,
-    totalDonationsReceived: settings?.donationsReceived ?? 1285000,
-    activePrograms: settings?.programsCount ?? 45,
-    volunteersCount: settings?.volunteersCount ?? 1580,
+    totalLivesServed: (settings?.livesServed && settings.livesServed > 0) ? settings.livesServed : 542000,
+    totalDonationsReceived: (settings?.donationsReceived && settings.donationsReceived > 0) ? settings.donationsReceived : 1285000,
+    activePrograms: (settings?.programsCount && settings.programsCount > 0) ? settings.programsCount : 45,
+    volunteersCount: (settings?.volunteersCount && settings.volunteersCount > 0) ? settings.volunteersCount : 1580,
   };
 
   return (

@@ -10,7 +10,19 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, orderBy, limit, Firestore } from 'firebase/firestore';
 import { Testimonial } from '@/types';
 
-export const TestimonialSection: React.FC = () => {
+interface TestimonialSectionProps {
+  titleEn?: string;
+  titleUr?: string;
+  subtitleEn?: string;
+  subtitleUr?: string;
+}
+
+export const TestimonialSection: React.FC<TestimonialSectionProps> = ({
+  titleEn,
+  titleUr,
+  subtitleEn,
+  subtitleUr
+}) => {
   const { language } = useLanguage();
   const [testimonials, setTestimonials] = React.useState<Testimonial[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -40,6 +52,15 @@ export const TestimonialSection: React.FC = () => {
     }
     fetchTestimonials();
   }, []);
+
+  // Use CMS titles if available, fallback to hardcoded
+  const sectionTitle = language === 'ur'
+    ? (titleUr || 'کامیابی کی کہانیاں اور اعتماد')
+    : (titleEn || 'Success Stories & Trust');
+  const sectionSubtitle = language === 'ur'
+    ? (subtitleUr || 'ہمارے ڈونرز، رضاکاروں اور ان لوگوں کی کہانیاں سنیں جن کی ہم نے مل کر مدد کی ہے۔')
+    : (subtitleEn || 'Hear from our global community of donors, volunteers, and the lives we\'ve touched together.');
+
   return (
     <section className="py-32 bg-white relative overflow-hidden">
       {/* Decorative elements */}
@@ -59,16 +80,10 @@ export const TestimonialSection: React.FC = () => {
             {language === 'ur' ? 'کمیونٹی کی آوازیں' : 'Community Voices'}
           </span>
           <h2 className={`text-5xl md:text-7xl font-black text-[#0f172a] leading-tight tracking-tight ${language === 'ur' ? 'urdu-text' : 'english-text'}`}>
-            {language === 'ur' ? (
-              <>کامیابی کی کہانیاں اور <span className="text-[#1ea05f]">اعتماد</span></>
-            ) : (
-              <>Success Stories & <span className="text-[#1ea05f]">Trust</span></>
-            )}
+            {sectionTitle}
           </h2>
           <p className={`text-xl text-slate-500 font-medium max-w-2xl mx-auto opacity-70 ${language === 'ur' ? 'urdu-text' : 'english-text'}`}>
-            {language === 'ur' 
-              ? 'ہمارے ڈونرز، رضاکاروں اور ان لوگوں کی کہانیاں سنیں جن کی ہم نے مل کر مدد کی ہے۔'
-              : "Hear from our global community of donors, volunteers, and the lives we've touched together."}
+            {sectionSubtitle}
           </p>
         </motion.div>
 

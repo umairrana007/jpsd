@@ -34,7 +34,13 @@ export const CauseCard: React.FC<CauseCardProps> = ({ cause }) => {
     }
   };
 
-  const currentPercentage = Math.min(100, Math.round((cause.raisedAmount / cause.goalAmount) * 100));
+  const raisedAmount = cause.raisedAmount ?? 0;
+  const goalAmount = cause.goalAmount ?? 1;
+  const currentPercentage = cause.percentage ?? Math.min(100, Math.round((raisedAmount / goalAmount) * 100));
+  const isActive = cause.active !== false;
+  const isFeatured = cause.featured ?? false;
+  const urgencyLevel = cause.urgency ?? 'low';
+  const deadlineDate = cause.deadline ? new Date(cause.deadline) : null;
 
   return (
     <motion.div
@@ -46,22 +52,22 @@ export const CauseCard: React.FC<CauseCardProps> = ({ cause }) => {
       {/* Image Container */}
       <div className="relative h-64 w-full overflow-hidden">
         <Image
-          src={imgError ? '/images/jpsd_main.jpg' : cause.image}
+          src={imgError || !cause.image ? '/images/jpsd_main.jpg' : cause.image}
           alt={cause.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           onError={() => setImgError(true)}
-          priority={cause.featured}
+          priority={isFeatured}
           quality={75}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         {/* Urgency Badge */}
         <div className="absolute top-6 left-6">
-          <div className={`${getUrgencyStyles(cause.urgency)} px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center space-x-1.5`}>
-            {cause.urgency === UrgencyLevel.CRITICAL && <FiAlertCircle className="text-xs" />}
-            <span>{cause.urgency}</span>
+          <div className={`${getUrgencyStyles(urgencyLevel as UrgencyLevel)} px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center space-x-1.5`}>
+            {urgencyLevel === UrgencyLevel.CRITICAL && <FiAlertCircle className="text-xs" />}
+            <span>{urgencyLevel}</span>
           </div>
         </div>
       </div>
@@ -93,18 +99,18 @@ export const CauseCard: React.FC<CauseCardProps> = ({ cause }) => {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 {language === 'ur' ? 'جمع شدہ' : 'Raised'}
               </span>
-              <span className="text-lg font-black text-[#0f172a] English-text">${cause.raisedAmount.toLocaleString()}</span>
+              <span className="text-lg font-black text-[#0f172a] English-text">PKR {raisedAmount.toLocaleString()}</span>
             </div>
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 {language === 'ur' ? 'ہدف' : 'Goal'}
               </span>
-              <span className="text-lg font-black text-slate-400 English-text">${cause.goalAmount.toLocaleString()}</span>
+              <span className="text-lg font-black text-slate-400 English-text">PKR {goalAmount.toLocaleString()}</span>
             </div>
           </div>
           
           <ProgressBar 
-            percentage={currentPercentage} 
+            percentage={currentPercentage || 0} 
             size="md"
             className="!h-3 overflow-hidden rounded-full bg-slate-100"
           />
@@ -117,7 +123,7 @@ export const CauseCard: React.FC<CauseCardProps> = ({ cause }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <FiCalendar className="text-[#1ea05f]" />
-                {new Date(cause.deadline).toLocaleDateString()}
+                {deadlineDate ? deadlineDate.toLocaleDateString() : 'Ongoing'}
               </div>
             </div>
           </div>
@@ -127,9 +133,9 @@ export const CauseCard: React.FC<CauseCardProps> = ({ cause }) => {
               variant="primary"
               size="md"
               className={`w-full !rounded-2xl !py-4 mt-4 font-black shadow-lg shadow-[#1ea05f]/10 ${language === 'ur' ? 'urdu-text tracking-normal' : 'tracking-widest'}`}
-              disabled={!cause.active}
+              disabled={!isActive}
             >
-              {cause.active 
+              {isActive 
                 ? (language === 'ur' ? 'ابھی عطیہ کریں' : 'CONTRIBUTE NOW') 
                 : (language === 'ur' ? 'مہم ختم ہوگئی' : 'CAMPAIGN ENDED')}
             </Button>
