@@ -46,7 +46,7 @@ export default function GlobalSearch() {
         <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1ea05f] transition-colors" />
         <input
           type="text"
-          placeholder="Search CNIC, Phone, Email..."
+          placeholder="Search CNIC, Phone..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full bg-slate-100/50 border border-slate-200/50 rounded-2xl py-3 pl-12 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1ea05f]/20 focus:bg-white transition-all"
