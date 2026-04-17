@@ -198,7 +198,7 @@ export const getCauses = async (): Promise<Cause[]> => {
       where('status', '==', 'published'),
       orderBy('createdAt', 'desc')
     );
-    const snapshot = await getDocs(causesQuery);
+    const snapshot = await withTimeout(getDocs(causesQuery), 5000);
     
     const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
@@ -253,7 +253,7 @@ export const getEvents = async (): Promise<Event[]> => {
       collection(getDb() as Firestore, 'events'),
       orderBy('startDate', 'asc')
     );
-    const snapshot = await getDocs(eventsQuery);
+    const snapshot = await withTimeout(getDocs(eventsQuery), 5000);
 
     const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
@@ -311,7 +311,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
       where('status', '==', 'published'),
       orderBy('publishedAt', 'desc')
     );
-    const snapshot = await getDocs(postsQuery);
+    const snapshot = await withTimeout(getDocs(postsQuery), 5000);
 
     const data = snapshot.docs.map(doc => {
       const data = doc.data() as any;
